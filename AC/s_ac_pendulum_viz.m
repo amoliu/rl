@@ -30,15 +30,15 @@ function s_ac_pendulum_viz(actor, cr)
 
         % Actuate
         [obs, ~, terminal] = env_mops_sim('step', a);
-        norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);  
         
-        x = radius * cos(norm_obs(2)-pi/2) + 2;
-        y = radius * sin(norm_obs(2)-pi/2) + 4;
+        x = radius * cos(obs(1)-pi/2) + radius;
+        y = radius * sin(obs(1)-pi/2) + radius;
         
-        plot(x,y,'r*');
+        plot(x,y,'r*', [radius x], [radius y], '-');
         xlabel('x');
         ylabel('y');
-        axis([0,2*pi,0,2*pi])
+        axis([0,2*radius,0,2*radius]);
+        axis square
         title('Policy');
         M(tt)=getframe;
     end

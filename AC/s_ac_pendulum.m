@@ -1,11 +1,11 @@
 function [critic, actor, cr] = s_ac_pendulum()
     % Initialize parameters
     actor.alpha   = 0.25;  % Learning rate for the actor
-    actor.grids   = 2;     % Total of grid used for the actor
+    actor.grids   = 16;     % Total of grid used for the actor
     actor.tiles   = 4096;  % Total of tiles per grid used for the actor
     
     critic.alpha  = 0.25;  % Learning rate for the critic
-    critic.grids   = 2;    % Total of grid used for the actor
+    critic.grids   = 16;    % Total of grid used for the actor
     critic.tiles   = 2048; % Total of tiles per grid used for the actor
     
     gamma         = 0.98;  % Discount rate
@@ -39,7 +39,9 @@ function [critic, actor, cr] = s_ac_pendulum()
         % Random action
         a = normrnd(0, sd);
         [obs, ~, terminal] = env_mops_sim('step', a);
-        norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);
+        %norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);
+        
+        norm_obs = obs ./ [ pi/10, pi];
 
         for tt=0:steps
             if terminal
@@ -55,8 +57,10 @@ function [critic, actor, cr] = s_ac_pendulum()
             
             % Actuate
             [obs, reward, terminal] = env_mops_sim('step', a);
-            norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);
-            norm_reward = normalize(reward, 1, spec.reward_min, spec.reward_max);
+%            norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);
+            norm_obs = obs ./ [ pi/10, pi];
+%            norm_reward = normalize(reward, 1, spec.reward_min, spec.reward_max);
+            norm_reward = reward;
             
             % Decay Eligibility trace
             Z_values = Z_values*lambda*gamma;
