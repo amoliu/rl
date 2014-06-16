@@ -8,7 +8,7 @@ function s_ac_pendulum_viz(actor, cr)
     
     % Reset simulation to initial condition
     obs = env_mops_sim('start');
-    norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);
+    norm_obs = obs ./ [ pi/10, pi];
 
     terminal = 0;
     
@@ -26,10 +26,11 @@ function s_ac_pendulum_viz(actor, cr)
         a = fa_estimate(norm_obs, actor);
         a = max(a, spec.action_min);
         a = min(a, spec.action_max);
-        % disp(a);
+        disp(a);
 
         % Actuate
         [obs, ~, terminal] = env_mops_sim('step', a);
+        norm_obs = obs ./ [ pi/10, pi];
         
         x = radius * cos(obs(1)-pi/2) + radius;
         y = radius * sin(obs(1)-pi/2) + radius;
