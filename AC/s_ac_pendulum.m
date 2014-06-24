@@ -1,24 +1,25 @@
 function [critic, actor, cr] = s_ac_pendulum()
     % Initialize parameters
-    actor.alpha   = 0.1;      % Learning rate for the actor
-    actor.grids   = 16;       % Total of grid used for the actor
-    actor.tiles   = 1048576;  % Total of tiles per grid used for the actor
+    actor.alpha   = 0.005;      % Learning rate for the actor
+    actor.grids   = 16;         % Total of grid used for the actor
+    actor.tiles   = 3596;     % Total of tiles per grid used for the actor
     
-    critic.alpha  = 0.005;    % Learning rate for the critic
+    critic.alpha  = 0.1;      % Learning rate for the critic
     critic.grids  = 16;       % Total of grid used for the actor
-    critic.tiles  = 1048576;  % Total of tiles per grid used for the actor
+    critic.tiles  = 3596;   % Total of tiles per grid used for the actor
     
-    gamma         = 0.97;     % Discount rate
-    lambda        = 0.65;     % Decay rate
+    alpha_decay   = 0.75;     % Alpha decay
+    gamma         = 0.77;     % Discount rate
+    lambda        = 0.25;     % Decay rate
     memory_size   = 100;      % Eligibility trace memory
-    episodes      = 50;       % Total of episodes
+    episodes      = 150;      % Total of episodes
     steps         = 100;      % Steps per episode
-    sd            = 1.0;      % Standard-deviation for gaussian noise in action
+    sd            = 0.7;      % Standard-deviation for gaussian noise in action
         
     % Initialize weights for FA
-    critic.weights = ones([critic.grids critic.tiles])*-10;
+    critic.weights = ones([critic.grids critic.tiles])*-1000/critic.grids;
     actor.weights = zeros([actor.grids actor.tiles]);
-
+    
     % Initialize learning curve
     cr = zeros(1, episodes);
 
@@ -39,19 +40,22 @@ function [critic, actor, cr] = s_ac_pendulum()
         % Random action
         a = normrnd(0, sd);
         [obs, ~, terminal] = env_mops_sim('step', a);
-        %norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);
-        
+        %norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);        
         norm_obs = obs ./ [ pi/10, pi];
 
-        for tt=0:steps
+        if (ee > 10 && cr(ee-1) > -1000)
+            critic.alpha = critic.alpha * alpha_decay;
+            actor.alpha = actor.alpha * alpha_decay;
+        end
+        
+        for tt=1:steps
             if terminal
                 break;
             end
             
             random_u = normrnd(0, sd);
             % Calculate action
-            a_fa = fa_estimate(norm_obs, actor);
-            a = a_fa + random_u;
+            a = fa_estimate(norm_obs, actor) + random_u;
             a = max(a, spec.action_min);
             a = min(a, spec.action_max);
             disp([obs a]);
@@ -72,10 +76,10 @@ function [critic, actor, cr] = s_ac_pendulum()
             Z_obs(trace_pos,:) = GetTiles_Mex(critic.grids, norm_obs, critic.tiles, 1);
             
             % Don't learn on the first step
-            if (tt > 0)
+            if (tt > 1)
                 % TD-error
                 delta = norm_reward + gamma*fa_estimate(norm_obs, critic) ...
-                        - fa_estimate(old_norm_obs, critic);
+                        - fa_estimate(norm_old_obs, critic);
                 
                 % Update actor and critic
                 % Critic update using Eligibility trace
@@ -86,14 +90,17 @@ function [critic, actor, cr] = s_ac_pendulum()
                         update_matrix(ii, Z_obs(tr, ii)) = Z_values(traces(tr));
                     end
                 end
-                critic.weights = critic.weights + (critic.alpha)*delta*update_matrix;
+                critic.weights = critic.weights + (critic.alpha*delta*update_matrix)./critic.grids;
                 
                 % Actor update
-                actor.weights = actor.weights + (actor.alpha)*fa_gradient(norm_obs, actor)*(random_u - a_fa)*delta;
+                actor_update = (actor.alpha*random_u*delta)./actor.grids;
+                actor.weights = actor.weights + fa_gradient(norm_obs, actor)*actor_update;
+                
+%                disp([norm_reward delta actor_update max(max(actor.weights))]);
             end
 
             % Prepare for next timestep
-            old_norm_obs = norm_obs;
+            norm_old_obs = norm_obs;
 
             % Keep track of learning curve
             cr(ee) = cr(ee) + reward;

@@ -1,4 +1,4 @@
-function s_ac_pendulum_viz(actor, cr)
+function [V, policy] = s_ac_pendulum_viz(actor, critic, cr)
    
     steps   = 100;   % Steps per episode
     radius  = 2;     % Radius for plot
@@ -15,8 +15,43 @@ function s_ac_pendulum_viz(actor, cr)
     trials = size(cr, 2);
     x = linspace(1, trials, trials);
     plot(x, cr);
+    title('Performance');
+    xlabel('Trials');
+    ylabel('Average reward');
+
+    x = linspace(0,6.2832,100);
+    y = linspace(-37.6991,37.6991,100);
+    %[X,Y] = meshgrid(x,y);
+    % Critic
+    figure;
+    V = zeros(100);
+    for i=1:100
+        for j=1:100
+            V(j,i) = fa_estimate([x(i) ./ (pi/10) y(j) ./ pi], critic);
+        end
+    end
+    contourf(x, y, V);
+    title('Critic');
+    xlabel('angle[rad]');
+    ylabel('angular velocity[rad/s]');
+    colorbar;
     
-    figure;  
+    % Actor
+    figure;
+    policy = zeros(100);
+    for i=1:100
+        for j=1:100
+            policy(j,i) = fa_estimate([x(i) ./ (pi/10) y(j) ./ pi], actor);
+        end
+    end
+    contourf(x, y, policy);
+    title('Actor');
+    xlabel('angle[rad]');
+    ylabel('angular velocity[rad/s]');
+    colorbar;
+    
+    % Movie
+    figure;
     for tt=1:steps       
         if terminal
             break;
