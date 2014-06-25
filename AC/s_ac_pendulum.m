@@ -2,13 +2,12 @@ function [critic, actor, cr] = s_ac_pendulum()
     % Initialize parameters
     actor.alpha   = 0.005;      % Learning rate for the actor
     actor.grids   = 16;         % Total of grid used for the actor
-    actor.tiles   = 16384;     % Total of tiles per grid used for the actor
+    actor.tiles   = 216384;     % Total of tiles per grid used for the actor
     
     critic.alpha  = 0.1;      % Learning rate for the critic
     critic.grids  = 16;       % Total of grid used for the actor
-    critic.tiles  = 16384;   % Total of tiles per grid used for the actor
+    critic.tiles  = 216384;   % Total of tiles per grid used for the actor
     
-    alpha_decay   = 1;     % Alpha decay
     gamma         = 0.97;     % Discount rate
     lambda        = 0.67;     % Decay rate
     memory_size   = 100;      % Eligibility trace memory
