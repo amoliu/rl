@@ -77,7 +77,7 @@ Finally, in this scenario, we will consider the full problem, starting the pendu
 %----------------------------------------------------------------------------------------
 
 \section{Pendulum Balancing}
-For the balancing, we changed the code and created a new environment. Now we have \textit{env\_mops\_sim\_up} and the first observation is $[\pi,0]$.
+For the balancing, we changed the code and created a new environment, in which the first observation is $[\pi,0]$.
 Using the attributes listed in Table \ref{tab:balancing} we could make it as we can see in Figures \ref{fig:cr_balancing}, \ref{fig:actor_balancing} and \ref{fig:critic_balancing}.
 
 \begin{table}
@@ -89,9 +89,8 @@ Using the attributes listed in Table \ref{tab:balancing} we could make it as we 
     $\alpha$       & $0.1$      \\
     \multicolumn{2}{c}{Parameter}   \\ \hline
     $\gamma$       & $0.97$     \\
-    $\lambda$      & $0.65$     \\
-    $\sigma$       & $0.2$      \\
-    $\alpha$-decay & $0.75$     \\
+    $\lambda$      & $0.67$     \\
+    $\sigma$       & $1.0$      \\
     \end{tabular}
     \caption{Parameters used in Pendulum Balancing}
     \label{tab:balancing}
@@ -125,21 +124,69 @@ Using the attributes listed in Table \ref{tab:balancing} we could make it as we 
     \label{fig:result_balancing}
 \end{figure}
 
-As we can see, it works(Figure \ref{fig:result_balancing}). In Figure \ref{fig:cr_balancing} we can see that the average reward is good after 40 trials, and as we low the $\alpha$ learning rate after that, it stays high. Otherwise, it diverges! Another interesting thing to notice is the policy in Figure \ref{fig:actor_balancing}: as the angle goes to the left, the action is to push to the right and vice-versa. The critic, in Figure \ref{fig:critic_balancing} shows that the central position is the best.
+As we can see, it works(Figure \ref{fig:result_balancing}). In Figure \ref{fig:cr_balancing} we can see that the average reward is good after 30 trials, Another interesting thing to notice is the policy in Figure \ref{fig:actor_balancing}: as the angle goes to the left, the action is to push to the right and vice-versa. The critic, in Figure \ref{fig:critic_balancing} shows that the central position is the best.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 3
 %----------------------------------------------------------------------------------------
 
-\section{Sample Calculation}
+\section{Pendulum Swing-up}
+For the swing-up, we used the environment as it is. The first observation is $[0,0]$.
+Using the attributes listed in Table \ref{tab:swing} (the same attributes here used in the balancing) we could make it as we can see in Figures \ref{fig:cr_swing}, \ref{fig:actor_swing} and \ref{fig:critic_swing}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{ll}
+    \multicolumn{2}{c}{Actor}   \\ \hline
+    $\alpha$       & $0.005$    \\
+    \multicolumn{2}{c}{Critic}   \\ \hline
+    $\alpha$       & $0.1$      \\
+    \multicolumn{2}{c}{Parameter}   \\ \hline
+    $\gamma$       & $0.97$     \\
+    $\lambda$      & $0.67$     \\
+    $\sigma$       & $1.0$      \\
+    \end{tabular}
+    \caption{Parameters used in Pendulum Swing-up}
+    \label{tab:balancing}
+\end{table}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.7\textwidth]{cr_swing.png}
+    \caption{Total reward for each trial in the swing-up problem}
+    \label{fig:cr_swing}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.7\textwidth]{actor_swing.png}
+    \caption{The Actor for the swing problem}
+    \label{fig:actor_swing}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.7\textwidth]{critic_swing.png}
+    \caption{The Critic for the swing problem}
+    \label{fig:critic_swing}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.7\textwidth]{result_swing.png}
+    \caption{The final position for the swing problem}
+    \label{fig:result_swing}
+\end{figure}
+
+As we can see, it also works(Figure \ref{fig:result_swing}). In Figure \ref{fig:cr_swing} we can see that the average reward is good after 130 trials, which is much more than the balancing problem. Another interesting thing to notice is the policy in Figure \ref{fig:actor_swing}: there is the swinging, and then, once the pole is on top, it has to balance. The critic, in Figure \ref{fig:critic_swing} shows that the central position is the best.
 
 
 %----------------------------------------------------------------------------------------
 %	SECTION 4
 %----------------------------------------------------------------------------------------
 
-\section{Results and Conclusions}
-
+\section{Difficulties}
+My first version was updating the wrong state, and because of that, it wasn't converging. For each transition, we have the old state (s), the action we took (a), the new state (s') and the reward we get (r). We must update s not s'.
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
