@@ -41,11 +41,6 @@ function [critic, actor, cr] = s_ac_pendulum()
         [obs, ~, terminal] = env_mops_sim('step', a);
         %norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);        
         norm_old_obs = obs ./ [ pi/10, pi];
-
-        if (ee > 10 && cr(ee-1) > -1000)
-            critic.alpha = critic.alpha * alpha_decay;
-            actor.alpha = actor.alpha * alpha_decay;
-        end
         
         for tt=1:steps
             if terminal
