@@ -1,24 +1,24 @@
 function [critic, actor, cr] = s_ac_walker()
     % Initialize parameters
-    actor.alpha   = 0.005;      % Learning rate for the actor
-    actor.grids   = 24;         % Total of grid used for the actor
-    actor.tiles   = 17216384;     % Total of tiles per grid used for the actor
+    actor.alpha   = 0.01;      % Learning rate for the actor
+    actor.grids   = 16;        % Total of grid used for the actor
+    actor.tiles   = 163840;     % Total of tiles per grid used for the actor
     
-    critic.alpha  = 0.1;      % Learning rate for the critic
-    critic.grids  = 24;       % Total of grid used for the actor
-    critic.tiles  = 17216384;   % Total of tiles per grid used for the actor
+    critic.alpha  = 0.2;      % Learning rate for the critic
+    critic.grids  = 16;       % Total of grid used for the actor
+    critic.tiles  = 163840;   % Total of tiles per grid used for the actor
     
-    gamma         = 0.97;     % Discount rate
-    lambda        = 0.87;     % Decay rate
+    gamma         = 0.99;     % Discount rate
+    lambda        = 0.92;     % Decay rate
     memory_size   = 100;      % Eligibility trace memory
-    episodes      = 100;      % Total of episodes
-    steps         = 100;      % Steps per episode
-    sd            = 1.0;      % Standard-deviation for gaussian noise in action
+    episodes      = 10;      % Total of episodes
+    steps         = 500;      % Steps per episode
+    sd            = 0.1;      % Standard-deviation for gaussian noise in action
         
-    norm_factor   = [pi/20, pi/20, pi/10, pi/10]; % Normalization factor used in observations
+    norm_factor   = [ 0.0838, 0.1047, 0.1111, 0.2222 ]; % Normalization factor used in observations
     
     % Initialize weights for FA
-    critic.weights = (ones([critic.grids critic.tiles])*-1000)/critic.grids;
+    critic.weights = (rand([critic.grids critic.tiles]))/critic.grids;
     actor.weights = zeros([actor.grids actor.tiles]);
     
     % Initialize learning curve
@@ -42,6 +42,7 @@ function [critic, actor, cr] = s_ac_walker()
         a = normrnd(0, sd);
         a = max(a, spec.action_min);
         a = min(a, spec.action_max);
+        
         [obs, ~, terminal] = env_walker('step', a);
         %norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);        
         norm_old_obs = obs ./ norm_factor;
@@ -56,6 +57,7 @@ function [critic, actor, cr] = s_ac_walker()
             a = fa_estimate(norm_old_obs, actor) + random_u;
             a = max(a, spec.action_min);
             a = min(a, spec.action_max);
+            
             disp([obs a]);
             
             % Actuate
@@ -87,11 +89,19 @@ function [critic, actor, cr] = s_ac_walker()
                         update_matrix(ii, Z_obs(tr, ii)) = Z_values(traces(tr));
                     end
                 end
-                critic.weights = critic.weights + (critic.alpha*delta*update_matrix)./critic.grids;
+                
+                active_tiles = find(update_matrix);
+                critic.weights(active_tiles) = critic.weights(active_tiles) + critic.alpha*delta/critic.grids;
+                
+                %critic.weights = critic.weights + (critic.alpha*delta*update_matrix)./critic.grids;
                 
                 % Actor update
                 actor_update = (actor.alpha*random_u*delta)./actor.grids;
-                actor.weights = actor.weights + fa_gradient(norm_old_obs, actor)*actor_update;
+                
+                active_tiles = GetTiles_Mex(actor.grids, norm_old_obs, actor.tiles, 1);
+                actor.weights(active_tiles) = actor.weights(active_tiles) + actor_update;
+                
+                %actor.weights = actor.weights + fa_gradient(norm_old_obs, actor)*actor_update;
                 
                 %disp([norm_reward delta actor_update max(max(actor.weights))]);
             end
