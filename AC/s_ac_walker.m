@@ -2,18 +2,20 @@ function [critic, actor, cr] = s_ac_walker()
     % Initialize parameters
     actor.alpha   = 0.01;      % Learning rate for the actor
     actor.grids   = 16;        % Total of grid used for the actor
-    actor.tiles   = 163840;     % Total of tiles per grid used for the actor
+    actor.tiles   = 863840;     % Total of tiles per grid used for the actor
+    actor.offset  = linspace(0, actor.grids-1, actor.grids)*actor.tiles;
     
     critic.alpha  = 0.2;      % Learning rate for the critic
     critic.grids  = 16;       % Total of grid used for the actor
-    critic.tiles  = 163840;   % Total of tiles per grid used for the actor
+    critic.tiles  = 863840;   % Total of tiles per grid used for the actor
+    critic.offset = linspace(0, critic.grids-1, critic.grids)*critic.tiles;
     
     gamma         = 0.99;     % Discount rate
     lambda        = 0.92;     % Decay rate
     memory_size   = 100;      % Eligibility trace memory
-    episodes      = 10;      % Total of episodes
+    episodes      = 400;       % Total of episodes
     steps         = 500;      % Steps per episode
-    sd            = 0.1;      % Standard-deviation for gaussian noise in action
+    sd            = 0.5;      % Standard-deviation for gaussian noise in action
         
     norm_factor   = [ 0.0838, 0.1047, 0.1111, 0.2222 ]; % Normalization factor used in observations
     
@@ -44,7 +46,6 @@ function [critic, actor, cr] = s_ac_walker()
         a = min(a, spec.action_max);
         
         [obs, ~, terminal] = env_walker('step', a);
-        %norm_obs = normalize(obs, spec.observation_dims, spec.observation_min, spec.observation_max);        
         norm_old_obs = obs ./ norm_factor;
         
         for tt=1:steps
@@ -63,47 +64,33 @@ function [critic, actor, cr] = s_ac_walker()
             % Actuate
             [obs, reward, terminal] = env_walker('step', a);
             norm_obs = obs ./ norm_factor;
-%            norm_reward = normalize(reward, 1, spec.reward_min, spec.reward_max, spec.action_min, spec.action_max);
-            norm_reward = reward;
             
             % Decay Eligibility trace
             Z_values = Z_values*lambda*gamma;
             
             % Add obs to Eligibility trace
-            [~, trace_pos] = min(Z_values);
-            Z_values(trace_pos) = 1;
-            Z_obs(trace_pos,:) = GetTiles_Mex(critic.grids, norm_old_obs, critic.tiles, 1);
+            [~, last_trace] = min(Z_values);
+            Z_values(last_trace) = 1;
+            Z_obs(last_trace,:) = GetTiles_Mex(critic.grids, norm_old_obs, critic.tiles, 1) + critic.offset;
             
             % Don't learn on the first step
             if (tt > 1)
                 % TD-error
-                delta = norm_reward + gamma*fa_estimate(norm_obs, critic) ...
+                delta = reward + gamma*fa_estimate(norm_obs, critic) ...
                         - fa_estimate(norm_old_obs, critic);
                 
                 % Update actor and critic
                 % Critic update using Eligibility trace
-                update_matrix = zeros([critic.grids critic.tiles]);
-                traces = find(Z_values);
-                for tr=1:numel(traces)
-                    for ii=1:critic.grids
-                        update_matrix(ii, Z_obs(tr, ii)) = Z_values(traces(tr));
-                    end
-                end
-                
-                active_tiles = find(update_matrix);
-                critic.weights(active_tiles) = critic.weights(active_tiles) + critic.alpha*delta/critic.grids;
-                
-                %critic.weights = critic.weights + (critic.alpha*delta*update_matrix)./critic.grids;
+                critic_update = critic.alpha*delta/critic.grids;
+                critic.weights(Z_obs(1:last_trace,:)) = critic.weights(Z_obs(1:last_trace,:)) + repmat(Z_values(1:last_trace,:).*critic_update, 1, critic.grids);
                 
                 % Actor update
-                actor_update = (actor.alpha*random_u*delta)./actor.grids;
+                actor_update = (actor.alpha*random_u*delta)/actor.grids;
                 
                 active_tiles = GetTiles_Mex(actor.grids, norm_old_obs, actor.tiles, 1);
-                actor.weights(active_tiles) = actor.weights(active_tiles) + actor_update;
+                actor.weights(active_tiles + actor.offset) = actor.weights(active_tiles + actor.offset) + actor_update;
                 
-                %actor.weights = actor.weights + fa_gradient(norm_old_obs, actor)*actor_update;
-                
-                %disp([norm_reward delta actor_update max(max(actor.weights))]);
+                %disp([reward delta actor_update max(max(actor.weights))]);
             end
 
             % Prepare for next timestep
