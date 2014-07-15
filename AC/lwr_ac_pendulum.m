@@ -15,9 +15,11 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     memory_size   = 100;      % Eligibility trace memory
     episodes      = 150;      % Total of episodes
     steps         = 100;      % Steps per episode
+    model_steps   = 7;       % Max model steps per episode
     sd            = 1.0;      % Standard-deviation for gaussian noise in action
+    random_u      = 0;
         
-    norm_factor   = [ pi/10, pi]; % Normalization factor used in observations
+    norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
     
     % Initialize weights for FA
     critic.weights = (ones([critic.grids critic.tiles])*-1000)/critic.grids;
@@ -35,6 +37,8 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     k = 4 * (spec.observation_dims + spec.action_dims);
     lwr = zeros([lwr_memory lwr_params]);
     
+    last_lwr_pos = 0;
+    
     for ee=1:episodes
         % Show progress
         disp(ee)
@@ -48,7 +52,7 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
         Z_obs_real = zeros([memory_size critic.grids]);
         
         % Random action
-        a = normrnd(0, sd);
+        a = choose_action(norm_first_obs);
         [obs, ~, terminal] = env_mops_sim('step', a);
         norm_old_obs = obs ./ norm_factor;
         
@@ -57,7 +61,6 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
                 break;
             end
             
-            random_u = normrnd(0, sd);
             % Calculate action
             a = choose_action(norm_old_obs);
             
@@ -66,7 +69,7 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
             norm_obs = obs ./ norm_factor;
             
             % Add to LWR
-            last_lwr_pos = (ee-1)*steps + tt;
+            last_lwr_pos = last_lwr_pos + 1;
             lwr(last_lwr_pos,:) = [norm_old_obs a norm_obs-norm_old_obs reward terminal];
             
             % Update based on real observation
@@ -83,17 +86,28 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
                 
                 % Set first state
                 model_norm_old_obs = norm_first_obs;
-                terminal = 0;
+                model_tt = 0;
                 
-                while ~terminal
+                while 1
                     a = choose_action(model_norm_old_obs);
-                    [model_norm_obs, reward, terminal] = model_transition(norm_first_obs, a);
-                    disp([model_norm_obs, reward, terminal]);
+                    [model_obs, model_reward, model_terminal] = model_transition(model_norm_old_obs, a);
+                    model_norm_obs = model_obs ./ norm_factor;
+                    %disp([model_norm_obs, model_reward, model_terminal]);
                     
-                    [Z_values_model, Z_obs_model] = update(model_norm_old_obs, model_norm_obs, reward, Z_values_model, Z_obs_model);
+                    % Stop model transition if there is no change, or its a
+                    % terminal state, or we hit the max number of steps
+                    if  model_terminal || ...
+                        model_tt >= model_steps
+                        %all(model_norm_old_obs == model_norm_obs) || ...
+                        break;
+                    end
+                    
+                    [Z_values_model, Z_obs_model] = update(model_norm_old_obs, model_norm_obs, model_reward, Z_values_model, Z_obs_model);
                     
                     model_norm_old_obs = model_norm_obs;
+                    model_tt = model_tt + 1;
                 end
+                %disp(model_tt);
             end
             
             % Prepare for next timestep
@@ -131,10 +145,11 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     end
 
     function a = choose_action(norm_old_obs)
+        random_u = normrnd(0, sd);
         a = fa_estimate(norm_old_obs, actor) + random_u;
         a = max(a, spec.action_min);
         a = min(a, spec.action_max);
-        disp([norm_old_obs a]);
+        disp([norm_old_obs .* norm_factor a]);
     end
     
     function [model_obs model_reward model_termination] = model_transition(norm_old_obs, action)
@@ -177,6 +192,9 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
         mean_termination = mean(4);
         
         model_obs = mean_transition + norm_old_obs;
+        model_obs = max(model_obs, spec.observation_min);
+        model_obs = min(model_obs, spec.observation_max);
+        
         model_reward = mean_reward;
         model_termination = mean_termination | ...
             any(variance > [spec.observation_max - spec.observation_min spec.action_max - spec.action_min]);
