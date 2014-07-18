@@ -14,16 +14,17 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
     env.lambda        = 0.67;     % Decay rate
     env.steps         = 100;      % Steps per episode
     
-    model.actor.alpha   = env.actor.alpha / 10;
-    model.critic.alpha  = env.critic.alpha / 10;
-    model.gamma         = 0.97;     % Discount rate
-    model.lambda        = 0;        % Decay rate
-    model.steps         = 10;       % Max model steps per episode
+    model.actor.alpha         = env.actor.alpha / 10;
+    model.critic.alpha        = env.critic.alpha / 10;
+    model.gamma               = 0.97;     % Discount rate
+    model.lambda              = 0;        % Decay rate
+    model.steps_per_episode   = 20;       % Max model steps per episode
+    model.steps               = 100;      % Max model steps per episode
     
     memory_size   = 100;      % Eligibility trace memory
     episodes      = 150;      % Total of episodes 
     
-    sd            = 1.0;      % Standard-deviation for gaussian noise in action
+    sd            = 0.7;      % Standard-deviation for gaussian noise in action
     random_u      = 0.6;      % Random noise for action
     threshold     = 0.5;      % Threshold for 0-2PI limits
         
@@ -57,6 +58,7 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
         % Reset simulation to initial condition
         first_obs = env_mops_sim('start');
         norm_first_obs = first_obs ./ norm_factor;
+        restart_model();
         
         % Initialize traces
         Z_values_real = zeros([memory_size 1]);
@@ -97,33 +99,23 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
 
             % Try the model
             % Need enough observations
-            if (last_lwr_pos > k)
-                % Clear model eligibility traces
-                Z_values_model = zeros([memory_size 1]);
-                Z_obs_model = zeros([memory_size critic.grids]);
-                
-                % Set first state
-                model_norm_old_obs = norm_obs;
-                model_tt = 0;
-                
-                while 1
+            if (last_lwr_pos > k)                
+                for mm=1:model.steps_per_episode
                     a = choose_action(model_norm_old_obs);
                     [model_obs, model_reward, model_terminal] = model_transition(model_norm_old_obs, a);
                     model_norm_obs = model_obs ./ norm_factor;
                     %disp([model_norm_obs, model_reward, model_terminal]);
-                    
-                    % Stop model transition if there is no change, or its a
-                    % terminal state, or we hit the max number of steps
-                    if  model_terminal || ...
-                        model_tt >= model.steps
-                        %all(model_norm_old_obs == model_norm_obs) || ...
-                        break;
-                    end
-                    
+                                       
                     [Z_values_model, Z_obs_model] = update(model_norm_old_obs, model_norm_obs, model_reward, model, Z_values_model, Z_obs_model);
                     
                     model_norm_old_obs = model_norm_obs;
                     model_tt = model_tt + 1;
+                    
+                    % Restart model transition if hit a terminal state or
+                    % if we had model.steps iterations
+                    if  model_terminal || model_tt == model.steps
+                        restart_model();
+                    end
                 end
                 %disp(model_tt);
             end
@@ -136,6 +128,16 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
         end
     end
 
+    function restart_model()
+        % Set first state
+        model_tt = 0;
+        model_norm_old_obs = norm_first_obs;
+        
+        % Clear model eligibility traces
+        Z_values_model = zeros([memory_size 1]);
+        Z_obs_model = zeros([memory_size critic.grids]);
+    end
+    
     function add_lwr(norm_old_obs, a, norm_obs, reward, terminal)
         push_value_lwr(norm_old_obs, a, norm_obs, reward, terminal);
         
