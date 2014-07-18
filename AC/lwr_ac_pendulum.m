@@ -1,4 +1,4 @@
-function [critic, actor, cr, lwr] = lwr_ac_pendulum()
+function [critic, actor, cr, rmse] = lwr_ac_pendulum()
     % Initialize parameters
     actor.grids   = 16;         % Total of grid used for the actor
     actor.tiles   = 16384;     % Total of tiles per grid used for the actor
@@ -24,7 +24,8 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     episodes      = 150;      % Total of episodes 
     
     sd            = 1.0;      % Standard-deviation for gaussian noise in action
-    random_u      = 0;
+    random_u      = 0.6;      % Random noise for action
+    threshold     = 0.5;      % Threshold for 0-2PI limits
         
     norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
     
@@ -34,6 +35,9 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     
     % Initialize learning curve
     cr = zeros(1, episodes);
+    
+    % Initialize RMSE curve
+    rmse = zeros(1, episodes);
 
     % Initialize simulation
     spec = env_mops_sim('init');
@@ -74,6 +78,14 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
             % Actuate
             [obs, reward, terminal] = env_mops_sim('step', a);
             norm_obs = obs ./ norm_factor;
+            
+            % Need enough observations
+            if (last_lwr_pos > k)
+                [model_obs, ~, ~] = model_transition(norm_old_obs, a);
+                model_norm_obs = model_obs ./ norm_factor;
+                
+                rmse(ee) = rmse(ee) + sum((model_norm_obs - norm_obs) .^ 2);
+            end
             
             % Add to LWR
             add_lwr(norm_old_obs, a, norm_obs, reward, terminal);
@@ -125,6 +137,30 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     end
 
     function add_lwr(norm_old_obs, a, norm_obs, reward, terminal)
+        push_value_lwr(norm_old_obs, a, norm_obs, reward, terminal);
+        
+        if abs(norm_obs(1) - 20) < threshold
+            new_norm_obs = norm_obs - [20 0];
+            new_norm_obs(1) = abs(new_norm_obs(1));
+            
+            new_norm_old_obs = norm_old_obs - [20 0];
+            new_norm_old_obs(1) = abs(new_norm_old_obs(1));
+            
+            push_value_lwr(new_norm_old_obs, a, new_norm_obs, reward, terminal);
+        end
+        
+        if abs(norm_obs(1)) < threshold
+            new_norm_obs = norm_obs;
+            new_norm_obs(1) = 20 - new_norm_obs(1);
+            
+            new_norm_old_obs = norm_old_obs;
+            new_norm_old_obs(1) = 20 - new_norm_old_obs(1);
+            
+            push_value_lwr(new_norm_old_obs, a, new_norm_obs, reward, terminal);
+        end
+    end
+
+    function push_value_lwr(norm_old_obs, a, norm_obs, reward, terminal)
         last_lwr_pos = last_lwr_pos + 1;
         lwr(last_lwr_pos,:) = [norm_old_obs a norm_obs-norm_old_obs reward terminal];
     end
