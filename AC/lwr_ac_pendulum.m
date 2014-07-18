@@ -1,21 +1,28 @@
 function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     % Initialize parameters
-    actor.alpha   = 0.005;      % Learning rate for the actor
     actor.grids   = 16;         % Total of grid used for the actor
     actor.tiles   = 16384;     % Total of tiles per grid used for the actor
     actor.offset  = linspace(0, actor.grids-1, actor.grids)*actor.tiles;
     
-    critic.alpha  = 0.1;      % Learning rate for the critic
     critic.grids  = 16;       % Total of grid used for the actor
     critic.tiles  = 16384;   % Total of tiles per grid used for the actor
     critic.offset = linspace(0, critic.grids-1, critic.grids)*critic.tiles;
     
-    gamma         = 0.97;     % Discount rate
-    lambda        = 0.67;     % Decay rate
+    env.actor.alpha   = 0.005;
+    env.critic.alpha  = 0.1;
+    env.gamma         = 0.97;     % Discount rate
+    env.lambda        = 0.67;     % Decay rate
+    env.steps         = 100;      % Steps per episode
+    
+    model.actor.alpha   = env.actor.alpha / 10;
+    model.critic.alpha  = env.critic.alpha / 10;
+    model.gamma         = 0.97;     % Discount rate
+    model.lambda        = 0;        % Decay rate
+    model.steps         = 10;       % Max model steps per episode
+    
     memory_size   = 100;      % Eligibility trace memory
-    episodes      = 150;      % Total of episodes
-    steps         = 100;      % Steps per episode
-    model_steps   = 7;       % Max model steps per episode
+    episodes      = 150;      % Total of episodes 
+    
     sd            = 1.0;      % Standard-deviation for gaussian noise in action
     random_u      = 0;
         
@@ -32,7 +39,7 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
     spec = env_mops_sim('init');
     
     % LWR parameters
-    lwr_memory = steps*episodes;
+    lwr_memory = env.steps*episodes;
     lwr_params = 2*spec.observation_dims + spec.action_dims + 2;
     k = 4 * (spec.observation_dims + spec.action_dims);
     lwr = zeros([lwr_memory lwr_params]);
@@ -56,7 +63,7 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
         [obs, ~, terminal] = env_mops_sim('step', a);
         norm_old_obs = obs ./ norm_factor;
         
-        for tt=1:steps
+        for tt=1:env.steps
             if terminal
                 break;
             end
@@ -69,12 +76,11 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
             norm_obs = obs ./ norm_factor;
             
             % Add to LWR
-            last_lwr_pos = last_lwr_pos + 1;
-            lwr(last_lwr_pos,:) = [norm_old_obs a norm_obs-norm_old_obs reward terminal];
+            add_lwr(norm_old_obs, a, norm_obs, reward, terminal);
             
             % Update based on real observation
             if (tt > 1)
-                [Z_values_real, Z_obs_real] = update(norm_old_obs, norm_obs, reward, Z_values_real, Z_obs_real);
+                [Z_values_real, Z_obs_real] = update(norm_old_obs, norm_obs, reward, env, Z_values_real, Z_obs_real);
             end
 
             % Try the model
@@ -85,7 +91,7 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
                 Z_obs_model = zeros([memory_size critic.grids]);
                 
                 % Set first state
-                model_norm_old_obs = norm_first_obs;
+                model_norm_old_obs = norm_obs;
                 model_tt = 0;
                 
                 while 1
@@ -97,12 +103,12 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
                     % Stop model transition if there is no change, or its a
                     % terminal state, or we hit the max number of steps
                     if  model_terminal || ...
-                        model_tt >= model_steps
+                        model_tt >= model.steps
                         %all(model_norm_old_obs == model_norm_obs) || ...
                         break;
                     end
                     
-                    [Z_values_model, Z_obs_model] = update(model_norm_old_obs, model_norm_obs, model_reward, Z_values_model, Z_obs_model);
+                    [Z_values_model, Z_obs_model] = update(model_norm_old_obs, model_norm_obs, model_reward, model, Z_values_model, Z_obs_model);
                     
                     model_norm_old_obs = model_norm_obs;
                     model_tt = model_tt + 1;
@@ -118,9 +124,14 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
         end
     end
 
-    function [Z_values, Z_obs] = update(norm_old_obs, norm_obs, reward, Z_values, Z_obs)
+    function add_lwr(norm_old_obs, a, norm_obs, reward, terminal)
+        last_lwr_pos = last_lwr_pos + 1;
+        lwr(last_lwr_pos,:) = [norm_old_obs a norm_obs-norm_old_obs reward terminal];
+    end
+    
+    function [Z_values, Z_obs] = update(norm_old_obs, norm_obs, reward, params, Z_values, Z_obs)
         % Decay Eligibility trace
-        Z_values = Z_values*lambda*gamma;
+        Z_values = Z_values*params.lambda*params.gamma;
 
         % Add obs to Eligibility trace
         [~, last_trace] = min(Z_values);
@@ -128,16 +139,16 @@ function [critic, actor, cr, lwr] = lwr_ac_pendulum()
         Z_obs(last_trace,:) = GetTiles_Mex(critic.grids, norm_old_obs, critic.tiles, 1) + critic.offset;
 
         % TD-error
-        delta = reward + gamma*fa_estimate(norm_obs, critic) ...
+        delta = reward + params.gamma*fa_estimate(norm_obs, critic) ...
                 - fa_estimate(norm_old_obs, critic);
 
         % Update actor and critic
         % Critic update using Eligibility trace
-        critic_update = critic.alpha*delta/critic.grids;
+        critic_update = params.critic.alpha*delta/critic.grids;
         critic.weights(Z_obs(1:last_trace,:)) = critic.weights(Z_obs(1:last_trace,:)) + repmat(Z_values(1:last_trace,:).*critic_update, 1, critic.grids);
 
         % Actor update
-        actor_update = (actor.alpha*random_u*delta)/actor.grids;
+        actor_update = (params.actor.alpha*random_u*delta)/actor.grids;
         active_tiles = GetTiles_Mex(actor.grids, norm_old_obs, actor.tiles, 1);
         actor.weights(active_tiles + actor.offset) = actor.weights(active_tiles + actor.offset) + actor_update;
 
