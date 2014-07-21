@@ -1,11 +1,11 @@
-function [critic, actor, cr, rmse] = lwr_ac_pendulum()
+function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     % Initialize parameters
     actor.grids   = 16;         % Total of grid used for the actor
-    actor.tiles   = 16384;     % Total of tiles per grid used for the actor
+    actor.tiles   = 216384;     % Total of tiles per grid used for the actor
     actor.offset  = linspace(0, actor.grids-1, actor.grids)*actor.tiles;
     
     critic.grids  = 16;       % Total of grid used for the actor
-    critic.tiles  = 16384;   % Total of tiles per grid used for the actor
+    critic.tiles  = 216384;   % Total of tiles per grid used for the actor
     critic.offset = linspace(0, critic.grids-1, critic.grids)*critic.tiles;
     
     env.actor.alpha   = 0.005;
@@ -16,16 +16,16 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
     
     model.actor.alpha         = env.actor.alpha / 10;
     model.critic.alpha        = env.critic.alpha / 10;
-    model.gamma               = 0.97;     % Discount rate
+    model.gamma               = 0.67;     % Discount rate
     model.lambda              = 0;        % Decay rate
-    model.steps_per_episode   = 20;       % Max model steps per episode
+    model.steps_per_episode   = 0;       % Max model steps per episode
     model.steps               = 100;      % Max model steps per episode
     
     memory_size   = 100;      % Eligibility trace memory
     episodes      = 150;      % Total of episodes 
     
-    sd            = 0.7;      % Standard-deviation for gaussian noise in action
-    random_u      = 0.6;      % Random noise for action
+    sd            = 1.0;      % Standard-deviation for gaussian noise in action
+    random_u      = 0.0;      % Random noise for action - Global variable declaration
     threshold     = 0.5;      % Threshold for 0-2PI limits
         
     norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
@@ -44,7 +44,7 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
     spec = env_mops_sim('init');
     
     % LWR parameters
-    lwr_memory = env.steps*episodes;
+    lwr_memory = env.steps*episodes*2;
     lwr_params = 2*spec.observation_dims + spec.action_dims + 2;
     k = 4 * (spec.observation_dims + spec.action_dims);
     lwr = zeros([lwr_memory lwr_params]);
@@ -85,6 +85,14 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
             if (last_lwr_pos > k)
                 [model_obs, ~, ~] = model_transition(norm_old_obs, a);
                 model_norm_obs = model_obs ./ norm_factor;
+                
+                if model_norm_obs(1) - norm_obs(1) < -10
+                    model_norm_obs = model_norm_obs + [20 0];
+                end
+                
+                if model_norm_obs(1) - norm_obs(1) > 10
+                    model_norm_obs = model_norm_obs - [20 0];
+                end
                 
                 rmse(ee) = rmse(ee) + sum((model_norm_obs - norm_obs) .^ 2);
             end
@@ -139,24 +147,31 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
     end
     
     function add_lwr(norm_old_obs, a, norm_obs, reward, terminal)
+        % Cross boundary?
+        if norm_obs(1) - norm_old_obs(1) < -10
+            add_lwr(norm_old_obs, a, norm_obs + [20 0], reward, terminal);
+            add_lwr(norm_old_obs - [20 0], a, norm_obs, reward, terminal);
+            return;
+        end
+        
+        if norm_obs(1) - norm_old_obs(1) > 10
+            add_lwr(norm_old_obs + [20 0], a, norm_obs, reward, terminal);
+            add_lwr(norm_old_obs, a, norm_obs - [20 0], reward, terminal);
+            return;
+        end
+        
         push_value_lwr(norm_old_obs, a, norm_obs, reward, terminal);
         
-        if abs(norm_obs(1) - 20) < threshold
-            new_norm_obs = norm_obs - [20 0];
-            new_norm_obs(1) = abs(new_norm_obs(1));
-            
-            new_norm_old_obs = norm_old_obs - [20 0];
-            new_norm_old_obs(1) = abs(new_norm_old_obs(1));
+        if norm_obs(1) - threshold < 0
+            new_norm_obs = norm_obs + [20 0];
+            new_norm_old_obs = norm_old_obs + [20 0];
             
             push_value_lwr(new_norm_old_obs, a, new_norm_obs, reward, terminal);
         end
         
-        if abs(norm_obs(1)) < threshold
-            new_norm_obs = norm_obs;
-            new_norm_obs(1) = 20 - new_norm_obs(1);
-            
-            new_norm_old_obs = norm_old_obs;
-            new_norm_old_obs(1) = 20 - new_norm_old_obs(1);
+        if norm_obs(1) + threshold > 20
+            new_norm_obs = norm_obs - [20 0];
+            new_norm_old_obs = norm_old_obs - [20 0];
             
             push_value_lwr(new_norm_old_obs, a, new_norm_obs, reward, terminal);
         end
@@ -241,12 +256,24 @@ function [critic, actor, cr, rmse] = lwr_ac_pendulum()
         mean_termination = mean(4);
         
         model_obs = mean_transition + norm_old_obs;
+        if model_obs(1) < 0
+            model_obs = model_obs + [20 0];
+        end
+        
+        if model_obs(1) > 20
+            model_obs = model_obs - [20 0];
+        end
+            
         model_obs = max(model_obs, spec.observation_min);
         model_obs = min(model_obs, spec.observation_max);
         
         model_reward = mean_reward;
-        model_termination = mean_termination | ...
-            any(variance > [spec.observation_max - spec.observation_min spec.action_max - spec.action_min]);
+        model_termination = mean_termination;
+        
+        if any(variance > [spec.observation_max - spec.observation_min spec.action_max - spec.action_min])
+            %disp([1 1 1]);
+            model_termination = 1;
+        end
     end
 
     % Destroy simulation
