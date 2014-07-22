@@ -2,8 +2,8 @@
 ==
 ##Points to do
 1. ~~Use S~AC on Simple Walker~~
-2. Implement LWR in Matlab using Wouter's paper (Section III - C)
-3. Try LWR~AC on Pendulum
+2. ~~Implement LWR in Matlab using Wouter's paper (Section III - C)~~
+3. ~~Try LWR~AC on Pendulum~~
 4. Try LWR~AC on Simple Walker
 
 =====
@@ -27,7 +27,7 @@
 2. Replay it
 
 ###How to use the model
-1. The generate samples and update using it;
+1. ~~The generate samples and update using it;~~
 2. To best update the actor/critic;
 3. To remove the actor. Critic + model is the actor;
 
