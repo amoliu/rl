@@ -13,18 +13,19 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     env.gamma         = 0.97;     % Discount rate
     env.lambda        = 0.67;     % Decay rate
     env.steps         = 100;      % Steps per episode
+    env.sd            = 1.0;      % Standard-deviation for gaussian noise in action
     
-    model.actor.alpha         = env.actor.alpha / 10;
-    model.critic.alpha        = env.critic.alpha / 10;
-    model.gamma               = 0.67;     % Discount rate
+    model.actor.alpha         = env.actor.alpha;
+    model.critic.alpha        = env.critic.alpha;
+    model.gamma               = 0.97;     % Discount rate
     model.lambda              = 0;        % Decay rate
-    model.steps_per_episode   = 0;       % Max model steps per episode
-    model.steps               = 100;      % Max model steps per episode
+    model.steps_per_episode   = 30;       % Max model steps per episode
+    model.steps               = 100;      % Max model steps
+    model.sd                  = 0.3;      % Standard-deviation for gaussian noise in action
     
     memory_size   = 100;      % Eligibility trace memory
     episodes      = 150;      % Total of episodes 
     
-    sd            = 1.0;      % Standard-deviation for gaussian noise in action
     random_u      = 0.0;      % Random noise for action - Global variable declaration
     threshold     = 0.5;      % Threshold for 0-2PI limits
         
@@ -65,7 +66,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         Z_obs_real = zeros([memory_size critic.grids]);
         
         % Random action
-        a = choose_action(norm_first_obs);
+        a = choose_action(norm_first_obs, env);
         [obs, ~, terminal] = env_mops_sim('step', a);
         norm_old_obs = obs ./ norm_factor;
         
@@ -75,7 +76,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
             end
             
             % Calculate action
-            a = choose_action(norm_old_obs);
+            a = choose_action(norm_old_obs, env);
             
             % Actuate
             [obs, reward, terminal] = env_mops_sim('step', a);
@@ -83,17 +84,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
             
             % Need enough observations
             if (last_lwr_pos > k)
-                [model_obs, ~, ~] = model_transition(norm_old_obs, a);
-                model_norm_obs = model_obs ./ norm_factor;
-                
-                if model_norm_obs(1) - norm_obs(1) < -10
-                    model_norm_obs = model_norm_obs + [20 0];
-                end
-                
-                if model_norm_obs(1) - norm_obs(1) > 10
-                    model_norm_obs = model_norm_obs - [20 0];
-                end
-                
+                [model_norm_obs, ~, ~] = model_transition(norm_old_obs, a);                
                 rmse(ee) = rmse(ee) + sum((model_norm_obs - norm_obs) .^ 2);
             end
             
@@ -109,9 +100,8 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
             % Need enough observations
             if (last_lwr_pos > k)                
                 for mm=1:model.steps_per_episode
-                    a = choose_action(model_norm_old_obs);
-                    [model_obs, model_reward, model_terminal] = model_transition(model_norm_old_obs, a);
-                    model_norm_obs = model_obs ./ norm_factor;
+                    a = choose_action(model_norm_old_obs, model);
+                    [model_norm_obs, model_reward, model_terminal] = model_transition(model_norm_old_obs, a);
                     %disp([model_norm_obs, model_reward, model_terminal]);
                                        
                     [Z_values_model, Z_obs_model] = update(model_norm_old_obs, model_norm_obs, model_reward, model, Z_values_model, Z_obs_model);
@@ -208,8 +198,8 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         %disp([reward delta actor_update max(max(actor.weights))]);
     end
 
-    function a = choose_action(norm_old_obs)
-        random_u = normrnd(0, sd);
+    function a = choose_action(norm_old_obs, param)
+        random_u = normrnd(0, param.sd);
         a = fa_estimate(norm_old_obs, actor) + random_u;
         a = max(a, spec.action_min);
         a = min(a, spec.action_max);
@@ -228,7 +218,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         for dd=1:k
             d(dd,:) = norm(NI(dd,:) - q);
         end
-        h = max(d);
+        h = max(d) + 0.01;
         w = exp(-(d./h).^2);
         A = zeros(k, size_NO);
         for ii=1:k
@@ -238,11 +228,12 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         for ii=1:k
             B(ii,:) = w(ii)*NO(ii,:);
         end
-        X = pinv(A'*A)*A'*B;
+        
+        temp_inv = pinv(A'*A);
+        X = temp_inv*A'*B;
         R = A*X - B;
         
         p = zeros(k, 1);
-        temp_inv = pinv(A'*A);
         for pp=1:k
             p(pp) = w(pp,:)*A(pp,:)*temp_inv*A(pp,:)';
         end
@@ -264,15 +255,15 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
             model_obs = model_obs - [20 0];
         end
             
-        model_obs = max(model_obs, spec.observation_min);
-        model_obs = min(model_obs, spec.observation_max);
+        model_obs = max(model_obs, spec.observation_min ./ norm_factor);
+        model_obs = min(model_obs, spec.observation_max ./ norm_factor);
         
         model_reward = mean_reward;
         model_termination = mean_termination;
         
         if any(variance > [spec.observation_max - spec.observation_min spec.action_max - spec.action_min])
             %disp([1 1 1]);
-            model_termination = 1;
+            %model_termination = 1;
         end
     end
 
