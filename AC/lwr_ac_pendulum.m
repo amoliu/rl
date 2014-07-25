@@ -19,12 +19,14 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     model.critic.alpha        = env.critic.alpha;
     model.gamma               = 0.97;     % Discount rate
     model.lambda              = 0;        % Decay rate
-    model.steps_per_episode   = 30;       % Max model steps per episode
+    model.steps_per_episode   = 40;       % Max model steps per episode
     model.steps               = 100;      % Max model steps
-    model.sd                  = 0.3;      % Standard-deviation for gaussian noise in action
+    model.sd                  = 1.0;      % Standard-deviation for gaussian noise in action
     
     memory_size   = 100;      % Eligibility trace memory
-    episodes      = 150;      % Total of episodes 
+    episodes      = 100;      % Total of episodes
+    
+    kdtree_update = 10;      % Number of elements in LWR to redo the KDTree
     
     random_u      = 0.0;      % Random noise for action - Global variable declaration
     threshold     = 0.5;      % Threshold for 0-2PI limits
@@ -49,8 +51,9 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     lwr_params = 2*spec.observation_dims + spec.action_dims + 2;
     k = 4 * (spec.observation_dims + spec.action_dims);
     lwr = zeros([lwr_memory lwr_params]);
-    
     last_lwr_pos = 0;
+    
+    kdtree = build_kdtree();
     
     for ee=1:episodes
         % Show progress
@@ -170,6 +173,10 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     function push_value_lwr(norm_old_obs, a, norm_obs, reward, terminal)
         last_lwr_pos = last_lwr_pos + 1;
         lwr(last_lwr_pos,:) = [norm_old_obs a norm_obs-norm_old_obs reward terminal];
+        
+        if mod(last_lwr_pos, kdtree_update) == 0
+            kdtree = build_kdtree();
+        end
     end
     
     function [Z_values, Z_obs] = update(norm_old_obs, norm_obs, reward, params, Z_values, Z_obs)
@@ -206,35 +213,51 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         disp([norm_old_obs .* norm_factor a]);
     end
     
+    function kdtree = build_kdtree()
+        kdtree = createns(lwr(1:last_lwr_pos,1:3), 'NSMethod', 'kdtree');
+    end
+
     function [model_obs model_reward model_termination] = model_transition(norm_old_obs, action)
         q = [norm_old_obs action];
-        points = knnsearch(q, lwr(1:last_lwr_pos,1:3), k);
+        points = kdtree.knnsearch(q, 'K', k);
         N = lwr(points, :);
         size_NI = spec.observation_dims+spec.action_dims;
         size_NO = spec.observation_dims+2;
+        knn = numel(points);
         NI = N(:,1:size_NI);
         NO = N(:,size_NI+1:size_NI + size_NO);
-        d = zeros(k,1);
-        for dd=1:k
+        d = zeros(knn,1);
+        for dd=1:knn
             d(dd,:) = norm(NI(dd,:) - q);
         end
         h = max(d) + 0.01;
         w = exp(-(d./h).^2);
-        A = zeros(k, size_NO);
-        for ii=1:k
+        A = zeros(knn, size_NO);
+        for ii=1:knn
             A(ii,:) = w(ii)*[NI(ii,:) 1];
         end
-        B = zeros(k, size_NO);
-        for ii=1:k
+        B = zeros(knn, size_NO);
+        for ii=1:knn
             B(ii,:) = w(ii)*NO(ii,:);
         end
         
+        % Using Cholesky
+        % A = U'U
+        %inv(A) = inv(U)*inv(U)'
+        
+        %if any(eig(A'*A) <= 0)
+        %    disp(A'*A);
+        %end
+        %U = chol(A'*A);
+        %iU = inv(U);
+        %temp_inv = iU*iU';
         temp_inv = pinv(A'*A);
+        
         X = temp_inv*A'*B;
         R = A*X - B;
         
-        p = zeros(k, 1);
-        for pp=1:k
+        p = zeros(knn, 1);
+        for pp=1:knn
             p(pp) = w(pp,:)*A(pp,:)*temp_inv*A(pp,:)';
         end
         
