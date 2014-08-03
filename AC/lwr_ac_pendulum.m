@@ -19,7 +19,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     model.critic.alpha        = env.critic.alpha;
     model.gamma               = 0.97;     % Discount rate
     model.lambda              = 0;        % Decay rate
-    model.steps_per_episode   = 40;       % Max model steps per episode
+    model.steps_per_episode   = 20;       % Max model steps per episode
     model.steps               = 100;      % Max model steps
     model.sd                  = 1.0;      % Standard-deviation for gaussian noise in action
     
@@ -32,6 +32,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     threshold     = 0.5;      % Threshold for 0-2PI limits
         
     norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
+    ridge_regression = 0.01;
     
     % Initialize weights for FA
     critic.weights = (ones([critic.grids critic.tiles])*-1000)/critic.grids;
@@ -53,7 +54,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
     lwr = zeros([lwr_memory lwr_params]);
     last_lwr_pos = 0;
     
-    kdtree = build_kdtree();
+    %kdtree = build_kdtree();
     
     for ee=1:episodes
         % Show progress
@@ -175,7 +176,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         lwr(last_lwr_pos,:) = [norm_old_obs a norm_obs-norm_old_obs reward terminal];
         
         if mod(last_lwr_pos, kdtree_update) == 0
-            kdtree = build_kdtree();
+            %kdtree = build_kdtree();
         end
     end
     
@@ -210,7 +211,7 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         a = fa_estimate(norm_old_obs, actor) + random_u;
         a = max(a, spec.action_min);
         a = min(a, spec.action_max);
-        disp([norm_old_obs .* norm_factor a]);
+        % disp([norm_old_obs .* norm_factor a]);
     end
     
     function kdtree = build_kdtree()
@@ -219,7 +220,8 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
 
     function [model_obs model_reward model_termination] = model_transition(norm_old_obs, action)
         q = [norm_old_obs action];
-        points = kdtree.knnsearch(q, 'K', k);
+        %points = kdtree.knnsearch(q, 'K', k);
+        points = knnsearch(q, lwr(1:last_lwr_pos,1:3), k);
         N = lwr(points, :);
         size_NI = spec.observation_dims+spec.action_dims;
         size_NO = spec.observation_dims+2;
@@ -243,26 +245,22 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         
         % Using Cholesky
         % A = U'U
-        %inv(A) = inv(U)*inv(U)'
+        % inv(A) = inv(U)*inv(U)'
         
-        %if any(eig(A'*A) <= 0)
-        %    disp(A'*A);
-        %end
-        %U = chol(A'*A);
-        %iU = inv(U);
-        %temp_inv = iU*iU';
-        temp_inv = pinv(A'*A);
+        U = chol(A'*A + eye(size_NO)*ridge_regression);
+        iU = inv(U);
+        temp_inv = iU*iU';
         
         X = temp_inv*A'*B;
-        R = A*X - B;
+        %R = A*X - B;
         
-        p = zeros(knn, 1);
-        for pp=1:knn
-            p(pp) = w(pp,:)*A(pp,:)*temp_inv*A(pp,:)';
-        end
+        %p = zeros(knn, 1);
+        %for pp=1:knn
+        %    p(pp) = w(pp,:)*A(pp,:)*temp_inv*A(pp,:)';
+        %end
         
-        n = sum(w.^2);
-        variance = sum(sum(R.^2)) / (n - sum(p));
+        %n = sum(w.^2);
+        %variance = sum(sum(R.^2)) / (n - sum(p));
         
         mean = [q 1]*X;
         mean_transition = mean(1:2);
@@ -284,10 +282,10 @@ function [critic, actor, cr, rmse, lwr] = lwr_ac_pendulum()
         model_reward = mean_reward;
         model_termination = mean_termination;
         
-        if any(variance > [spec.observation_max - spec.observation_min spec.action_max - spec.action_min])
-            %disp([1 1 1]);
-            %model_termination = 1;
-        end
+        %if any(variance > [spec.observation_max - spec.observation_min spec.action_max - spec.action_min])
+        %    disp([1 1 1]);
+        %    model_termination = 1;
+        %end
     end
 
     % Destroy simulation
