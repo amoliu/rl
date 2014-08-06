@@ -11,13 +11,12 @@ classdef LLR < handle
         last_llr;
     end % properties
     methods(Access = private)
-        function rel = calc_relevance(llr, input, output, neighbors)
+        function rel = calc_relevance(llr, output, y_hat)
             if (llr.last_llr <= llr.k)
                 rel = norm(output)^2;
                 return;
             end
             
-            y_hat = calc_query_neighbors(llr, input, neighbors);
             rel = norm(output - y_hat')^2;
         end
         
@@ -73,19 +72,26 @@ classdef LLR < handle
         
         function add(llr, input, output)
             neighbors = get_neighbors(llr, input);
-            rel = calc_relevance(llr, input, output, neighbors);
             
             for i=1:numel(neighbors)
-                llr.relevance(neighbors(i)) = llr.gamma*llr.relevance(neighbors(i)) ...
-                        + (1-llr.gamma)*calc_relevance(llr, llr.data(neighbors(i),1:llr.input), ...
-                            llr.data(neighbors(i),llr.input+1:llr.input+llr.output), neighbors);
+                predict_value = calc_query_neighbors(llr, llr.data(neighbors(i),1:llr.input), neighbors);
+                rel = calc_relevance(llr, llr.data(neighbors(i),llr.input+1:llr.input+llr.output), predict_value);
+                
+                llr.relevance(neighbors(i)) = llr.gamma*llr.relevance(neighbors(i)) + (1-llr.gamma)*rel;
+                %llr.data(neighbors(i),llr.input+1:llr.input+llr.output) = predict_value;
             end
+            
+            predict_value = calc_query_neighbors(llr, input, neighbors);
+            rel = calc_relevance(llr, output, predict_value);
             
             if (llr.last_llr <= llr.memory)
                 pos = llr.last_llr;
                 llr.last_llr = llr.last_llr + 1;
             else
-                [~, pos] = min(llr.relevance);
+                [rel_min, pos] = min(llr.relevance);
+                if (rel < rel_min)
+                    return;
+                end
             end
             
             llr.relevance(pos,:) = rel;
