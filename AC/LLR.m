@@ -9,6 +9,7 @@ classdef LLR < handle
         tikhonov;
         gamma;
         last_llr;
+        initial_value;
     end % properties
     methods(Access = private)
         function rel = calc_relevance(llr, output, y_hat)
@@ -32,8 +33,8 @@ classdef LLR < handle
         
         function [y_hat, X] = calc_query_neighbors(llr, query, neighbors)
             if (llr.last_llr <= llr.k)
-                y_hat = rand(1, llr.output);
-                X = rand(llr.output, llr.input + 1);
+                y_hat = rand(1, llr.output) + llr.initial_value;
+                X = rand(llr.output, llr.input + 1) + llr.initial_value;
                 return;
             end
             
@@ -58,7 +59,7 @@ classdef LLR < handle
         end
     end
     methods
-        function llr = LLR(memory, input, output, k, tikhonov, gamma)
+        function llr = LLR(memory, input, output, k, tikhonov, gamma, initial_value)
             llr.memory = memory;
             llr.input = input;
             llr.output = output;
@@ -68,6 +69,11 @@ classdef LLR < handle
             llr.data = zeros([llr.memory llr.input + llr.output]);
             llr.relevance = zeros([llr.memory 1]);
             llr.last_llr = 1;
+            if nargin == 6
+                llr.initial_value = 0;
+            else
+                llr.initial_value = initial_value;
+            end
         end
         
         function add(llr, input, output)
