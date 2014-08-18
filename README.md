@@ -28,9 +28,21 @@
 
 ###How to use the model
 1. ~~The generate samples and update using it;~~
-2. To best update the actor/critic;
-3. To remove the actor. Critic + model is the actor;
+2. To remove the actor. Critic + model is the actor;
+3. To best update the actor/critic;
+
+======
+##Speed up
+* Coder
+* ~~createns~~
+* ~~Change pinv usage (chol)~~
+* ~~Try the 2014 version of Matlab~~
 
 ======
 ##References
 * Learning rate free reinforcement learning. Grondman
+* Off-PAC. Degris
+
+======
+##Code
+* RLPark. Degris (rlpark.github.io)
