@@ -1,4 +1,4 @@
-function [V, policy] = llr_pendulum_viz(actor, critic, cr)
+function [V, policy] = llr_pendulum_viz(actor, critic, cr, rmse)
    
     steps   = 100;   % Steps per episode
     radius  = 2;     % Radius for plot
@@ -18,7 +18,15 @@ function [V, policy] = llr_pendulum_viz(actor, critic, cr)
     title('Performance');
     xlabel('Trials');
     ylabel('Average reward');
-
+    
+    if nargin == 4
+        figure;
+        plot(rmse);
+        title('RMSE');
+        xlabel('Trials');
+        ylabel('RMSE');
+    end
+    
     %{
     x = linspace(0,6.2832,100);
     y = linspace(-37.6991,37.6991,100);
