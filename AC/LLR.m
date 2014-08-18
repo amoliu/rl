@@ -10,8 +10,14 @@ classdef LLR < handle
         gamma;
         last_llr;
         initial_value;
+        total_elements_for_tree;
+        tree;
     end % properties
     methods(Access = private)
+        function build_kdtree(llr)
+            llr.tree = kdtree_build(llr.data(1:llr.last_llr-1,1:llr.input));
+        end
+        
         function rel = calc_relevance(llr, output, y_hat)
             if (llr.last_llr <= llr.k)
                 rel = norm(output)^2;
@@ -28,7 +34,8 @@ classdef LLR < handle
             end
             
             %points = env.kdtree.knnsearch(query, 'K', env.k);
-            neighbors = knnsearch(query, llr.data(1:llr.last_llr-1,1:llr.input), llr.k);
+            %neighbors = knnsearch(query, llr.data(1:llr.last_llr-1,1:llr.input), llr.k);
+            neighbors = kdtree_k_nearest_neighbors(llr.tree, query, llr.k);
         end
         
         function [y_hat, X] = calc_query_neighbors(llr, query, neighbors)
@@ -69,6 +76,7 @@ classdef LLR < handle
             llr.data = zeros([llr.memory llr.input + llr.output]);
             llr.relevance = zeros([llr.memory 1]);
             llr.last_llr = 1;
+            llr.total_elements_for_tree = 0;
             if nargin == 6
                 llr.initial_value = 0;
             else
@@ -102,6 +110,11 @@ classdef LLR < handle
             
             llr.relevance(pos,:) = rel;
             llr.data(pos,:) = [input output];
+            
+            llr.total_elements_for_tree = llr.total_elements_for_tree + 1;
+            if mod(llr.total_elements_for_tree, llr.k) == 0
+                llr.build_kdtree();
+            end
         end
         
         function update(llr, delta, points, min_value, max_value)
