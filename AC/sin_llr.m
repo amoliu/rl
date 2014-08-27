@@ -4,7 +4,7 @@
 %clear all;
 %close all;
 
-llr = LLR(30, 1, 1, 5, 0.01, 0.9);
+llr = LLR(30, 1, 1, 5);
 figure;       
     
 x = linspace(0,2*pi, 100);
@@ -18,9 +18,6 @@ for i=1:numel(x)
     axis([0,8,-1.3,1.3]);
     M(i)=getframe;
 end
-
-% Plays animation
-movie(M,1,30);
 
 query = rand();
 

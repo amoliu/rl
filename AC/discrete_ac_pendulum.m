@@ -1,22 +1,26 @@
-function [critic, actor, cr] = llr_ac_pendulum()
+function [critic, cr] = discrete_ac_pendulum()
+% Discrete Actor-free reinforcement learning algorithm
+% Solving the pendulum problem
+% This algorithm discretize the number of possible actions
+% Then chooses the best next state we can by looking in a process model and the critic.
     % Initialize simulation
     spec = env_mops_sim('init');
     
-    actor.memory      = 2000;
-    actor.llr         = LLR(actor.memory, spec.observation_dims, 1, 20);
-    actor.alpha       = 0.05;
+    discrete_actions = 6;
+    actions = linspace(spec.action_min, spec.action_max, discrete_actions);
     
     critic.memory     = 2000;
-    critic.llr        = LLR(critic.memory, spec.observation_dims, 1, 20, -1000);
-    critic.alpha      = 0.25;
+    critic.llr        = LLR(critic.memory, spec.observation_dims, 1, 20);
+    critic.alpha      = 0.2;
+    
+    model.llr         = LLR(1000, spec.observation_dims + spec.action_dims, spec.observation_dims, 9);
     
     env.gamma         = 0.97;     % Discount rate
     env.lambda        = 0.67;     % Decay rate
     env.steps         = 100;      % Steps per episode
     env.sd            = 1.0;      % Standard-deviation for gaussian noise in action
     
-    episodes          = 30;           % Total of episodes
-    random_u          = 1.0;           % Random noise for action - Global variable declaration
+    episodes          = 30;            % Total of episodes
     norm_factor       = [ pi/10, pi ]; % Normalization factor used in observations
     
     threshold         = 0.5;           % Threshold for 0-2PI limits
@@ -51,6 +55,8 @@ function [critic, actor, cr] = llr_ac_pendulum()
             % Actuate
             [obs, reward, terminal] = env_mops_sim('step', a);
             norm_obs = obs ./ norm_factor;
+            
+            model.llr.add([norm_old_obs a], norm_obs);
             
             % Update based on real observation
             update(norm_old_obs, norm_obs, reward);
@@ -88,32 +94,19 @@ function [critic, actor, cr] = llr_ac_pendulum()
         Z_values(old_critic_neighbors) = 1;
         
         critic.llr.update(Z_values.*critic.alpha*delta);
-        
-        % Update actor
-        [~, ~, actor_neighbors] = actor.llr.query(norm_old_obs);
-        actor_update = actor.alpha*random_u*delta;
-        actor.llr.update(actor_update, actor_neighbors, spec.action_min, spec.action_max);
     end
 
-    function a = choose_action(norm_old_obs)
-        random_u = normrnd(0, env.sd);
-        a = actor.llr.query(norm_old_obs) + random_u;
-        a = max(a, spec.action_min);
-        a = min(a, spec.action_max);
+    function a = choose_action(norm_obs)
+        values = zeros(1, discrete_actions);
         
-        if norm_old_obs(1) - threshold < 0
-            new_norm_obs = norm_old_obs + [20 0];
-            actor.llr.add(new_norm_obs, a);
+        for aa=1:discrete_actions
+            next_state = model.llr.query([norm_obs actions(aa)]);
+            values(aa) = critic.llr.query(next_state);
         end
-        
-        if norm_old_obs(1) + threshold > 20
-            new_norm_obs = norm_old_obs - [20 0];
-            actor.llr.add(new_norm_obs, a);
-        end
-        
-        actor.llr.add(norm_old_obs, a);
-        
-        %disp([norm_old_obs .* norm_factor a]);
+       
+        [~, pos_a] = max(values);
+        a = actions(pos_a);
+        disp([norm_obs .* norm_factor a]);
     end
 
     % Destroy simulation

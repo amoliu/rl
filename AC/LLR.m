@@ -14,17 +14,36 @@ classdef LLR < handle
         tree;
     end % properties
     methods(Access = private)
+        function rel = update_relevance_for_point(llr, input, output)
+            neighbors = get_neighbors(llr, input);
+            
+            for i=1:numel(neighbors)
+                predict_value = calc_query_neighbors(llr, llr.data(neighbors(i),1:llr.input), neighbors);
+                rel = calc_relevance(llr, llr.data(neighbors(i),llr.input+1:llr.input+llr.output), predict_value);
+                
+                llr.relevance(neighbors(i)) = llr.gamma*llr.relevance(neighbors(i)) + (1-llr.gamma)*rel;
+                %llr.data(neighbors(i),llr.input+1:llr.input+llr.output) = predict_value;
+            end
+            
+            predict_value = calc_query_neighbors(llr, input, neighbors);
+            rel = calc_relevance(llr, output, predict_value);
+        end
+        
         function build_kdtree(llr)
+            if llr.tree ~= 0
+                kdtree_delete(llr.tree);
+            end
+            
             llr.tree = kdtree_build(llr.data(1:llr.last_llr-1,1:llr.input));
         end
         
         function rel = calc_relevance(llr, output, y_hat)
             if (llr.last_llr <= llr.k)
-                rel = norm(output)^2;
+                rel = 0;
                 return;
             end
             
-            rel = norm(output - y_hat')^2;
+            rel = norm(output - y_hat)^2;
         end
         
         function neighbors = get_neighbors(llr, query)
@@ -62,41 +81,44 @@ classdef LLR < handle
 
             X = B*A'*temp_inv;
 
-            y_hat = X*[query 1]';
+            try
+                y_hat = (X*[query 1]')';
+            catch err
+                disp(err);
+            end
         end
     end
     methods
-        function llr = LLR(memory, input, output, k, tikhonov, gamma, initial_value)
+        function llr = LLR(memory, input, output, k, initial_value, tikhonov, gamma)
             llr.memory = memory;
             llr.input = input;
             llr.output = output;
             llr.k = k;
-            llr.gamma = gamma;
-            llr.tikhonov = tikhonov;
             llr.data = zeros([llr.memory llr.input + llr.output]);
             llr.relevance = zeros([llr.memory 1]);
             llr.last_llr = 1;
             llr.total_elements_for_tree = 0;
-            if nargin == 6
-                llr.initial_value = 0;
-            else
-                llr.initial_value = initial_value;
+            llr.tree = 0;
+            
+            % Default values
+            llr.initial_value = 0;
+            llr.gamma = 0.9;
+            llr.tikhonov = 0.000001;
+            switch nargin
+                case 5
+                    llr.initial_value = initial_value;
+                case 6
+                    llr.initial_value = initial_value;
+                    llr.tikhonov = tikhonov;
+                case 7
+                    llr.initial_value = initial_value;
+                    llr.tikhonov = tikhonov;
+                    llr.gamma = gamma;
             end
         end
         
-        function add(llr, input, output)
-            neighbors = get_neighbors(llr, input);
-            
-            for i=1:numel(neighbors)
-                predict_value = calc_query_neighbors(llr, llr.data(neighbors(i),1:llr.input), neighbors);
-                rel = calc_relevance(llr, llr.data(neighbors(i),llr.input+1:llr.input+llr.output), predict_value);
-                
-                llr.relevance(neighbors(i)) = llr.gamma*llr.relevance(neighbors(i)) + (1-llr.gamma)*rel;
-                %llr.data(neighbors(i),llr.input+1:llr.input+llr.output) = predict_value;
-            end
-            
-            predict_value = calc_query_neighbors(llr, input, neighbors);
-            rel = calc_relevance(llr, output, predict_value);
+        function pos = add(llr, input, output)
+            rel = update_relevance_for_point(llr, input, output);
             
             if (llr.last_llr <= llr.memory)
                 pos = llr.last_llr;
@@ -105,14 +127,14 @@ classdef LLR < handle
                 [rel_min, pos] = min(llr.relevance);
                 if (rel < rel_min)
                     return;
-                end
+                end            
             end
             
             llr.relevance(pos,:) = rel;
             llr.data(pos,:) = [input output];
             
             llr.total_elements_for_tree = llr.total_elements_for_tree + 1;
-            if mod(llr.total_elements_for_tree, llr.k) == 0
+            if mod(llr.total_elements_for_tree, 1) == 0
                 llr.build_kdtree();
             end
         end
