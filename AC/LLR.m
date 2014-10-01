@@ -144,8 +144,10 @@ classdef LLR < handle
                 llr.data(:,llr.input+1:llr.input+llr.output) = ...
                     llr.data(:,llr.input+1:llr.input+llr.output) + delta;
             else
-               llr.data(points, llr.input+1:llr.input+llr.output) = ...
-                min(max(llr.data(points,llr.input+1:llr.input+llr.output) + delta, min_value), max_value); 
+                if numel(points)
+                    llr.data(points, llr.input+1:llr.input+llr.output) = ...
+                        min(max(llr.data(points,llr.input+1:llr.input+llr.output) + repmat(delta, [size(points), 1]), repmat(min_value, [size(points), 1])), repmat(max_value, [size(points), 1])); 
+                end
             end
         end
         
