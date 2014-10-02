@@ -1,13 +1,14 @@
 clear all;
 close all;
 
-episodes = 20;
+episodes = 30;
 trials = 10;
 
 cr = zeros(trials,episodes);
+rmse = zeros(trials,episodes);
 
 for i=1:trials
-    [~, ~, cr(i,:)] = llr_lwr_ac_pendulum();
+    [~, ~, cr(i,:), rmse(i,:)] = llr_lwr_ac_pendulum();
 end
 
-plot(mean(cr));
+errorbaralpha(mean(cr), mean(rmse));
