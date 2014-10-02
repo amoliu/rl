@@ -15,7 +15,7 @@ function [critic, actor, cr] = llr_ac_pendulum()
     env.steps         = 100;      % Steps per episode
     env.sd            = 1.0;      % Standard-deviation for gaussian noise in action
     
-    episodes          = 30;           % Total of episodes
+    episodes          = 200;           % Total of episodes
     random_u          = 1.0;           % Random noise for action - Global variable declaration
     norm_factor       = [ pi/10, pi ]; % Normalization factor used in observations
     
