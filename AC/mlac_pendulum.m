@@ -24,9 +24,11 @@ function [critic, actor, cr, rmse] = mlac_pendulum()
     
     threshold     = 0.5;      % Threshold for 0-2PI limits
     
-    episodes      = 30;       % Total of episodes
+    episodes      = 50;       % Total of episodes
     
-    norm_factor   = [ 1, pi ]; % Normalization factor used in observations
+    norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
+    upper_bound   = 20;            % Upper bound to add or subtract to observations
+    cross_limit   = 10;            % Difference in previous and current observation to decide if change sides
     
     % Initialize learning curve
     cr = zeros(1, episodes);
@@ -70,9 +72,6 @@ function [critic, actor, cr, rmse] = mlac_pendulum()
             if (ee > 2)
                 model_norm_obs = model_transition(norm_old_obs, action);
                 rmse(ee) = rmse(ee) + sum((model_norm_obs - norm_obs) .^ 2);
-                if (sum((model_norm_obs - norm_obs) .^ 2) > 5)
-                    disp(1);
-                end
             end
             
             % Update process model
@@ -80,11 +79,8 @@ function [critic, actor, cr, rmse] = mlac_pendulum()
             model.Xs = X(:,1:spec.observation_dims);
             model.Xa = X(:,spec.observation_dims+1:spec.observation_dims+spec.action_dims);
             model.Xb = X(:,spec.observation_dims+spec.action_dims+1);
-            
-            %[model_obs_action, ~, model_neighbors] = model.llr.query([norm_old_obs action]);
-            
+                        
             add_model(norm_old_obs, policy_action, norm_obs);
-            %model.llr.update(norm_obs - model_obs_action, model_neighbors, spec.observation_min ./ norm_factor, spec.observation_max ./ norm_factor);
             
             [~, X] = critic.llr.query(model_obs);
             critic.Xs = X(:,1:spec.observation_dims);
@@ -138,52 +134,48 @@ function [critic, actor, cr, rmse] = mlac_pendulum()
         [u, X, actor_neighbors] = actor.llr.query(norm_obs);
         u_policy = min(max(u, spec.action_min), spec.action_max);
         u = min(max(u + random_u, spec.action_min), spec.action_max);
-        disp([norm_obs .* norm_factor u]);
+        %disp([norm_obs .* norm_factor u]);
     end
 
     function add_model(norm_old_obs, a, norm_obs)        
-        % Cross boundary?
-        if (norm_old_obs(1) == 0 && norm_old_obs(2) == 0 && a == -3)
-            disp(1);
-        end
-        
-        if norm_obs(1) - norm_old_obs(1) < -3
-            %add_model(norm_old_obs, a, norm_obs + [2*pi 0]);
-            %add_model(norm_old_obs - [2*pi 0], a, norm_obs);
+        % Cross boundary?       
+        if norm_obs(1) - norm_old_obs(1) < -cross_limit
+            add_model(norm_old_obs, a, norm_obs + [upper_bound 0]);
+            add_model(norm_old_obs - [upper_bound 0], a, norm_obs);
             return;
         end
         
-        if norm_obs(1) - norm_old_obs(1) > 3
-            %add_model(norm_old_obs + [2*pi 0], a, norm_obs);
-            %add_model(norm_old_obs, a, norm_obs - [2*pi 0]);
+        if norm_obs(1) - norm_old_obs(1) > cross_limit
+            add_model(norm_old_obs + [upper_bound 0], a, norm_obs);
+            add_model(norm_old_obs, a, norm_obs - [upper_bound 0]);
             return;
         end
         
         model.llr.add([norm_old_obs a], norm_obs);
         
         if norm_obs(1) - threshold < 0
-            %new_norm_obs = norm_obs + [2*pi 0];
-            %new_norm_old_obs = norm_old_obs + [2*pi 0];
+            new_norm_obs = norm_obs + [upper_bound 0];
+            new_norm_old_obs = norm_old_obs + [upper_bound 0];
             
-            %model.llr.add([new_norm_old_obs a], new_norm_obs);
+            model.llr.add([new_norm_old_obs a], new_norm_obs);
         end
         
-        if norm_obs(1) + threshold > 2*pi
-            %new_norm_obs = norm_obs - [2*pi 0];
-            %new_norm_old_obs = norm_old_obs - [2*pi 0];
+        if norm_obs(1) + threshold > upper_bound
+            new_norm_obs = norm_obs - [upper_bound 0];
+            new_norm_old_obs = norm_old_obs - [upper_bound 0];
             
-            %model.llr.add([new_norm_old_obs a], new_norm_obs);
+            model.llr.add([new_norm_old_obs a], new_norm_obs);
         end
     end
 
     function [model_obs, X] = model_transition(norm_old_obs, action)
         [model_obs, X] = model.llr.query([norm_old_obs action]);
         if model_obs(1) < 0
-            model_obs = model_obs + [2*pi 0];
+            model_obs = model_obs + [upper_bound 0];
         end
         
-        if model_obs(1) > 2*pi
-            model_obs = model_obs - [2*pi 0];
+        if model_obs(1) > upper_bound
+            model_obs = model_obs - [upper_bound 0];
         end
             
         model_obs = max(model_obs, spec.observation_min ./ norm_factor);
