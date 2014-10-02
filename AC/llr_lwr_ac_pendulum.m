@@ -28,7 +28,7 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum()
     model.sd                  = 0.2;      % Standard-deviation for gaussian noise in action
     model.add_llr             = 0;        % This env add exp to LLR?
     
-    episodes      = 20;      % Total of episodes
+    episodes      = 30;      % Total of episodes
     
     random_u      = 0.0;      % Random noise for action - Global variable declaration
     threshold     = 0.5;      % Threshold for 0-2PI limits
