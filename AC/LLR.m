@@ -76,16 +76,13 @@ classdef LLR < handle
             %inv(A) = inv(U)*inv(U)'
 
             U = chol(A*A' + eye(llr.input+1)*llr.tikhonov);
+            
             iU = inv(U);
             temp_inv = iU*iU';
 
             X = B*A'*temp_inv;
 
-            try
-                y_hat = (X*[query 1]')';
-            catch err
-                disp(err);
-            end
+            y_hat = [query 1]*X';
         end
     end
     methods
