@@ -3,23 +3,21 @@ function [critic, actor, cr] = llr_ac_pendulum()
     spec = env_mops_sim('init');
     
     actor.memory      = 2000;
-    actor.llr         = LLR(actor.memory, spec.observation_dims, 1, 20);
+    actor.llr         = LLR(actor.memory, spec.observation_dims, spec.action_dims, 25);
     actor.alpha       = 0.05;
     
     critic.memory     = 2000;
-    critic.llr        = LLR(critic.memory, spec.observation_dims, 1, 20, -1000);
-    critic.alpha      = 0.25;
+    critic.llr        = LLR(critic.memory, spec.observation_dims, 1, 15);
+    critic.alpha      = 0.3;
     
     env.gamma         = 0.97;     % Discount rate
     env.lambda        = 0.67;     % Decay rate
     env.steps         = 100;      % Steps per episode
     env.sd            = 1.0;      % Standard-deviation for gaussian noise in action
     
-    episodes          = 200;           % Total of episodes
+    episodes          = 100;           % Total of episodes
     random_u          = 1.0;           % Random noise for action - Global variable declaration
     norm_factor       = [ pi/10, pi ]; % Normalization factor used in observations
-    
-    threshold         = 0.5;           % Threshold for 0-2PI limits
     
     % Initialize learning curve
     cr = zeros(1, episodes);
@@ -46,14 +44,14 @@ function [critic, actor, cr] = llr_ac_pendulum()
             end
             
             % Calculate action
-            a = choose_action(norm_old_obs);
+            action = choose_action(norm_old_obs);
             
             % Actuate
-            [obs, reward, terminal] = env_mops_sim('step', a);
+            [obs, reward, terminal] = env_mops_sim('step', action);
             norm_obs = obs ./ norm_factor;
             
             % Update based on real observation
-            update(norm_old_obs, norm_obs, reward);
+            update(norm_old_obs, action, norm_obs, reward);
             
             % Prepare for next timestep
             norm_old_obs = norm_obs;
@@ -63,7 +61,7 @@ function [critic, actor, cr] = llr_ac_pendulum()
         end
     end
     
-    function update(norm_old_obs, norm_obs, reward)
+    function update(norm_old_obs, action, norm_obs, reward)
         % Critic
         value_function = critic.llr.query(norm_obs);
         [old_value_function, ~, old_critic_neighbors] = critic.llr.query(norm_old_obs);
@@ -73,15 +71,6 @@ function [critic, actor, cr] = llr_ac_pendulum()
         
         % Add to Critic LLR
         critic.llr.add(norm_old_obs, old_value_function);
-        if norm_old_obs(1) - threshold < 0
-            new_norm_obs = norm_old_obs + [20 0];
-            critic.llr.add(new_norm_obs, old_value_function);
-        end
-        
-        if norm_old_obs(1) + threshold > 20
-            new_norm_obs = norm_old_obs - [20 0];
-            critic.llr.add(new_norm_obs, old_value_function);
-        end
         
         % Update ET
         Z_values = Z_values*env.lambda*env.gamma;
@@ -90,8 +79,10 @@ function [critic, actor, cr] = llr_ac_pendulum()
         critic.llr.update(Z_values.*critic.alpha*delta);
         
         % Update actor
-        [~, ~, actor_neighbors] = actor.llr.query(norm_old_obs);
         actor_update = actor.alpha*random_u*delta;
+        actor.llr.add(norm_old_obs, action + actor_update);
+        
+        [~, ~, actor_neighbors] = actor.llr.query(norm_old_obs);
         actor.llr.update(actor_update, actor_neighbors, spec.action_min, spec.action_max);
     end
 
@@ -100,18 +91,6 @@ function [critic, actor, cr] = llr_ac_pendulum()
         a = actor.llr.query(norm_old_obs) + random_u;
         a = max(a, spec.action_min);
         a = min(a, spec.action_max);
-        
-        if norm_old_obs(1) - threshold < 0
-            new_norm_obs = norm_old_obs + [20 0];
-            actor.llr.add(new_norm_obs, a);
-        end
-        
-        if norm_old_obs(1) + threshold > 20
-            new_norm_obs = norm_old_obs - [20 0];
-            actor.llr.add(new_norm_obs, a);
-        end
-        
-        actor.llr.add(norm_old_obs, a);
         
         %disp([norm_old_obs .* norm_factor a]);
     end
