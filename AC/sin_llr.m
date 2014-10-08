@@ -1,8 +1,8 @@
 % Sin plot using LLR
 % Only for test purposes
 
-%clear all;
-%close all;
+clear all;
+close all;
 
 llr = LLR(30, 1, 1, 5);
 figure;       
@@ -18,8 +18,6 @@ for i=1:numel(x)
     axis([0,8,-1.3,1.3]);
     M(i)=getframe;
 end
-
-query = rand();
 
 x_hat = linspace(0,2*pi, 1000);
 y_hat = zeros(1, numel(x_hat));
