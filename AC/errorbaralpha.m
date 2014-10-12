@@ -51,6 +51,7 @@ p.addParamValue('rendering', 'alpha', @(x)strcmpi(x, 'alpha')||strcmpi(x, 'opaqu
 p.addParamValue('linewidth', 2, @(x)(isnumeric(x)&&numel(x)==1));
 p.addParamValue('linestyle', '-', @ischar);
 p.addParamValue('mode', 'lin', @ischar);
+p.addOptional('title', 'title');
 p.parse(varargin{:});
 r = p.Results;
 r.x = x;
@@ -159,6 +160,7 @@ end
 
 % Plot main data
 h = plot(x, y, 'Color', r.color, 'LineWidth', r.linewidth, 'LineStyle', r.linestyle);
+title(r.title);
 if ~ih
     hold off
 end
