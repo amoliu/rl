@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(steps_per_episode)
+function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_per_episode)
     % Initialize simulation
     spec = env_mops_sim('init');
 
@@ -27,8 +27,6 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(steps_per_episode)
     model.steps               = 100;      % Max model steps
     model.sd                  = 0.2;      % Standard-deviation for gaussian noise in action
     model.add_llr             = 0;        % This env add exp to LLR?
-    
-    episodes      = 50;      % Total of episodes
     
     random_u      = 0.0;      % Random noise for action - Global variable declaration
     threshold     = 0.5;      % Threshold for 0-2PI limits

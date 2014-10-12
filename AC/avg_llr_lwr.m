@@ -1,14 +1,20 @@
 clear all;
 close all;
 
-episodes = 30;
+episodes = 50;
 trials = 10;
+steps_per_iteration = 20;
 
-cr = zeros(trials,episodes);
-rmse = zeros(trials,episodes);
+for step=0:steps_per_iteration
+    cr = zeros(trials,episodes);
+    rmse = zeros(trials,episodes);
 
-for i=1:trials
-    [~, ~, cr(i,:), rmse(i,:)] = llr_lwr_ac_pendulum();
+    parfor i=1:trials
+        [~, ~, cr(i,:), rmse(i,:)] = llr_lwr_ac_pendulum(episodes, step);
+    end
+
+    figure;
+    errorbaralpha(mean(cr), std(cr), 'title', strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations'));
+    
+    %errorbaralpha(mean(rmse), std(rmse));
 end
-
-errorbaralpha(mean(cr), mean(rmse));

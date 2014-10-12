@@ -1,13 +1,13 @@
 clear all;
 close all;
 
-episodes = 100;
+episodes = 300;
 trials = 10;
 
 cr = zeros(trials,episodes);
 
 parfor i=1:trials
-    [~, ~, cr(i,:)] = llr_ac_pendulum();
+    [~, ~, cr(i,:)] = llr_ac_pendulum(episodes);
 end
 
-errorbaralpha(mean(cr), std(cr));
+errorbaralpha(mean(cr), std(cr), 'title', strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes'));

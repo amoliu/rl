@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse] = mlac_pendulum()
+function [critic, actor, cr, rmse] = mlac_pendulum(episodes)
     % Initialize simulation
     spec = env_mops_sim('init');
     
@@ -23,8 +23,6 @@ function [critic, actor, cr, rmse] = mlac_pendulum()
     sd            = 1.0;      % Random noise
     
     threshold     = 0.5;      % Threshold for 0-2PI limits
-    
-    episodes      = 50;       % Total of episodes
     
     norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
     upper_bound   = 20;            % Upper bound to add or subtract to observations
