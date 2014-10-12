@@ -1,4 +1,4 @@
-function [critic, actor, cr] = s_ac_pendulum()
+function [critic, actor, cr] = s_ac_pendulum(episodes)
     % Initialize parameters
     actor.alpha   = 0.005;      % Learning rate for the actor
     actor.grids   = 16;         % Total of grid used for the actor
@@ -13,7 +13,6 @@ function [critic, actor, cr] = s_ac_pendulum()
     gamma         = 0.97;     % Discount rate
     lambda        = 0.67;     % Decay rate
     memory_size   = 100;      % Eligibility trace memory
-    episodes      = 150;      % Total of episodes
     steps         = 100;      % Steps per episode
     sd            = 1.0;      % Standard-deviation for gaussian noise in action
         
@@ -58,7 +57,7 @@ function [critic, actor, cr] = s_ac_pendulum()
             a = fa_estimate(norm_old_obs, actor) + random_u;
             a = max(a, spec.action_min);
             a = min(a, spec.action_max);
-            disp([obs a]);
+            %disp([obs a]);
             
             % Actuate
             [obs, reward, terminal] = env_mops_sim('step', a);
