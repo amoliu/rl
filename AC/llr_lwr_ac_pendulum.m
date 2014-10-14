@@ -12,7 +12,7 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_pe
     critic.llr        = LLR(critic.memory, spec.observation_dims, 1, 20, -1000);
     
     env.actor.alpha   = 0.05;
-    env.critic.alpha  = 0.25;
+    env.critic.alpha  = 0.3;
     env.gamma         = 0.97;     % Discount rate
     env.lambda        = 0.67;     % Decay rate
     env.steps         = 100;      % Steps per episode
@@ -87,7 +87,7 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_pe
             
             % Update based on real observation
             if (tt > 1)
-                Z_values_real = update(norm_old_obs, norm_obs, reward, env, Z_values_real);
+                Z_values_real = update(norm_old_obs, a, norm_obs, reward, env, Z_values_real);
             end
 
             % Try the model
@@ -98,7 +98,7 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_pe
                     [model_norm_obs, model_reward, model_terminal] = model_transition(model_norm_old_obs, a);
                     %disp([model_norm_obs, model_reward, model_terminal]);
                                        
-                    Z_values_model = update(model_norm_old_obs, model_norm_obs, model_reward, model, Z_values_model);
+                    Z_values_model = update(model_norm_old_obs, a, model_norm_obs, model_reward, model, Z_values_model);
                     
                     model_norm_old_obs = model_norm_obs;
                     model_tt = model_tt + 1;
@@ -165,7 +165,7 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_pe
         lwr(last_lwr_pos,:) = [norm_old_obs a norm_obs-norm_old_obs reward terminal];
     end
     
-    function [Z_values] = update(norm_old_obs, norm_obs, reward, params, Z_values)
+    function [Z_values] = update(norm_old_obs, action, norm_obs, reward, params, Z_values)
         % Critic
         value_function = critic.llr.query(norm_obs);
         [old_value_function, ~, old_critic_neighbors] = critic.llr.query(norm_old_obs);
@@ -175,16 +175,6 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_pe
         
         % Add to Critic LLR
         if params.add_llr
-            if norm_old_obs(1) - threshold < 0
-                new_norm_obs = norm_old_obs + [20 0];
-                critic.llr.add(new_norm_obs, old_value_function);
-            end
-
-            if norm_old_obs(1) + threshold > 20
-                new_norm_obs = norm_old_obs - [20 0];
-                critic.llr.add(new_norm_obs, old_value_function);
-            end
-            
             critic.llr.add(norm_old_obs, old_value_function);
         end
         
@@ -195,8 +185,14 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_pe
         critic.llr.update(Z_values.*params.critic.alpha*delta);
         
         % Update actor
-        [~, ~, actor_neighbors] = actor.llr.query(norm_old_obs);
         actor_update = params.actor.alpha*random_u*delta;
+        
+        % Add to Actor LLR
+        if params.add_llr           
+            actor.llr.add(norm_old_obs, action + actor_update);
+        end
+        
+        [~, ~, actor_neighbors] = actor.llr.query(norm_old_obs);
         actor.llr.update(actor_update, actor_neighbors, spec.action_min, spec.action_max);
     end
 
@@ -205,20 +201,6 @@ function [critic, actor, cr, rmse, lwr] = llr_lwr_ac_pendulum(episodes, steps_pe
         a = actor.llr.query(norm_old_obs) + random_u;
         a = max(a, spec.action_min);
         a = min(a, spec.action_max);
-        if params.add_llr
-            if norm_old_obs(1) - threshold < 0
-                new_norm_obs = norm_old_obs + [20 0];
-                actor.llr.add(new_norm_obs, a);
-            end
-
-            if norm_old_obs(1) + threshold > 20
-                new_norm_obs = norm_old_obs - [20 0];
-                actor.llr.add(new_norm_obs, a);
-            end
-            
-            actor.llr.add(norm_old_obs, a);
-        end
-        
         %disp([norm_old_obs .* norm_factor a]);
     end
 
