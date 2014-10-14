@@ -15,18 +15,24 @@ classdef LLR < handle
     end % properties
     methods(Access = private)
         function rel = update_relevance_for_point(llr, input, output)
+            if (llr.last_llr <= llr.k)
+                rel = 0;
+                return;
+            end
+            
             neighbors = get_neighbors(llr, input);
             
             for i=1:numel(neighbors)
-                predict_value = calc_query_neighbors(llr, llr.data(neighbors(i),1:llr.input), neighbors);
-                rel = calc_relevance(llr, llr.data(neighbors(i),llr.input+1:llr.input+llr.output), predict_value);
+                predict_value = calc_query_neighbors_mex(llr.tikhonov, llr.input, llr.output, llr.data, llr.data(neighbors(i),1:llr.input), neighbors);
+                
+                rel = norm(llr.data(neighbors(i),llr.input+1:llr.input+llr.output) - predict_value)^2;
                 
                 llr.relevance(neighbors(i)) = llr.gamma*llr.relevance(neighbors(i)) + (1-llr.gamma)*rel;
                 %llr.data(neighbors(i),llr.input+1:llr.input+llr.output) = predict_value;
             end
             
-            predict_value = calc_query_neighbors(llr, input, neighbors);
-            rel = calc_relevance(llr, output, predict_value);
+            predict_value = calc_query_neighbors_mex(llr.tikhonov, llr.input, llr.output, llr.data, input, neighbors);
+            rel = norm(output - predict_value)^2;
         end
         
         function build_kdtree(llr)
@@ -35,15 +41,6 @@ classdef LLR < handle
             end
             
             llr.tree = kdtree_build(llr.data(1:llr.last_llr-1,1:llr.input));
-        end
-        
-        function rel = calc_relevance(llr, output, y_hat)
-            if (llr.last_llr <= llr.k)
-                rel = 0;
-                return;
-            end
-            
-            rel = norm(output - y_hat)^2;
         end
         
         function neighbors = get_neighbors(llr, query)
@@ -55,34 +52,6 @@ classdef LLR < handle
             %points = env.kdtree.knnsearch(query, 'K', env.k);
             %neighbors = knnsearch(query, llr.data(1:llr.last_llr-1,1:llr.input), llr.k);
             neighbors = kdtree_k_nearest_neighbors(llr.tree, query, llr.k);
-        end
-        
-        function [y_hat, X] = calc_query_neighbors(llr, query, neighbors)
-            if (llr.last_llr <= llr.k)
-                y_hat = rand(1, llr.output) + llr.initial_value;
-                X = rand(llr.output, llr.input + 1) + llr.initial_value;
-                return;
-            end
-            
-            N = llr.data(neighbors, :);
-
-            A = N(:,1:llr.input)';
-            A(llr.input+1,:) = 1; % bias
-
-            B = N(:,llr.input+1:llr.input + llr.output)';
-
-            % Using Cholesky
-            % A = U'U
-            %inv(A) = inv(U)*inv(U)'
-
-            U = chol(A*A' + eye(llr.input+1)*llr.tikhonov);
-            
-            iU = inv(U);
-            temp_inv = iU*iU';
-
-            X = B*A'*temp_inv;
-
-            y_hat = [query 1]*X';
         end
     end
     methods
@@ -131,7 +100,7 @@ classdef LLR < handle
             llr.data(pos,:) = [input output];
             
             llr.total_elements_for_tree = llr.total_elements_for_tree + 1;
-            if mod(llr.total_elements_for_tree, 1) == 0
+            if mod(llr.total_elements_for_tree, llr.k./2) == 0
                 llr.build_kdtree();
             end
         end
@@ -149,8 +118,15 @@ classdef LLR < handle
         end
         
         function [y_hat, X, neighbors] = query(llr, query)
+            if (llr.last_llr <= llr.k)
+                y_hat = rand(1, llr.output) + llr.initial_value;
+                X = rand(llr.output, llr.input + 1) + llr.initial_value;
+                neighbors = [];
+                return;
+            end
+            
             neighbors = get_neighbors(llr, query);
-            [y_hat, X] = calc_query_neighbors(llr, query, neighbors);
+            [y_hat, X] = calc_query_neighbors_mex(llr.tikhonov, llr.input, llr.output, llr.data, query, neighbors);
         end
     end % methods
 end
