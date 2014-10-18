@@ -46,3 +46,18 @@
 ======
 ##Code
 * RLPark. Degris (rlpark.github.io)
+
+3 times in a row with good perfomance
+even/odd plotings without the exploration and without learning
+
+plot the individual curves and see the results
+
+plot the 95% confidence
+
+try for 500 episodes (20 minutes) for 40 curves
+
+LLR updates is not clamped?
+
+dbl/utilities repository delft
+
+Rendering 'opaque' on errorbaralpha

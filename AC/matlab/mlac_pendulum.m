@@ -121,10 +121,9 @@ function [critic, actor, cr, rmse] = mlac_pendulum(episodes)
             % Prepare for next timestep
             norm_old_obs = norm_obs;
             old_value_function = value_function;
-
-            % Keep track of learning curve
-            cr(ee) = cr(ee) + reward;
         end
+        
+        cr(ee) = test_ac_llr(actor, spec);
     end
     
     function [u, u_policy, X, actor_neighbors] = choose_action(norm_obs)

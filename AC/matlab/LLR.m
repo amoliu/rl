@@ -100,7 +100,7 @@ classdef LLR < handle
             llr.data(pos,:) = [input output];
             
             llr.total_elements_for_tree = llr.total_elements_for_tree + 1;
-            if mod(llr.total_elements_for_tree, llr.k./2) == 0
+            if mod(llr.total_elements_for_tree, llr.k) == 0
                 llr.build_kdtree();
             end
         end

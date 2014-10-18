@@ -2,11 +2,11 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
     % Initialize simulation
     spec = env_mops_sim('init');
     
-    actor.memory      = 2000;
+    actor.memory      = 4000;
     actor.llr         = LLR(actor.memory, spec.observation_dims, spec.action_dims, 25);
     actor.alpha       = 0.05;
     
-    critic.memory     = 2000;
+    critic.memory     = 4000;
     critic.llr        = LLR(critic.memory, spec.observation_dims, 1, 15);
     critic.alpha      = 0.3;
     
@@ -56,8 +56,9 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
             norm_old_obs = norm_obs;
 
             % Keep track of learning curve
-            cr(ee) = cr(ee) + reward;
         end
+        
+        cr(ee) = test_ac_llr(actor, spec);
     end
     
     function update(norm_old_obs, action, norm_obs, reward)
@@ -79,7 +80,7 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
         
         % Update actor
         actor_update = actor.alpha*random_u*delta;
-        actor.llr.add(norm_old_obs, action + actor_update);
+        actor.llr.add(norm_old_obs, min(max(action + actor_update, spec.action_min), spec.action_max));
         
         [~, ~, actor_neighbors] = actor.llr.query(norm_old_obs);
         actor.llr.update(actor_update, actor_neighbors, spec.action_min, spec.action_max);

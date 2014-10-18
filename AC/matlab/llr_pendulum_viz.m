@@ -27,6 +27,20 @@ function [V, policy] = llr_pendulum_viz(actor, critic, cr, rmse)
         ylabel('RMSE');
     end
     
+    figure;
+    scatter(critic.llr.data(:, 1), critic.llr.data(:, 2), [], critic.llr.data(:,3), 'x')
+    title('Critic');
+    xlabel('angle[rad]');
+    ylabel('angular velocity[rad/s]');
+    colorbar;
+    
+    figure;
+    scatter(actor.llr.data(:, 1), actor.llr.data(:, 2), [], actor.llr.data(:,3), 'x')
+    title('Actor');
+    xlabel('angle[rad]');
+    ylabel('angular velocity[rad/s]');
+    colorbar;
+    
     %{
     x = linspace(0,6.2832,100);
     y = linspace(-37.6991,37.6991,100);
