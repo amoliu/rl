@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.ejml.alg.dense.decomposition.chol.CholeskyDecompositionInner_D64;
+import org.ejml.alg.dense.linsol.chol.LinearSolverChol;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.CholeskyDecomposition;
 import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
@@ -47,7 +47,7 @@ public class LLR
 
   private DistanceFunction                      distanceFunction;
 
-  private CholeskyDecomposition<DenseMatrix64F> choleskyDecomposition;
+  private LinearSolverChol                      solver;
 
   public LLR(int size, int input_dimensions, int output_dimensions, int k, double initial_value)
   {
@@ -83,7 +83,7 @@ public class LLR
 
     buildKDTree();
     distanceFunction = new SquareEuclideanDistanceFunction();
-    choleskyDecomposition = DecompositionFactory.chol(input_dimensions + 1, false);
+    solver = new LinearSolverChol(new CholeskyDecompositionInner_D64());
   }
 
   public void add(SimpleMatrix input, SimpleMatrix output)
@@ -162,7 +162,8 @@ public class LLR
   private SimpleMatrix queryForNeighbors(SimpleMatrix query, List<Integer> neighbors)
   {
     SimpleMatrix A = new SimpleMatrix(input_dimension + 1, neighbors.size());
-    SimpleMatrix B = new SimpleMatrix(output_dimension, neighbors.size());
+    SimpleMatrix B = new SimpleMatrix(neighbors.size(), output_dimension);
+    DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, 1);
 
     for (int n = 0; n < k; n++)
     {
@@ -176,30 +177,21 @@ public class LLR
 
       for (int i = 0; i < output_dimension; i++)
       {
-        B.set(i, n, data.get(pos, input_dimension + i));
+        B.set(n, i, data.get(pos, input_dimension + i));
       }
     }
 
-    // Using Cholesky
-    // A = U'U
-    // inv(A) = inv(U)*inv(U)'
+    solver.setA(A.mult(A.transpose()).plus(tikhonov).getMatrix());
+    solver.solve(A.mult(B).getMatrix(), X);
 
-    choleskyDecomposition.decompose(A.mult(A.transpose()).plus(tikhonov).getMatrix());
-    DenseMatrix64F U = choleskyDecomposition.getT(null);
-
-    SimpleMatrix iU = new SimpleMatrix(U).invert();
-    SimpleMatrix temp_inv = iU.mult(iU.transpose());
-
-    SimpleMatrix X = B.mult(A.transpose()).mult(temp_inv);
-
-    SimpleMatrix queryBias = new SimpleMatrix(1, query.numCols() + 1);
+    SimpleMatrix queryBias = new SimpleMatrix(1, input_dimension + 1);
     for (int i = 0; i < query.numCols(); i++)
     {
       queryBias.set(0, i, query.get(0, i));
     }
     queryBias.set(0, query.numCols(), 1);
 
-    return queryBias.mult(X.transpose());
+    return queryBias.mult(SimpleMatrix.wrap(X));
   }
 
   private double updateRelevanceForPoint(SimpleMatrix input, SimpleMatrix output)
