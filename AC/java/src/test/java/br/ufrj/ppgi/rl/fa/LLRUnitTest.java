@@ -2,6 +2,8 @@ package br.ufrj.ppgi.rl.fa;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -15,8 +17,11 @@ public class LLRUnitTest
   {
     LLR llr = new LLR(SIZE, 1, 1, 2, 0);
 
-    assertEquals(2, llr.data.getMatrix().numCols);
-    assertEquals(SIZE, llr.data.getMatrix().numRows);
+    assertEquals(1, llr.dataInput.getMatrix().numCols);
+    assertEquals(SIZE, llr.dataInput.getMatrix().numRows);
+    
+    assertEquals(1, llr.dataOutput.getMatrix().numCols);
+    assertEquals(SIZE, llr.dataOutput.getMatrix().numRows);
 
     assertEquals(SIZE, llr.relevance.length);
   }
@@ -26,8 +31,11 @@ public class LLRUnitTest
   {
     LLR llr = new LLR(SIZE, 2, 1, 2, 0);
 
-    assertEquals(3, llr.data.getMatrix().numCols);
-    assertEquals(SIZE, llr.data.getMatrix().numRows);
+    assertEquals(2, llr.dataInput.getMatrix().numCols);
+    assertEquals(SIZE, llr.dataInput.getMatrix().numRows);
+    
+    assertEquals(1, llr.dataOutput.getMatrix().numCols);
+    assertEquals(SIZE, llr.dataOutput.getMatrix().numRows);
 
     assertEquals(SIZE, llr.relevance.length);
   }
@@ -37,8 +45,11 @@ public class LLRUnitTest
   {
     LLR llr = new LLR(SIZE, 1, 2, 2, 0);
 
-    assertEquals(3, llr.data.getMatrix().numCols);
-    assertEquals(SIZE, llr.data.getMatrix().numRows);
+    assertEquals(1, llr.dataInput.getMatrix().numCols);
+    assertEquals(SIZE, llr.dataInput.getMatrix().numRows);
+    
+    assertEquals(2, llr.dataOutput.getMatrix().numCols);
+    assertEquals(SIZE, llr.dataOutput.getMatrix().numRows);
 
     assertEquals(SIZE, llr.relevance.length);
   }
@@ -57,8 +68,8 @@ public class LLRUnitTest
     llr.add(input, output);
     
     assertEquals(0, llr.relevance[0], DELTA);
-    assertEquals(1, llr.data.get(0, 0), DELTA);
-    assertEquals(1, llr.data.get(0, 1), DELTA);
+    assertEquals(1, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(1, llr.dataOutput.get(0, 0), DELTA);
   }
 
   @Test
@@ -82,12 +93,12 @@ public class LLRUnitTest
     llr.add(input, output);
     
     assertEquals(0, llr.relevance[0], DELTA);
-    assertEquals(0, llr.data.get(0, 0), DELTA);
-    assertEquals(0, llr.data.get(0, 1), DELTA);
+    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
     
     assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.data.get(1, 0),DELTA);
-    assertEquals(1, llr.data.get(1, 1),DELTA);
+    assertEquals(1, llr.dataInput.get(1, 0),DELTA);
+    assertEquals(1, llr.dataOutput.get(1, 0),DELTA);
   }
 
   @Test
@@ -111,12 +122,12 @@ public class LLRUnitTest
     llr.add(input, output);
     
     assertEquals(4, llr.relevance[0], DELTA);
-    assertEquals(2, llr.data.get(0, 0), DELTA);
-    assertEquals(4, llr.data.get(0, 1), DELTA);
+    assertEquals(2, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
     
     assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.data.get(1, 0), DELTA);
-    assertEquals(1, llr.data.get(1, 1), DELTA);
+    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
+    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
   }
   
   @Test
@@ -155,5 +166,78 @@ public class LLRUnitTest
     SimpleMatrix result = llr.query(query);
     
     assertEquals(1, result.get(0, 0), DELTA);
+  }
+  
+  @Test
+  public void testUpdate_SimpleMatrix()
+  {
+    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    
+    SimpleMatrix input = new SimpleMatrix(1, 1);
+    SimpleMatrix output = new SimpleMatrix(1, 1);
+    
+    input.set(0, 0);
+    output.set(0, 0);
+    llr.add(input, output);
+    
+    input.set(0, 2);
+    output.set(0, 2);
+    llr.add(input, output);
+    
+    SimpleMatrix delta = new SimpleMatrix(SIZE, 1);
+    for (int i=0; i<SIZE; i++)
+    {
+      delta.set(i, 0, 1);
+    }
+    delta.set(0, 0, 0);
+    
+    llr.update(delta);
+    
+    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
+    assertEquals(3, llr.dataOutput.get(1, 0), DELTA);
+  }
+  
+  @Test
+  public void testUpdate_doubleValue()
+  {
+    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    
+    SimpleMatrix input = new SimpleMatrix(1, 1);
+    SimpleMatrix output = new SimpleMatrix(1, 1);
+    
+    input.set(0, 0);
+    output.set(0, 0);
+    llr.add(input, output);
+    
+    input.set(0, 2);
+    output.set(0, 2);
+    llr.add(input, output);
+    
+    llr.update(1);
+    
+    assertEquals(1, llr.dataOutput.get(0, 0), DELTA);
+    assertEquals(3, llr.dataOutput.get(1, 0), DELTA);
+  }
+  
+  @Test
+  public void testUpdate_NeighborsAndDelta()
+  {
+    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    
+    SimpleMatrix input = new SimpleMatrix(1, 1);
+    SimpleMatrix output = new SimpleMatrix(1, 1);
+    
+    input.set(0, 0);
+    output.set(0, 0);
+    llr.add(input, output);
+    
+    input.set(0, 2);
+    output.set(0, 2);
+    llr.add(input, output);
+    
+    llr.update(Arrays.asList(1), 1);
+    
+    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
+    assertEquals(3, llr.dataOutput.get(1, 0), DELTA);
   }
 }

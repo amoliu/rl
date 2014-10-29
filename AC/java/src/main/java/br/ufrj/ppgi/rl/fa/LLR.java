@@ -23,7 +23,9 @@ public class LLR
 
   private static final double                   BIAS            = 1d;
 
-  protected SimpleMatrix                        data;
+  protected SimpleMatrix                        dataInput;
+  
+  protected SimpleMatrix                        dataOutput;
 
   protected double[]                            relevance;
 
@@ -74,8 +76,11 @@ public class LLR
     this.tikhonov = SimpleMatrix.identity(input_dimensions + 1).scale(tikhonov);
     this.gamma = gamma;
 
-    this.data = new SimpleMatrix(size, input_dimensions + output_dimensions);
-    this.data.zero();
+    this.dataInput = new SimpleMatrix(size, input_dimensions);
+    this.dataInput.zero();
+    
+    this.dataOutput = new SimpleMatrix(size, output_dimensions);
+    this.dataOutput.zero();
 
     this.relevance = new double[size];
 
@@ -104,19 +109,9 @@ public class LLR
     }
 
     relevance[pos] = rel;
-    int col = 0;
 
-    for (int i = 0; i < input.getNumElements(); i++)
-    {
-      data.set(pos, col, input.get(i));
-      col++;
-    }
-
-    for (int i = 0; i < output.getNumElements(); i++)
-    {
-      data.set(pos, col, output.get(i));
-      col++;
-    }
+    dataInput.setRow(pos, 0, input.getMatrix().getData());
+    dataOutput.setRow(pos, 0, output.getMatrix().getData());
 
     tree.addPoint(input.getMatrix().getData(), pos);
   }
@@ -139,10 +134,26 @@ public class LLR
 
     return posMinRelevance;
   }
-
-  public void update()
+  
+  public void update(List<Integer> points, double delta)
   {
+    for(Integer pos : points)
+    {
+      for(int i=0; i<output_dimension; i++)
+      {
+        dataOutput.set(pos, i, dataOutput.get(pos, i) + delta);
+      }
+    }
+  }
 
+  public void update(SimpleMatrix delta)
+  {
+    dataOutput = dataOutput.plus(delta);
+  }
+  
+  public void update(double delta)
+  {
+    dataOutput = dataOutput.plus(delta);
   }
 
   public SimpleMatrix query(SimpleMatrix query)
@@ -171,13 +182,13 @@ public class LLR
 
       for (int i = 0; i < input_dimension; i++)
       {
-        A.set(i, n, data.get(pos, i));
+        A.set(i, n, dataInput.get(pos, i));
       }
       A.set(input_dimension, n, BIAS);
 
       for (int i = 0; i < output_dimension; i++)
       {
-        B.set(n, i, data.get(pos, input_dimension + i));
+        B.set(n, i, dataOutput.get(pos, i));
       }
     }
 
@@ -207,10 +218,10 @@ public class LLR
     {
       Integer pos = neighbors.get(n);
 
-      SimpleMatrix query = data.extractMatrix(pos, pos + 1, 0, input_dimension);
+      SimpleMatrix query = dataInput.extractVector(true, pos);
       SimpleMatrix predict_value = queryForNeighbors(query, neighbors);
 
-      SimpleMatrix real_value = data.extractMatrix(pos, pos + 1, input_dimension, input_dimension + output_dimension);
+      SimpleMatrix real_value = dataOutput.extractVector(true, pos);
 
       double rel = Math.pow(NormOps.normP2(real_value.minus(predict_value).getMatrix()), 2);
 
@@ -247,10 +258,10 @@ public class LLR
     tree = new KdTree<Integer>(input_dimension);
     for (int i = 0; i < last_llr; i++)
     {
-      double[] location = new double[2];
+      double[] location = new double[input_dimension];
       for (int j = 0; j < input_dimension; j++)
       {
-        location[j] = data.get(i, j);
+        location[j] = dataInput.get(i, j);
       }
       tree.addPoint(location, i);
     }
