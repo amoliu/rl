@@ -174,7 +174,7 @@ public class LLR
   {
     SimpleMatrix A = new SimpleMatrix(input_dimension + 1, neighbors.size());
     SimpleMatrix B = new SimpleMatrix(neighbors.size(), output_dimension);
-    DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, 1);
+    DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, output_dimension);
 
     for (int n = 0; n < k; n++)
     {
@@ -196,11 +196,11 @@ public class LLR
     solver.solve(A.mult(B).getMatrix(), X);
 
     SimpleMatrix queryBias = new SimpleMatrix(1, input_dimension + 1);
-    for (int i = 0; i < query.numCols(); i++)
+    for (int i = 0; i < query.numRows(); i++)
     {
-      queryBias.set(0, i, query.get(0, i));
+      queryBias.set(0, i, query.get(i, 0));
     }
-    queryBias.set(0, query.numCols(), 1);
+    queryBias.set(0, query.numRows(), 1);
 
     return queryBias.mult(SimpleMatrix.wrap(X));
   }
@@ -223,13 +223,13 @@ public class LLR
 
       SimpleMatrix real_value = dataOutput.extractVector(true, pos);
 
-      double rel = Math.pow(NormOps.normP2(real_value.minus(predict_value).getMatrix()), 2);
+      double rel = NormOps.normP2(real_value.minus(predict_value).getMatrix());
 
       relevance[pos] = gamma * relevance[pos] + (1 - gamma) * rel;
     }
 
-    SimpleMatrix predict_value = queryForNeighbors(input, neighbors);
-    return Math.pow(NormOps.normP2(output.minus(predict_value).getMatrix()), 2);
+    SimpleMatrix predict_value = queryForNeighbors(input, neighbors).transpose();
+    return NormOps.normP2(output.minus(predict_value).getMatrix());
   }
 
   private boolean hasEnoughNeighbors()
