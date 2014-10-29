@@ -1,44 +1,178 @@
 package br.ufrj.ppgi.rl;
 
-public class Specification {
+import java.io.Serializable;
 
-	private float lamda;
+import org.ejml.simple.SimpleMatrix;
 
-	private float gamma;
+public class Specification implements Serializable
+{
+  private static final long serialVersionUID = -339958755408435757L;
 
-	private int steps;
+  private int               actorMemory;
 
-	private float sd;
+  private double            actorAlpha;
 
-	public float getLamda() {
-		return lamda;
-	}
+  private int               actorNeighbors;
 
-	public void setLamda(float lamda) {
-		this.lamda = lamda;
-	}
+  private SimpleMatrix      actorMin;
+  
+  private SimpleMatrix      actorMax;
 
-	public float getGamma() {
-		return gamma;
-	}
+  private int               criticMemory;
 
-	public void setGamma(float gamma) {
-		this.gamma = gamma;
-	}
+  private double            criticAlpha;
 
-	public int getSteps() {
-		return steps;
-	}
+  private int               criticNeighbors;
 
-	public void setSteps(int steps) {
-		this.steps = steps;
-	}
+  private int               inputDimensions;
 
-	public float getSd() {
-		return sd;
-	}
+  private int               outputDimensions;
 
-	public void setSd(float sd) {
-		this.sd = sd;
-	}
+  private float             lamda;
+
+  private float             gamma;
+
+  private int               steps;
+
+  private float             sd;
+
+  public int getActorMemory()
+  {
+    return actorMemory;
+  }
+
+  public void setActorMemory(int actorMemory)
+  {
+    this.actorMemory = actorMemory;
+  }
+
+  public double getActorAlpha()
+  {
+    return actorAlpha;
+  }
+
+  public void setActorAlpha(double actorAlpha)
+  {
+    this.actorAlpha = actorAlpha;
+  }
+
+  public int getCriticMemory()
+  {
+    return criticMemory;
+  }
+
+  public void setCriticMemory(int criticMemory)
+  {
+    this.criticMemory = criticMemory;
+  }
+
+  public double getCriticAlpha()
+  {
+    return criticAlpha;
+  }
+
+  public void setCriticAlpha(double criticAlpha)
+  {
+    this.criticAlpha = criticAlpha;
+  }
+
+  public float getLamda()
+  {
+    return lamda;
+  }
+
+  public void setLamda(float lamda)
+  {
+    this.lamda = lamda;
+  }
+
+  public float getGamma()
+  {
+    return gamma;
+  }
+
+  public void setGamma(float gamma)
+  {
+    this.gamma = gamma;
+  }
+
+  public int getSteps()
+  {
+    return steps;
+  }
+
+  public void setSteps(int steps)
+  {
+    this.steps = steps;
+  }
+
+  public float getSd()
+  {
+    return sd;
+  }
+
+  public void setSd(float sd)
+  {
+    this.sd = sd;
+  }
+
+  public int getInputDimensions()
+  {
+    return inputDimensions;
+  }
+
+  public void setInputDimensions(int inputDimensions)
+  {
+    this.inputDimensions = inputDimensions;
+  }
+
+  public int getOutputDimensions()
+  {
+    return outputDimensions;
+  }
+
+  public void setOutputDimensions(int outputDimensions)
+  {
+    this.outputDimensions = outputDimensions;
+  }
+
+  public int getActorNeighbors()
+  {
+    return actorNeighbors;
+  }
+
+  public void setActorNeighbors(int actorNeighbors)
+  {
+    this.actorNeighbors = actorNeighbors;
+  }
+
+  public int getCriticNeighbors()
+  {
+    return criticNeighbors;
+  }
+
+  public void setCriticNeighbors(int criticNeighbors)
+  {
+    this.criticNeighbors = criticNeighbors;
+  }
+
+  public SimpleMatrix getActorMin()
+  {
+    return actorMin;
+  }
+
+  public void setActorMin(SimpleMatrix actorMin)
+  {
+    this.actorMin = actorMin;
+  }
+
+  public SimpleMatrix getActorMax()
+  {
+    return actorMax;
+  }
+
+  public void setActorMax(SimpleMatrix actorMax)
+  {
+    this.actorMax = actorMax;
+  }
 }

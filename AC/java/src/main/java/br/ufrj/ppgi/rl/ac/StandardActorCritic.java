@@ -1,30 +1,89 @@
 package br.ufrj.ppgi.rl.ac;
 
-import br.ufrj.ppgi.rl.Actor;
-import br.ufrj.ppgi.rl.Critic;
+import org.ejml.simple.SimpleMatrix;
+
+import br.ufrj.ppgi.rl.ActorLLR;
+import br.ufrj.ppgi.rl.CriticLLR;
 import br.ufrj.ppgi.rl.Specification;
-import br.ufrj.ppgi.rl.environment.InvertedPendulum;
 
-public class StandardActorCritic {
+public class StandardActorCritic implements Agent
+{
+  private static final long serialVersionUID = 6398617648631155363L;
 
-	private Actor actor;
-	
-	private Critic critic;
-	
-	private InvertedPendulum invertedPendulum;
-	
-	private Specification specification;
+  private ActorLLR      actor;
 
-	public StandardActorCritic() {
-		specification = new Specification();
-		specification.setGamma(0.97f);
-		specification.setLamda(0.67f);
-		specification.setSteps(100);
-		specification.setSd(1.0f);
-		
-		invertedPendulum = new InvertedPendulum();
-		
-		actor = new Actor();
-		critic = new Critic();
-	}
+  private CriticLLR     critic;
+
+  private Specification specification;
+
+  private SimpleMatrix  lastObservation;
+
+  private SimpleMatrix  lastAction;
+
+  public StandardActorCritic()
+  {
+    actor = new ActorLLR();
+    critic = new CriticLLR();
+
+    specification = null;
+
+    lastObservation = null;
+    lastAction = null;
+  }
+
+  @Override
+  public void init(Specification specification)
+  {
+    if (this.specification != null)
+    {
+      throw new IllegalStateException("Agent already started");
+    }
+
+    this.specification = specification;
+
+    actor.init(specification);
+    critic.init(specification);
+  }
+
+  @Override
+  public SimpleMatrix start(SimpleMatrix observation)
+  {
+    lastObservation = observation;
+
+    return chooseAction(observation);
+  }
+
+  @Override
+  public SimpleMatrix step(double reward, SimpleMatrix observation)
+  {
+    update(reward, observation);
+
+    return chooseAction(observation);
+  }
+
+  @Override
+  public SimpleMatrix end(double reward)
+  {
+    update(reward, lastObservation);
+
+    return chooseAction(lastObservation);
+  }
+
+  @Override
+  public void fini()
+  {
+    this.specification = null;
+  }
+
+  private void update(double reward, SimpleMatrix observation)
+  {
+    double delta = critic.update(lastObservation, lastAction, reward, observation);
+    actor.update(delta);
+  }
+
+  private SimpleMatrix chooseAction(SimpleMatrix observation)
+  {
+    lastAction = actor.action(observation);
+    return lastAction;
+  }
 }

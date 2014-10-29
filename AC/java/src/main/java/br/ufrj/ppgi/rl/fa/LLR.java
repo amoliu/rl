@@ -1,5 +1,6 @@
 package br.ufrj.ppgi.rl.fa;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,41 +16,45 @@ import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
 import ags.utils.dataStructures.trees.thirdGenKD.KdTree;
 import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction;
 
-public class LLR
+public class LLR implements Serializable
 {
-  private static final double                   DEFAUL_TIKHONOV = 0.000001d;
+  private static final long   serialVersionUID = -8127879025820943557L;
 
-  private static final double                   DEFAUL_GAMMA    = 0.9d;
+  private static final double DEFAUL_TIKHONOV  = 0.000001d;
 
-  private static final double                   BIAS            = 1d;
+  private static final double DEFAUL_GAMMA     = 0.9d;
 
-  protected SimpleMatrix                        dataInput;
-  
-  protected SimpleMatrix                        dataOutput;
+  private static final double BIAS             = 1d;
 
-  protected double[]                            relevance;
+  protected SimpleMatrix      dataInput;
 
-  protected int                                 size;
+  protected SimpleMatrix      dataOutput;
 
-  private int                                   input_dimension;
+  protected double[]          relevance;
 
-  private int                                   output_dimension;
+  protected int               size;
 
-  private int                                   k;
+  private int                 input_dimension;
 
-  private SimpleMatrix                          tikhonov;
+  private int                 output_dimension;
 
-  private double                                gamma;
+  private int                 k;
 
-  protected int                                 last_llr;
+  private SimpleMatrix        tikhonov;
 
-  private double                                initial_value;
+  private double              gamma;
 
-  private KdTree<Integer>                       tree;
+  protected int               last_llr;
 
-  private DistanceFunction                      distanceFunction;
+  private double              initial_value;
 
-  private LinearSolverChol                      solver;
+  private KdTree<Integer>     tree;
+
+  private DistanceFunction    distanceFunction;
+
+  private LinearSolverChol    solver;
+
+  private Random              random;
 
   public LLR(int size, int input_dimensions, int output_dimensions, int k, double initial_value)
   {
@@ -78,13 +83,14 @@ public class LLR
 
     this.dataInput = new SimpleMatrix(size, input_dimensions);
     this.dataInput.zero();
-    
+
     this.dataOutput = new SimpleMatrix(size, output_dimensions);
     this.dataOutput.zero();
 
     this.relevance = new double[size];
 
     this.last_llr = 0;
+    this.random = new Random();
 
     buildKDTree();
     distanceFunction = new SquareEuclideanDistanceFunction();
@@ -113,7 +119,7 @@ public class LLR
     dataInput.setRow(pos, 0, input.getMatrix().getData());
     dataOutput.setRow(pos, 0, output.getMatrix().getData());
 
-    tree.addPoint(input.getMatrix().getData(), pos);
+    buildKDTree();
   }
 
   private int positionLessRelevant()
@@ -134,12 +140,12 @@ public class LLR
 
     return posMinRelevance;
   }
-  
+
   public void update(List<Integer> points, double delta)
   {
-    for(Integer pos : points)
+    for (Integer pos : points)
     {
-      for(int i=0; i<output_dimension; i++)
+      for (int i = 0; i < output_dimension; i++)
       {
         dataOutput.set(pos, i, dataOutput.get(pos, i) + delta);
       }
@@ -150,7 +156,7 @@ public class LLR
   {
     dataOutput = dataOutput.plus(delta);
   }
-  
+
   public void update(double delta)
   {
     dataOutput = dataOutput.plus(delta);
@@ -160,7 +166,7 @@ public class LLR
   {
     if (!hasEnoughNeighbors())
     {
-      SimpleMatrix result = SimpleMatrix.random(1, output_dimension, 0, 1, new Random());
+      SimpleMatrix result = SimpleMatrix.random(1, output_dimension, 0, 1, random);
       result.plus(initial_value);
 
       return result;
@@ -265,5 +271,10 @@ public class LLR
       }
       tree.addPoint(location, i);
     }
+  }
+
+  public void setRandom(Random random)
+  {
+    this.random = random;
   }
 }
