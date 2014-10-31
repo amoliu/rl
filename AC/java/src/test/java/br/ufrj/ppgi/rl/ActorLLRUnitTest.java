@@ -70,6 +70,46 @@ public class ActorLLRUnitTest
     Assert.assertEquals(-3, action.get(0), DELTA);
   }
 
+  @Test
+  public void testUpdate_ShouldAddEntryToLLR_ShouldUpdateNeighbors()
+  {
+    Specification specification = getSpecification_1Input1Output();
+
+    ActorLLR actor = new ActorLLR();
+    actor.init(specification);
+    actor.random = new RandomMock(0.5);
+    actor.llr.setRandom(new RandomMock(1.5));
+    
+    SimpleMatrix observation = new SimpleMatrix(1, 1);
+    observation.set(1);
+
+    SimpleMatrix action = actor.action(observation);
+    
+    actor.update(10, observation, action);
+    Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
+    Assert.assertEquals(2.5, actor.llr.getDataOutput().get(0), DELTA);
+    
+    observation.set(2);
+    action = actor.action(observation);
+    
+    actor.update(10, observation, action);
+    Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
+    Assert.assertEquals(2.5, actor.llr.getDataOutput().get(0), DELTA);
+    Assert.assertEquals(2, actor.llr.getDataInput().get(1), DELTA);
+    Assert.assertEquals(2.5, actor.llr.getDataOutput().get(1), DELTA);
+    
+    observation.set(3);
+    action = actor.action(observation);
+    
+    actor.update(10, observation, action);
+    Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
+    Assert.assertEquals(2.55, actor.llr.getDataOutput().get(0), DELTA);
+    Assert.assertEquals(2, actor.llr.getDataInput().get(1), DELTA);
+    Assert.assertEquals(2.55, actor.llr.getDataOutput().get(1), DELTA);
+    Assert.assertEquals(3, actor.llr.getDataInput().get(2), DELTA);
+    Assert.assertEquals(3, actor.llr.getDataOutput().get(2), DELTA);
+  }
+  
   private Specification getSpecification_1Input2Output()
   {
     Specification specification = getSpecification();

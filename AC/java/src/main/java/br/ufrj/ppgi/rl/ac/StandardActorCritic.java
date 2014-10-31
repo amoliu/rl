@@ -78,7 +78,7 @@ public class StandardActorCritic implements Agent
   private void update(double reward, SimpleMatrix observation)
   {
     double delta = critic.update(lastObservation, lastAction, reward, observation);
-    actor.update(delta);
+    actor.update(delta, lastObservation, lastAction);
   }
 
   private SimpleMatrix chooseAction(SimpleMatrix observation)

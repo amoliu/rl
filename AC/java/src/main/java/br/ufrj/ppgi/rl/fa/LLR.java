@@ -2,6 +2,7 @@ package br.ufrj.ppgi.rl.fa;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -162,18 +163,20 @@ public class LLR implements Serializable
     dataOutput = dataOutput.plus(delta);
   }
 
-  public SimpleMatrix query(SimpleMatrix query)
+  public LLRQueryVO query(SimpleMatrix query)
   {
     if (!hasEnoughNeighbors())
     {
       SimpleMatrix result = SimpleMatrix.random(1, output_dimension, 0, 1, random);
       result.plus(initial_value);
 
-      return result;
+      List<Integer> neighbors = Collections.emptyList();
+      
+      return new LLRQueryVO(result, neighbors);
     }
 
     List<Integer> neighbors = getNeighbors(query);
-    return queryForNeighbors(query, neighbors);
+    return new LLRQueryVO(queryForNeighbors(query, neighbors), neighbors);
   }
 
   private SimpleMatrix queryForNeighbors(SimpleMatrix query, List<Integer> neighbors)
@@ -276,5 +279,15 @@ public class LLR implements Serializable
   public void setRandom(Random random)
   {
     this.random = random;
+  }
+
+  public SimpleMatrix getDataInput()
+  {
+    return dataInput;
+  }
+
+  public SimpleMatrix getDataOutput()
+  {
+    return dataOutput;
   }
 }

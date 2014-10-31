@@ -7,6 +7,7 @@ import org.ejml.alg.dense.mult.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.rl.fa.LLR;
+import br.ufrj.ppgi.rl.fa.LLRQueryVO;
 
 public class ActorLLR implements Serializable
 {
@@ -42,15 +43,21 @@ public class ActorLLR implements Serializable
       throw new MatrixDimensionException("Observation is not the expected length");
     }
 
-    SimpleMatrix action = llr.query(observation);
+    LLRQueryVO queryResult = llr.query(observation);
+    SimpleMatrix action = queryResult.getResult();
     nextRandom();
 
     return wrap(action.plus(lastRandom));
   }
 
-  public void update(double delta)
+  public void update(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
-    llr.update(specification.getActorAlpha() * delta);
+    delta = delta*lastRandom*specification.getActorAlpha();
+    
+    LLRQueryVO queryResult = llr.query(observation);
+    llr.add(observation, wrap(action.plus(delta)));
+    
+    llr.update(queryResult.getNeighbors(), specification.getActorAlpha() * delta);
   }
 
   private void nextRandom()

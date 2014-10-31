@@ -428,9 +428,9 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 0);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(RANDOM_VALUE, result.get(0, 0), DELTA);
+    assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
   }
 
   @Test
@@ -442,10 +442,10 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 0);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(RANDOM_VALUE, result.get(0, 0), DELTA);
-    assertEquals(RANDOM_VALUE, result.get(0, 1), DELTA);
+    assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
+    assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 1), DELTA);
   }
 
   @Test
@@ -458,9 +458,9 @@ public class LLRUnitTest
     query.set(0, 0);
     query.set(1, 0);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(RANDOM_VALUE, result.get(0, 0), DELTA);
+    assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
   }
 
   @Test
@@ -473,10 +473,10 @@ public class LLRUnitTest
     query.set(0, 0);
     query.set(1, 0);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(RANDOM_VALUE, result.get(0, 0), DELTA);
-    assertEquals(RANDOM_VALUE, result.get(0, 1), DELTA);
+    assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
+    assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 1), DELTA);
   }
 
   @Test
@@ -498,9 +498,9 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 1);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(1, result.get(0, 0), DELTA);
+    assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
   }
 
   @Test
@@ -525,9 +525,9 @@ public class LLRUnitTest
     query.set(0, 1);
     query.set(1, 1);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(1, result.get(0, 0), DELTA);
+    assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
   }
 
   @Test
@@ -551,10 +551,10 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 1);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(1, result.get(0, 0), DELTA);
-    assertEquals(1, result.get(0, 1), DELTA);
+    assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
+    assertEquals(1, queryResult.getResult().get(0, 1), DELTA);
   }
 
   @Test
@@ -581,10 +581,10 @@ public class LLRUnitTest
     query.set(0, 1);
     query.set(1, 1);
 
-    SimpleMatrix result = llr.query(query);
+    LLRQueryVO queryResult = llr.query(query);
 
-    assertEquals(1, result.get(0, 0), DELTA);
-    assertEquals(1, result.get(0, 1), DELTA);
+    assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
+    assertEquals(1, queryResult.getResult().get(0, 1), DELTA);
   }
 
   @Test
