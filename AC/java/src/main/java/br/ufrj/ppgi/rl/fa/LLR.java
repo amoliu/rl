@@ -168,7 +168,7 @@ public class LLR implements Serializable
     if (!hasEnoughNeighbors())
     {
       SimpleMatrix result = SimpleMatrix.random(1, output_dimension, 0, 1, random);
-      result.plus(initial_value);
+      result = result.plus(initial_value);
 
       List<Integer> neighbors = Collections.emptyList();
       

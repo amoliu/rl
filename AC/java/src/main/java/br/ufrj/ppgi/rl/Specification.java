@@ -15,8 +15,10 @@ public class Specification implements Serializable
   private int               actorNeighbors;
 
   private SimpleMatrix      actorMin;
-  
+
   private SimpleMatrix      actorMax;
+
+  private double            criticInitialValue;
 
   private int               criticMemory;
 
@@ -174,5 +176,15 @@ public class Specification implements Serializable
   public void setActorMax(SimpleMatrix actorMax)
   {
     this.actorMax = actorMax;
+  }
+
+  public double getCriticInitialValue()
+  {
+    return criticInitialValue;
+  }
+
+  public void setCriticInitialValue(double criticInitialValue)
+  {
+    this.criticInitialValue = criticInitialValue;
   }
 }
