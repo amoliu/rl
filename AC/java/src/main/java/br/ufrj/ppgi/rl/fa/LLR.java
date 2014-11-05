@@ -19,13 +19,15 @@ import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction
 
 public class LLR implements Serializable
 {
-  private static final long   serialVersionUID = -8127879025820943557L;
+  private static final long serialVersionUID = 4191791627521406565L;
 
-  private static final double DEFAUL_TIKHONOV  = 0.000001d;
+  private static final double DEFAUL_TIKHONOV       = 0.000001d;
 
-  private static final double DEFAUL_GAMMA     = 0.9d;
+  private static final double DEFAUL_GAMMA          = 0.9d;
 
-  private static final double BIAS             = 1d;
+  private static final double DEFAULT_INITIAL_VALUE = 0;
+
+  private static final double BIAS                  = 1d;
 
   protected SimpleMatrix      dataInput;
 
@@ -56,6 +58,11 @@ public class LLR implements Serializable
   private LinearSolverChol    solver;
 
   private Random              random;
+
+  public LLR(int size, int input_dimensions, int output_dimensions, int k)
+  {
+    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_TIKHONOV, DEFAUL_GAMMA);
+  }
 
   public LLR(int size, int input_dimensions, int output_dimensions, int k, double initial_value)
   {
