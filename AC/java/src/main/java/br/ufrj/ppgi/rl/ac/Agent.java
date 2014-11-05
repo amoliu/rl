@@ -2,8 +2,6 @@ package br.ufrj.ppgi.rl.ac;
 
 import java.io.Serializable;
 
-import org.ejml.simple.SimpleMatrix;
-
 import br.ufrj.ppgi.rl.Specification;
 
 public interface Agent extends Serializable
@@ -19,7 +17,7 @@ public interface Agent extends Serializable
    * @param observation
    * @return the action to take
    */
-  public SimpleMatrix start(SimpleMatrix observation);
+  public double[][] start(double[][] observation);
 
   /**
    * Following steps, given the current reward and the next observation
@@ -28,7 +26,7 @@ public interface Agent extends Serializable
    * @param observation
    * @return the next action to take
    */
-  public SimpleMatrix step(double reward, SimpleMatrix observation);
+  public double[][] step(double reward, double[][] observation);
 
   /**
    * Signal the end of an episode
@@ -36,7 +34,7 @@ public interface Agent extends Serializable
    * @param reward
    * @return
    */
-  public SimpleMatrix end(double reward);
+  public double[][] end(double reward);
 
   /**
    * To exit cleanly after all episodes are finished.

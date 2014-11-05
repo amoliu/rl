@@ -5,9 +5,11 @@ import java.util.List;
 
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
+
 public class LLRQueryVO implements Serializable
 {
-  private static final long serialVersionUID = -4546987902103479820L;
+  private static final long serialVersionUID = -7650673322560623412L;
 
   private SimpleMatrix      result;
 
@@ -22,6 +24,11 @@ public class LLRQueryVO implements Serializable
   public SimpleMatrix getResult()
   {
     return result;
+  }
+
+  public double[][] getMatlabResult()
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(result);
   }
 
   public void setResult(SimpleMatrix result)

@@ -105,6 +105,14 @@ public class LLR implements Serializable
     solver = new LinearSolverChol(new CholeskyDecompositionInner_D64());
   }
 
+  /**
+   * Matlab proxy to real method call
+   */
+  public void add(double[][] input, double[][] output)
+  {
+    add(new SimpleMatrix(input), new SimpleMatrix(output));
+  }
+  
   public void add(SimpleMatrix input, SimpleMatrix output)
   {
     int pos = 0;
@@ -149,6 +157,20 @@ public class LLR implements Serializable
     return posMinRelevance;
   }
 
+  /**
+   * Matlab proxy to real method call
+   */
+  public void update(double[][] delta)
+  {
+    if (delta.length == 1 && delta[0].length == 1)
+    {
+      update(delta[0][0]);
+      return;
+    }
+    
+    update(new SimpleMatrix(delta));
+  }
+  
   public void update(List<Integer> points, double delta)
   {
     for (Integer pos : points)
@@ -170,6 +192,11 @@ public class LLR implements Serializable
     dataOutput = dataOutput.plus(delta);
   }
 
+  public LLRQueryVO query(double[][] query)
+  {
+    return query(new SimpleMatrix(query));
+  }
+  
   public LLRQueryVO query(SimpleMatrix query)
   {
     if (!hasEnoughNeighbors())

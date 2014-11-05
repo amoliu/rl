@@ -2,13 +2,14 @@ package br.ufrj.ppgi.rl.ac;
 
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.ActorLLR;
 import br.ufrj.ppgi.rl.CriticLLR;
 import br.ufrj.ppgi.rl.Specification;
 
 public class StandardActorCritic implements Agent
 {
-  private static final long serialVersionUID = 6398617648631155363L;
+  private static final long serialVersionUID = 343459651520399510L;
 
   private ActorLLR          actor;
 
@@ -46,23 +47,23 @@ public class StandardActorCritic implements Agent
   }
 
   @Override
-  public SimpleMatrix start(SimpleMatrix observation)
+  public double[][] start(double[][] observation)
   {
-    lastObservation = observation;
+    lastObservation = new SimpleMatrix(observation);
 
-    return chooseAction(observation);
+    return chooseAction(new SimpleMatrix(observation));
   }
 
   @Override
-  public SimpleMatrix step(double reward, SimpleMatrix observation)
+  public double[][] step(double reward, double[][] observation)
   {
-    update(reward, observation);
+    update(reward, new SimpleMatrix(observation));
 
-    return chooseAction(observation);
+    return chooseAction(new SimpleMatrix(observation));
   }
 
   @Override
-  public SimpleMatrix end(double reward)
+  public double[][] end(double reward)
   {
     update(reward, lastObservation);
 
@@ -81,9 +82,9 @@ public class StandardActorCritic implements Agent
     actor.update(delta, lastObservation, lastAction);
   }
 
-  private SimpleMatrix chooseAction(SimpleMatrix observation)
+  private double[][] chooseAction(SimpleMatrix observation)
   {
     lastAction = actor.action(observation);
-    return lastAction;
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
   }
 }
