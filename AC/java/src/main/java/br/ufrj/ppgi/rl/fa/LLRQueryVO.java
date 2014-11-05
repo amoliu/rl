@@ -9,9 +9,9 @@ public class LLRQueryVO implements Serializable
 {
   private static final long serialVersionUID = -4546987902103479820L;
 
-  private SimpleMatrix result;
-  
-  private List<Integer> neighbors;
+  private SimpleMatrix      result;
+
+  private List<Integer>     neighbors;
 
   public LLRQueryVO(SimpleMatrix result, List<Integer> neighbors)
   {

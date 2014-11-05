@@ -22,7 +22,8 @@ public class CriticLLR implements Serializable
     this.specification = specification;
 
     llr = new LLR(specification.getCriticMemory(), specification.getInputDimensions(),
-                  specification.getOutputDimensions(), specification.getCriticNeighbors(), this.specification.getCriticInitialValue());
+                  specification.getOutputDimensions(), specification.getCriticNeighbors(),
+                  this.specification.getCriticInitialValue());
 
     resetEligibilityTrace();
   }

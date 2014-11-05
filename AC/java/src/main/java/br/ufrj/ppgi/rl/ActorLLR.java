@@ -52,11 +52,11 @@ public class ActorLLR implements Serializable
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
-    delta = delta*lastRandom*specification.getActorAlpha();
-    
+    delta = delta * lastRandom * specification.getActorAlpha();
+
     LLRQueryVO queryResult = llr.query(observation);
     llr.add(observation, wrap(action.plus(delta)));
-    
+
     llr.update(queryResult.getNeighbors(), specification.getActorAlpha() * delta);
   }
 
@@ -67,15 +67,15 @@ public class ActorLLR implements Serializable
 
   private SimpleMatrix wrap(SimpleMatrix action)
   {
-    for(int i=0; i<action.numRows(); i++)
+    for (int i = 0; i < action.numRows(); i++)
     {
-      for(int j=0; j<action.numCols(); j++)
+      for (int j = 0; j < action.numCols(); j++)
       {
         if (action.get(i, j) > specification.getActorMax().get(i, j))
         {
           action.set(i, j, specification.getActorMax().get(i, j));
         }
-        
+
         if (action.get(i, j) < specification.getActorMin().get(i, j))
         {
           action.set(i, j, specification.getActorMin().get(i, j));

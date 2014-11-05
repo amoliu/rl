@@ -10,15 +10,15 @@ public class StandardActorCritic implements Agent
 {
   private static final long serialVersionUID = 6398617648631155363L;
 
-  private ActorLLR      actor;
+  private ActorLLR          actor;
 
-  private CriticLLR     critic;
+  private CriticLLR         critic;
 
-  private Specification specification;
+  private Specification     specification;
 
-  private SimpleMatrix  lastObservation;
+  private SimpleMatrix      lastObservation;
 
-  private SimpleMatrix  lastAction;
+  private SimpleMatrix      lastAction;
 
   public StandardActorCritic()
   {

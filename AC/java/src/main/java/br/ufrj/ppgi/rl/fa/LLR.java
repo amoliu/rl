@@ -171,7 +171,7 @@ public class LLR implements Serializable
       result = result.plus(initial_value);
 
       List<Integer> neighbors = Collections.emptyList();
-      
+
       return new LLRQueryVO(result, neighbors);
     }
 

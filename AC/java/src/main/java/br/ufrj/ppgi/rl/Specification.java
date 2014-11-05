@@ -58,6 +58,46 @@ public class Specification implements Serializable
     this.actorAlpha = actorAlpha;
   }
 
+  public int getActorNeighbors()
+  {
+    return actorNeighbors;
+  }
+
+  public void setActorNeighbors(int actorNeighbors)
+  {
+    this.actorNeighbors = actorNeighbors;
+  }
+
+  public SimpleMatrix getActorMin()
+  {
+    return actorMin;
+  }
+
+  public void setActorMin(SimpleMatrix actorMin)
+  {
+    this.actorMin = actorMin;
+  }
+
+  public SimpleMatrix getActorMax()
+  {
+    return actorMax;
+  }
+
+  public void setActorMax(SimpleMatrix actorMax)
+  {
+    this.actorMax = actorMax;
+  }
+
+  public double getCriticInitialValue()
+  {
+    return criticInitialValue;
+  }
+
+  public void setCriticInitialValue(double criticInitialValue)
+  {
+    this.criticInitialValue = criticInitialValue;
+  }
+
   public int getCriticMemory()
   {
     return criticMemory;
@@ -76,6 +116,36 @@ public class Specification implements Serializable
   public void setCriticAlpha(double criticAlpha)
   {
     this.criticAlpha = criticAlpha;
+  }
+
+  public int getCriticNeighbors()
+  {
+    return criticNeighbors;
+  }
+
+  public void setCriticNeighbors(int criticNeighbors)
+  {
+    this.criticNeighbors = criticNeighbors;
+  }
+
+  public int getInputDimensions()
+  {
+    return inputDimensions;
+  }
+
+  public void setInputDimensions(int inputDimensions)
+  {
+    this.inputDimensions = inputDimensions;
+  }
+
+  public int getOutputDimensions()
+  {
+    return outputDimensions;
+  }
+
+  public void setOutputDimensions(int outputDimensions)
+  {
+    this.outputDimensions = outputDimensions;
   }
 
   public float getLamda()
@@ -116,75 +186,5 @@ public class Specification implements Serializable
   public void setSd(float sd)
   {
     this.sd = sd;
-  }
-
-  public int getInputDimensions()
-  {
-    return inputDimensions;
-  }
-
-  public void setInputDimensions(int inputDimensions)
-  {
-    this.inputDimensions = inputDimensions;
-  }
-
-  public int getOutputDimensions()
-  {
-    return outputDimensions;
-  }
-
-  public void setOutputDimensions(int outputDimensions)
-  {
-    this.outputDimensions = outputDimensions;
-  }
-
-  public int getActorNeighbors()
-  {
-    return actorNeighbors;
-  }
-
-  public void setActorNeighbors(int actorNeighbors)
-  {
-    this.actorNeighbors = actorNeighbors;
-  }
-
-  public int getCriticNeighbors()
-  {
-    return criticNeighbors;
-  }
-
-  public void setCriticNeighbors(int criticNeighbors)
-  {
-    this.criticNeighbors = criticNeighbors;
-  }
-
-  public SimpleMatrix getActorMin()
-  {
-    return actorMin;
-  }
-
-  public void setActorMin(SimpleMatrix actorMin)
-  {
-    this.actorMin = actorMin;
-  }
-
-  public SimpleMatrix getActorMax()
-  {
-    return actorMax;
-  }
-
-  public void setActorMax(SimpleMatrix actorMax)
-  {
-    this.actorMax = actorMax;
-  }
-
-  public double getCriticInitialValue()
-  {
-    return criticInitialValue;
-  }
-
-  public void setCriticInitialValue(double criticInitialValue)
-  {
-    this.criticInitialValue = criticInitialValue;
   }
 }

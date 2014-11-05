@@ -23,13 +23,13 @@ public class LLRPerformanceTest
 
     long addTime = 0;
     long queryTime = 0;
-    
+
     Random rand = new Random();
     LLR llr = new LLR(size, inputDimension, outputDimension, neighbors, initialValue);
 
     StopWatch watch = new StopWatch();
 
-    for(int r=0; r<TOTAL_RUN; r++)
+    for (int r = 0; r < TOTAL_RUN; r++)
     {
       watch.reset();
       watch.start();
@@ -40,10 +40,10 @@ public class LLRPerformanceTest
       watch.stop();
       addTime += watch.getTime();
     }
-    
-    System.out.println("Add: " + addTime/(double)TOTAL_RUN + " milliseconds.");
 
-    for(int r=0; r<TOTAL_RUN; r++)
+    System.out.println("Add: " + addTime / (double) TOTAL_RUN + " milliseconds.");
+
+    for (int r = 0; r < TOTAL_RUN; r++)
     {
       watch.reset();
       watch.start();
@@ -54,7 +54,7 @@ public class LLRPerformanceTest
       watch.stop();
       queryTime += watch.getTime();
     }
-    System.out.println("Query: " + queryTime/(double)TOTAL_RUN + " milliseconds.");
+    System.out.println("Query: " + queryTime / (double) TOTAL_RUN + " milliseconds.");
   }
 
 }
