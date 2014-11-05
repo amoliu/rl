@@ -335,4 +335,9 @@ public class LLR implements Serializable
   {
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(dataOutput);
   }
+
+  public double[] getRelevance()
+  {
+    return relevance;
+  }
 }
