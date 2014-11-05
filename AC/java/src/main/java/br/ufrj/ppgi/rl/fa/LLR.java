@@ -12,6 +12,7 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import ags.utils.dataStructures.MaxHeap;
 import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
 import ags.utils.dataStructures.trees.thirdGenKD.KdTree;
@@ -319,9 +320,19 @@ public class LLR implements Serializable
   {
     return dataInput;
   }
+  
+  public double[][] getMatlabDataInput()
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(dataInput);
+  }
 
   public SimpleMatrix getDataOutput()
   {
     return dataOutput;
+  }
+  
+  public double[][] getMatlabDataOutput()
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(dataOutput);
   }
 }
