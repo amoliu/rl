@@ -76,15 +76,15 @@ public class CriticLLRUnitTest
     
     observation.set(3);
     action.set(2);
-    critic.update(observation, action, 0, observation);
+    critic.update(observation, action, CRITIC_INITIAL_VALUE + 10, observation);
     Assert.assertEquals(1, critic.llr.getDataInput().get(0), DELTA);
-    Assert.assertEquals(2, critic.llr.getDataOutput().get(0), DELTA);
+    Assert.assertEquals(CRITIC_INITIAL_VALUE + 1, critic.llr.getDataOutput().get(0), DELTA);
     
     Assert.assertEquals(2, critic.llr.getDataInput().get(1), DELTA);
-    Assert.assertEquals(2, critic.llr.getDataOutput().get(1), DELTA);
+    Assert.assertEquals(CRITIC_INITIAL_VALUE + 1, critic.llr.getDataOutput().get(1), DELTA);
     
     Assert.assertEquals(3, critic.llr.getDataInput().get(2), DELTA);
-    Assert.assertEquals(2, critic.llr.getDataOutput().get(2), DELTA);
+    Assert.assertEquals(CRITIC_INITIAL_VALUE, critic.llr.getDataOutput().get(2), DELTA);
   }
   
   private Specification getSpecification()
