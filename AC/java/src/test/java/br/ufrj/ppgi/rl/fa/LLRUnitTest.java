@@ -310,6 +310,18 @@ public class LLRUnitTest
     assertEquals(0, llr.relevance[1], DELTA);
     assertEquals(1, llr.dataInput.get(1, 0), DELTA);
     assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
+    
+    input.set(0, 0);
+    output.set(0, 0);
+    llr.add(input, output);
+    
+    assertEquals(1.8, llr.relevance[0], DELTA);
+    assertEquals(2, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
+
+    assertEquals(1.9, llr.relevance[1], DELTA);
+    assertEquals(0, llr.dataInput.get(1, 0), DELTA);
+    assertEquals(0, llr.dataOutput.get(1, 0), DELTA);
   }
 
   @Test
@@ -369,15 +381,15 @@ public class LLRUnitTest
     output.set(0, 4);
     llr.add(input, output);
 
-    assertEquals(2, llr.relevance[0], DELTA);
-    assertEquals(2, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(2, llr.dataInput.get(0, 1), DELTA);
-    assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
+    assertEquals(0.05, llr.relevance[0], DELTA);
+    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(0, llr.dataInput.get(0, 1), DELTA);
+    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
 
-    assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataInput.get(1, 1), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
+    assertEquals(2, llr.relevance[1], DELTA);
+    assertEquals(2, llr.dataInput.get(1, 0), DELTA);
+    assertEquals(2, llr.dataInput.get(1, 1), DELTA);
+    assertEquals(4, llr.dataOutput.get(1, 0), DELTA);
   }
 
   @Test
@@ -406,17 +418,17 @@ public class LLRUnitTest
     output.set(1, 4);
     llr.add(input, output);
 
-    assertEquals(2 * Math.sqrt(2), llr.relevance[0], DELTA);
-    assertEquals(2, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(2, llr.dataInput.get(0, 1), DELTA);
-    assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
-    assertEquals(4, llr.dataOutput.get(0, 1), DELTA);
-
-    assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataInput.get(1, 1), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 1), DELTA);
+    assertEquals(0.07, llr.relevance[0], DELTA);
+    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(0, llr.dataInput.get(0, 1), DELTA);
+    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
+    assertEquals(0, llr.dataOutput.get(0, 1), DELTA);
+    
+    assertEquals(2 * Math.sqrt(2), llr.relevance[1], DELTA);
+    assertEquals(2, llr.dataInput.get(1, 0), DELTA);
+    assertEquals(2, llr.dataInput.get(1, 1), DELTA);
+    assertEquals(4, llr.dataOutput.get(1, 0), DELTA);
+    assertEquals(4, llr.dataOutput.get(1, 1), DELTA);
   }
 
   @Test

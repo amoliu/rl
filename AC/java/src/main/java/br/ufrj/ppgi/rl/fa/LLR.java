@@ -126,8 +126,8 @@ public class LLR implements Serializable
     }
     else
     {
-      int posMinRelevance = positionLessRelevant();
-      if (rel <= relevance[posMinRelevance])
+      pos = positionLessRelevant();
+      if (rel <= relevance[pos])
         return;
     }
 
