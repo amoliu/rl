@@ -1,3 +1,4 @@
+
 package br.ufrj.ppgi.rl;
 
 import java.io.Serializable;
@@ -6,7 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = -339958755408435757L;
+  private static final long serialVersionUID = 4480686117748483071L;
 
   private int               actorMemory;
 
@@ -33,8 +34,6 @@ public class Specification implements Serializable
   private float             lamda;
 
   private float             gamma;
-
-  private int               steps;
 
   private float             sd;
 
@@ -73,6 +72,11 @@ public class Specification implements Serializable
     return actorMin;
   }
 
+  public void setActorMin(double[][] value)
+  {
+	setActorMin(new SimpleMatrix(value));
+  }
+  
   public void setActorMin(SimpleMatrix actorMin)
   {
     this.actorMin = actorMin;
@@ -83,6 +87,11 @@ public class Specification implements Serializable
     return actorMax;
   }
 
+  public void setActorMax(double[][] value)
+  {
+	setActorMax(new SimpleMatrix(value));
+  }
+  
   public void setActorMax(SimpleMatrix actorMax)
   {
     this.actorMax = actorMax;
@@ -166,16 +175,6 @@ public class Specification implements Serializable
   public void setGamma(float gamma)
   {
     this.gamma = gamma;
-  }
-
-  public int getSteps()
-  {
-    return steps;
-  }
-
-  public void setSteps(int steps)
-  {
-    this.steps = steps;
   }
 
   public float getSd()

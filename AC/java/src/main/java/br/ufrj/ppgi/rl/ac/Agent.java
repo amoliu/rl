@@ -2,6 +2,8 @@ package br.ufrj.ppgi.rl.ac;
 
 import java.io.Serializable;
 
+import br.ufrj.ppgi.rl.ActorLLR;
+import br.ufrj.ppgi.rl.CriticLLR;
 import br.ufrj.ppgi.rl.Specification;
 
 public interface Agent extends Serializable
@@ -40,4 +42,14 @@ public interface Agent extends Serializable
    * To exit cleanly after all episodes are finished.
    */
   public void fini();
+  
+  /**
+   * Get the critic learned
+   */
+  public CriticLLR getCritic();
+  
+  /**
+   * Get the actor learned
+   */
+  public ActorLLR getActor();
 }

@@ -33,12 +33,12 @@ public class ActorLLR implements Serializable
 
   public SimpleMatrix action(SimpleMatrix observation)
   {
-    if (observation.numCols() != 1)
+    if (observation.numRows() != 1)
     {
-      throw new MatrixDimensionException("Observation is not a column vector");
+      throw new MatrixDimensionException("Observation is not a row vector");
     }
 
-    if (observation.numRows() != specification.getInputDimensions())
+    if (observation.numCols() != specification.getInputDimensions())
     {
       throw new MatrixDimensionException("Observation is not the expected length");
     }

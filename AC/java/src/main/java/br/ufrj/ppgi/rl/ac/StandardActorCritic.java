@@ -9,7 +9,7 @@ import br.ufrj.ppgi.rl.Specification;
 
 public class StandardActorCritic implements Agent
 {
-  private static final long serialVersionUID = 343459651520399510L;
+  private static final long serialVersionUID = -6663645034619646233L;
 
   private ActorLLR          actor;
 
@@ -86,5 +86,15 @@ public class StandardActorCritic implements Agent
   {
     lastAction = actor.action(observation);
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
+  }
+
+  @Override
+  public CriticLLR getCritic() {
+	return critic;
+  }
+
+  @Override
+  public ActorLLR getActor() {
+	return actor;
   }
 }

@@ -1,25 +1,33 @@
 function [critic, actor, cr] = llr_ac_pendulum(episodes)
-    % Initialize simulation
+    % Initialize environment
     spec = env_mops_sim('init');
+    javaSpec = br.ufrj.ppgi.rl.Specification;
+
+    javaSpec.setActorAlpha(0.05);
+    javaSpec.setActorMemory(4000);
+    javaSpec.setActorNeighbors(25)
+    javaSpec.setActorMin(spec.action_min);
+    javaSpec.setActorMax(spec.action_max);
     
-    actor.memory      = 4000;
-    actor.llr         = LLR(actor.memory, spec.observation_dims, spec.action_dims, 25);
-    actor.alpha       = 0.05;
+    javaSpec.setCriticInitialValue(-1000);
+    javaSpec.setCriticAlpha(0.3);
+    javaSpec.setCriticMemory(4000);
+    javaSpec.setCriticNeighbors(25);
+
+    javaSpec.setInputDimensions(spec.observation_dims);
+    javaSpec.setOutputDimensions(spec.action_dims);
+
+    javaSpec.setLamda(0.67);
+    javaSpec.setGamma(0.97);
+    javaSpec.setSd(1.0);  
     
-    critic.memory     = 4000;
-    critic.llr        = LLR(critic.memory, spec.observation_dims, 1, 15);
-    critic.alpha      = 0.3;
-    
-    env.gamma         = 0.97;     % Discount rate
-    env.lambda        = 0.67;     % Decay rate
-    env.steps         = 100;      % Steps per episode
-    env.sd            = 1.0;      % Standard-deviation for gaussian noise in action
-    
-    random_u          = 1.0;           % Random noise for action - Global variable declaration
-    norm_factor       = [ pi/10, pi ]; % Normalization factor used in observations
+    agent = br.ufrj.ppgi.rl.ac.StandardActorCritic;
+    agent.init(javaSpec);
     
     % Initialize learning curve
     cr = zeros(1, episodes);
+    
+    norm_factor = [ pi/10, pi ]; % Normalization factor used in observations
     
     for ee=1:episodes
         % Show progress
@@ -29,72 +37,30 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
         first_obs = env_mops_sim('start');
         norm_first_obs = first_obs ./ norm_factor;
         
-        % Initialize traces
-        Z_values = zeros([critic.memory 1]);
+        action = agent.start(norm_first_obs);      
         
-        % Random action
-        a = choose_action(norm_first_obs);
-        [obs, ~, terminal] = env_mops_sim('step', a);
-        norm_old_obs = obs ./ norm_factor;
-        
-        for tt=1:env.steps
-            if terminal
-                break;
-            end
-            
-            % Calculate action
-            action = choose_action(norm_old_obs);
-            
-            % Actuate
+        for tt=1:100
+             % Actuate
             [obs, reward, terminal] = env_mops_sim('step', action);
             norm_obs = obs ./ norm_factor;
             
-            % Update based on real observation
-            update(norm_old_obs, action, norm_obs, reward);
+            if terminal
+                agent.end(reward);
+                break;
+            end
             
-            % Prepare for next timestep
-            norm_old_obs = norm_obs;
-
+            % Learn and choose next action
+            action = agent.step(reward, norm_obs);
+                      
             % Keep track of learning curve
+            cr(ee) = cr(ee) + reward;
         end
-        
-        cr(ee) = test_ac_llr(actor, spec);
-    end
-    
-    function update(norm_old_obs, action, norm_obs, reward)
-        % Critic
-        value_function = critic.llr.query(norm_obs);
-        [old_value_function, ~, old_critic_neighbors] = critic.llr.query(norm_old_obs);
-        
-        % TD-error
-        delta = reward + env.gamma*value_function - old_value_function;
-        
-        % Add to Critic LLR
-        critic.llr.add(norm_old_obs, old_value_function);
-        
-        % Update ET
-        Z_values = Z_values*env.lambda*env.gamma;
-        Z_values(old_critic_neighbors) = 1;
-        
-        critic.llr.update(Z_values.*critic.alpha*delta);
-        
-        % Update actor
-        actor_update = actor.alpha*random_u*delta;
-        actor.llr.add(norm_old_obs, min(max(action + actor_update, spec.action_min), spec.action_max));
-        
-        [~, ~, actor_neighbors] = actor.llr.query(norm_old_obs);
-        actor.llr.update(actor_update, actor_neighbors, spec.action_min, spec.action_max);
-    end
-
-    function a = choose_action(norm_old_obs)
-        random_u = normrnd(0, env.sd);
-        a = actor.llr.query(norm_old_obs) + random_u;
-        a = max(a, spec.action_min);
-        a = min(a, spec.action_max);
-        
-        %disp([norm_old_obs .* norm_factor a]);
     end
 
     % Destroy simulation
-    env_mops_sim('fini');   
+    env_mops_sim('fini');
+    agent.fini();
+    
+    critic = agent.getCritic();
+    actor = agent.getActor();
 end
