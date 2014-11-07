@@ -20,7 +20,7 @@ import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction
 
 public class LLR implements Serializable
 {
-  private static final long serialVersionUID = 4191791627521406565L;
+  private static final long   serialVersionUID      = 4191791627521406565L;
 
   private static final double DEFAUL_TIKHONOV       = 0.000001d;
 
@@ -113,7 +113,7 @@ public class LLR implements Serializable
   {
     add(new SimpleMatrix(input), new SimpleMatrix(output));
   }
-  
+
   public void add(SimpleMatrix input, SimpleMatrix output)
   {
     int pos = 0;
@@ -168,10 +168,10 @@ public class LLR implements Serializable
       update(delta[0][0]);
       return;
     }
-    
+
     update(new SimpleMatrix(delta));
   }
-  
+
   public void update(List<Integer> points, double delta)
   {
     for (Integer pos : points)
@@ -197,7 +197,7 @@ public class LLR implements Serializable
   {
     return query(new SimpleMatrix(query));
   }
-  
+
   public LLRQueryVO query(SimpleMatrix query)
   {
     if (!hasEnoughNeighbors())
@@ -320,7 +320,7 @@ public class LLR implements Serializable
   {
     return dataInput;
   }
-  
+
   public double[][] getMatlabDataInput()
   {
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(dataInput);
@@ -330,7 +330,7 @@ public class LLR implements Serializable
   {
     return dataOutput;
   }
-  
+
   public double[][] getMatlabDataOutput()
   {
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(dataOutput);
