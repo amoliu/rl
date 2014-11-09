@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LLR;
 import br.ufrj.ppgi.rl.fa.LLRQueryVO;
 
@@ -39,13 +40,11 @@ public class CriticLLR implements Serializable
     LLRQueryVO valueFunction = llr.query(observation);
     LLRQueryVO oldValueFunction = llr.query(lastObservation);
 
-    double tdError = reward - specification.getGamma() * valueFunction.getResult().get(0)
+    double tdError = reward + specification.getGamma() * valueFunction.getResult().get(0)
                      - oldValueFunction.getResult().get(0);
 
     // Add to LLR
-    SimpleMatrix oldOutput = new SimpleMatrix(1, 1);
-    oldOutput.set(oldValueFunction.getResult());
-    llr.add(lastObservation, oldOutput);
+    llr.add(lastObservation, oldValueFunction.getResult());
 
     // Update ET
     for (int i = 0; i < eligibilityTrace.getNumElements(); i++)
@@ -66,4 +65,13 @@ public class CriticLLR implements Serializable
     return tdError;
   }
 
+  public LLR getLLR()
+  {
+    return llr;
+  }
+  
+  public double[][] getEligibilityTrace()
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(eligibilityTrace);
+  }
 }

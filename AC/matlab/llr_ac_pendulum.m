@@ -4,20 +4,20 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
     javaSpec.setActorAlpha(0.05);
-    javaSpec.setActorMemory(4000);
-    javaSpec.setActorNeighbors(25)
+    javaSpec.setActorMemory(3000);
+    javaSpec.setActorNeighbors(20)
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     
-    javaSpec.setCriticInitialValue(-1000);
+    javaSpec.setCriticInitialValue(0);
     javaSpec.setCriticAlpha(0.3);
-    javaSpec.setCriticMemory(4000);
-    javaSpec.setCriticNeighbors(25);
+    javaSpec.setCriticMemory(2000);
+    javaSpec.setCriticNeighbors(10);
 
     javaSpec.setInputDimensions(spec.observation_dims);
     javaSpec.setOutputDimensions(spec.action_dims);
 
-    javaSpec.setLamda(0.67);
+    javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
     javaSpec.setSd(1.0);  
     

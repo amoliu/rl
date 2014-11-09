@@ -127,8 +127,8 @@ public class LLR implements Serializable
     else
     {
       pos = positionLessRelevant();
-      if (rel <= relevance[pos])
-        return;
+      //if (rel <= relevance[pos])
+      //  return;
     }
 
     relevance[pos] = rel;
@@ -179,6 +179,18 @@ public class LLR implements Serializable
       for (int i = 0; i < output_dimension; i++)
       {
         dataOutput.set(pos, i, dataOutput.get(pos, i) + delta);
+      }
+    }
+  }
+  
+  public void update(List<Integer> points, double delta, SimpleMatrix maxValue, SimpleMatrix minValue)
+  {
+    for (Integer pos : points)
+    {
+      SimpleMatrix update = EJMLMatlabUtils.wrap(dataOutput.extractVector(true, pos).plus(delta), maxValue, minValue);
+      for (int i = 0; i < output_dimension; i++)
+      {
+        dataOutput.set(pos, i, update.get(i));
       }
     }
   }
@@ -240,11 +252,11 @@ public class LLR implements Serializable
     solver.solve(A.mult(B).getMatrix(), X);
 
     SimpleMatrix queryBias = new SimpleMatrix(1, input_dimension + 1);
-    for (int i = 0; i < query.numRows(); i++)
+    for (int i = 0; i < query.numCols(); i++)
     {
-      queryBias.set(0, i, query.get(i, 0));
+      queryBias.set(0, i, query.get(i));
     }
-    queryBias.set(0, query.numRows(), 1);
+    queryBias.set(0, query.numCols(), 1);
 
     return queryBias.mult(SimpleMatrix.wrap(X));
   }
@@ -302,12 +314,7 @@ public class LLR implements Serializable
     tree = new KdTree<Integer>(input_dimension);
     for (int i = 0; i < last_llr; i++)
     {
-      double[] location = new double[input_dimension];
-      for (int j = 0; j < input_dimension; j++)
-      {
-        location[j] = dataInput.get(i, j);
-      }
-      tree.addPoint(location, i);
+      tree.addPoint(dataInput.extractVector(true, i).getMatrix().data, i);
     }
   }
 

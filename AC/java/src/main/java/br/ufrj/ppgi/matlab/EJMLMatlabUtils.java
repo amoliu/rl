@@ -20,4 +20,24 @@ public class EJMLMatlabUtils implements Serializable
     return matlabResult;
   }
 
+  public static SimpleMatrix wrap(SimpleMatrix value, SimpleMatrix maxValue, SimpleMatrix minValue)
+  {
+    for (int i = 0; i < value.numRows(); i++)
+    {
+      for (int j = 0; j < value.numCols(); j++)
+      {
+        if (value.get(i, j) > maxValue.get(i, j))
+        {
+          value.set(i, j, maxValue.get(i, j));
+        }
+
+        if (value.get(i, j) < minValue.get(i, j))
+        {
+          value.set(i, j, minValue.get(i, j));
+        }
+      }
+    }
+    return value;
+  }
+
 }

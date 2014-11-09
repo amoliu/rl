@@ -11,15 +11,15 @@ public class StandardActorCritic implements Agent
 {
   private static final long serialVersionUID = -6663645034619646233L;
 
-  private ActorLLR          actor;
+  protected ActorLLR        actor;
 
-  private CriticLLR         critic;
+  protected CriticLLR       critic;
 
   private Specification     specification;
 
-  private SimpleMatrix      lastObservation;
+  protected SimpleMatrix    lastObservation;
 
-  private SimpleMatrix      lastAction;
+  protected SimpleMatrix    lastAction;
 
   public StandardActorCritic()
   {
@@ -58,6 +58,7 @@ public class StandardActorCritic implements Agent
   public double[][] step(double reward, double[][] observation)
   {
     update(reward, new SimpleMatrix(observation));
+    lastObservation = new SimpleMatrix(observation);
 
     return chooseAction(new SimpleMatrix(observation));
   }
@@ -89,12 +90,14 @@ public class StandardActorCritic implements Agent
   }
 
   @Override
-  public CriticLLR getCritic() {
-	return critic;
+  public CriticLLR getCritic()
+  {
+    return critic;
   }
 
   @Override
-  public ActorLLR getActor() {
-	return actor;
+  public ActorLLR getActor()
+  {
+    return actor;
   }
 }

@@ -45,4 +45,10 @@ public class LLRQueryVO implements Serializable
   {
     this.neighbors = neighbors;
   }
+
+  @Override
+  public String toString()
+  {
+    return "LLRQueryVO [result=" + result + ", neighbors=" + neighbors + "]";
+  }
 }

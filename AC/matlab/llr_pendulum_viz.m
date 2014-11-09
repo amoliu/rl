@@ -1,5 +1,4 @@
-function [V, policy] = llr_pendulum_viz(actor, critic, cr, rmse)
-   
+function llr_pendulum_viz(actor, critic, cr, rmse)
     steps   = 100;   % Steps per episode
     radius  = 2;     % Radius for plot
     
@@ -28,52 +27,23 @@ function [V, policy] = llr_pendulum_viz(actor, critic, cr, rmse)
     end
     
     figure;
-    scatter(critic.llr.data(:, 1), critic.llr.data(:, 2), [], critic.llr.data(:,3), 'x')
+    criticInput = critic.getLLR.getMatlabDataInput;
+    criticOutput = critic.getLLR.getMatlabDataOutput;
+    scatter(criticInput(:,1), criticInput(:,2), [], criticOutput, 'x')
     title('Critic');
     xlabel('angle[rad]');
     ylabel('angular velocity[rad/s]');
     colorbar;
     
     figure;
-    scatter(actor.llr.data(:, 1), actor.llr.data(:, 2), [], actor.llr.data(:,3), 'x')
+    actorInput = actor.getLLR.getMatlabDataInput;
+    actorOutput = actor.getLLR.getMatlabDataOutput;
+    scatter(actorInput(:,1), actorInput(:,2), [], actorOutput, 'x')
     title('Actor');
     xlabel('angle[rad]');
     ylabel('angular velocity[rad/s]');
     colorbar;
-    
-    %{
-    x = linspace(0,6.2832,100);
-    y = linspace(-37.6991,37.6991,100);
-    %[X,Y] = meshgrid(x,y);
-    % Critic
-    figure;
-    V = zeros(100,100);
-    for i=1:100
-        for j=1:100
-            V(j,i) = critic.llr.query([x(i) ./ (pi/10) y(j) ./ pi]);
-        end
-    end
-    contourf(x, y, V);
-    title('Critic');
-    xlabel('angle[rad]');
-    ylabel('angular velocity[rad/s]');
-    colorbar;
-    
-    % Actor
-    figure;
-    policy = zeros(100,100);
-    for i=1:100
-        for j=1:100
-            policy(j,i) = actor.llr.query([x(i) ./ (pi/10) y(j) ./ pi]);
-        end
-    end
-    contourf(x, y, policy);
-    title('Actor');
-    xlabel('angle[rad]');
-    ylabel('angular velocity[rad/s]');
-    colorbar;
-    %}
-    
+        
     % Movie
     figure;
     for tt=1:steps       
@@ -82,9 +52,7 @@ function [V, policy] = llr_pendulum_viz(actor, critic, cr, rmse)
         end
             
         % Calculate action
-        a = actor.llr.query(norm_obs);
-        a = max(a, spec.action_min);
-        a = min(a, spec.action_max);
+        a = actor.getLLR.query(norm_obs).getMatlabResult;
         disp(a);
 
         % Actuate

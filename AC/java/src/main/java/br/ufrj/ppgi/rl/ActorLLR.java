@@ -6,6 +6,7 @@ import java.util.Random;
 import org.ejml.alg.dense.mult.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LLR;
 import br.ufrj.ppgi.rl.fa.LLRQueryVO;
 
@@ -47,7 +48,7 @@ public class ActorLLR implements Serializable
     SimpleMatrix action = queryResult.getResult();
     nextRandom();
 
-    return wrap(action.plus(lastRandom));
+    return EJMLMatlabUtils.wrap(action.plus(lastRandom), specification.getActorMax(), specification.getActorMin());
   }
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action)
@@ -55,9 +56,9 @@ public class ActorLLR implements Serializable
     delta = delta * lastRandom * specification.getActorAlpha();
 
     LLRQueryVO queryResult = llr.query(observation);
-    llr.add(observation, wrap(action.plus(delta)));
+    llr.add(observation, EJMLMatlabUtils.wrap(action.plus(delta), specification.getActorMax(), specification.getActorMin()));
 
-    llr.update(queryResult.getNeighbors(), specification.getActorAlpha() * delta);
+    llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
 
   private void nextRandom()
@@ -65,23 +66,8 @@ public class ActorLLR implements Serializable
     lastRandom = random.nextGaussian() * specification.getSd();
   }
 
-  private SimpleMatrix wrap(SimpleMatrix action)
+  public LLR getLLR()
   {
-    for (int i = 0; i < action.numRows(); i++)
-    {
-      for (int j = 0; j < action.numCols(); j++)
-      {
-        if (action.get(i, j) > specification.getActorMax().get(i, j))
-        {
-          action.set(i, j, specification.getActorMax().get(i, j));
-        }
-
-        if (action.get(i, j) < specification.getActorMin().get(i, j))
-        {
-          action.set(i, j, specification.getActorMin().get(i, j));
-        }
-      }
-    }
-    return action;
+    return llr;
   }
 }
