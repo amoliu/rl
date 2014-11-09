@@ -4,12 +4,6 @@
 clear all;
 close all;
 
-javaaddpath('/home/bruno/Documentos/rl/AC/java/build/matlab/core-0.26.jar');
-javaaddpath('/home/bruno/Documentos/rl/AC/java/build/matlab/equation-0.26.jar');
-javaaddpath('/home/bruno/Documentos/rl/AC/java/build/matlab/knn-benchmark-0.1.jar');
-javaaddpath('/home/bruno/Documentos/rl/AC/java/build/matlab/commons-lang3-3.3.2.jar');
-javaaddpath('/home/bruno/Documentos/rl/AC/java/build/matlab/projeto.jar');
-
 llr = br.ufrj.ppgi.rl.fa.LLR(50,1,1,3);
 figure;       
     
