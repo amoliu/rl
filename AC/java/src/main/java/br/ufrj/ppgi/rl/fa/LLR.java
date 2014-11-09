@@ -280,6 +280,8 @@ public class LLR implements Serializable
       SimpleMatrix real_value = dataOutput.extractVector(true, pos);
 
       double rel = NormOps.normP2(real_value.minus(predict_value).getMatrix());
+      
+      dataOutput.setRow(pos, 0, predict_value.getMatrix().data);
 
       relevance[pos] = gamma * relevance[pos] + (1 - gamma) * rel;
     }
