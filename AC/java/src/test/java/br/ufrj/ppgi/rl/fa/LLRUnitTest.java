@@ -148,143 +148,7 @@ public class LLRUnitTest
   }
 
   @Test
-  public void testAdd_MemoryFull_EntryNotRelevant_ShouldNotAdd_1Input1Output()
-  {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
-
-    SimpleMatrix input = new SimpleMatrix(1, 1);
-    SimpleMatrix output = new SimpleMatrix(1, 1);
-
-    input.set(0, 0);
-    output.set(0, 0);
-    llr.add(input, output);
-
-    input.set(0, 1);
-    output.set(0, 1);
-    llr.add(input, output);
-
-    input.set(0, 0.5);
-    output.set(0, 0.5);
-    llr.add(input, output);
-
-    assertEquals(0, llr.relevance[0], DELTA);
-    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
-
-    assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
-  }
-
-  @Test
-  public void testAdd_MemoryFull_EntryNotRelevant_ShouldNotAdd_2Input1Output()
-  {
-    LLR llr = new LLR(SIZE, 2, 1, 2, 0);
-
-    SimpleMatrix input = new SimpleMatrix(2, 1);
-    SimpleMatrix output = new SimpleMatrix(1, 1);
-
-    input.set(0, 0);
-    input.set(1, 0);
-    output.set(0, 0);
-    llr.add(input, output);
-
-    input.set(0, 1);
-    input.set(1, 1);
-    output.set(0, 1);
-    llr.add(input, output);
-
-    input.set(0, 0.5);
-    input.set(1, 0.5);
-    output.set(0, 0.5);
-    llr.add(input, output);
-
-    assertEquals(0, llr.relevance[0], DELTA);
-    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataInput.get(0, 1), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
-
-    assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataInput.get(1, 1), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
-  }
-
-  @Test
-  public void testAdd_MemoryFull_EntryNotRelevant_ShouldNotAdd_1Input2Output()
-  {
-    LLR llr = new LLR(SIZE, 1, 2, 2, 0);
-
-    SimpleMatrix input = new SimpleMatrix(1, 1);
-    SimpleMatrix output = new SimpleMatrix(2, 1);
-
-    input.set(0, 0);
-    output.set(0, 0);
-    output.set(1, 0);
-    llr.add(input, output);
-
-    input.set(0, 1);
-    output.set(0, 1);
-    output.set(1, 1);
-    llr.add(input, output);
-
-    input.set(0, 0.5);
-    output.set(0, 0.5);
-    output.set(1, 0.5);
-    llr.add(input, output);
-
-    assertEquals(0, llr.relevance[0], DELTA);
-    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 1), DELTA);
-
-    assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 1), DELTA);
-  }
-
-  @Test
-  public void testAdd_MemoryFull_EntryNotRelevant_ShouldNotAdd_2Input2Output()
-  {
-    LLR llr = new LLR(SIZE, 2, 2, 2, 0);
-
-    SimpleMatrix input = new SimpleMatrix(2, 1);
-    SimpleMatrix output = new SimpleMatrix(2, 1);
-
-    input.set(0, 0);
-    input.set(1, 0);
-    output.set(0, 0);
-    output.set(1, 0);
-    llr.add(input, output);
-
-    input.set(0, 1);
-    input.set(1, 1);
-    output.set(0, 1);
-    output.set(1, 1);
-    llr.add(input, output);
-
-    input.set(0, 0.5);
-    input.set(1, 0.5);
-    output.set(0, 0.5);
-    output.set(1, 0.5);
-    llr.add(input, output);
-
-    assertEquals(0, llr.relevance[0], DELTA);
-    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataInput.get(0, 1), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 1), DELTA);
-
-    assertEquals(0, llr.relevance[1], DELTA);
-    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataInput.get(1, 1), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
-    assertEquals(1, llr.dataOutput.get(1, 1), DELTA);
-  }
-
-  @Test
-  public void testAdd_MemoryFull_EntryRelevant_ShouldAdd_1Input1Output()
+  public void testAdd_MemoryFull_1Input1Output()
   {
     LLR llr = new LLR(SIZE, 1, 1, 2, 0);
 
@@ -310,11 +174,11 @@ public class LLRUnitTest
     assertEquals(0, llr.relevance[1], DELTA);
     assertEquals(1, llr.dataInput.get(1, 0), DELTA);
     assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
-    
+
     input.set(0, 0);
     output.set(0, 0);
     llr.add(input, output);
-    
+
     assertEquals(1.8, llr.relevance[0], DELTA);
     assertEquals(2, llr.dataInput.get(0, 0), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
@@ -325,7 +189,7 @@ public class LLRUnitTest
   }
 
   @Test
-  public void testAdd_MemoryFull_EntryRelevant_ShouldAdd_1Input2Output()
+  public void testAdd_MemoryFull_1Input2Output()
   {
     LLR llr = new LLR(SIZE, 1, 2, 2, 0);
 
@@ -359,7 +223,7 @@ public class LLRUnitTest
   }
 
   @Test
-  public void testAdd_MemoryFull_EntryRelevant_ShouldAdd_2Input1Output()
+  public void testAdd_MemoryFull_2Input1Output()
   {
     LLR llr = new LLR(SIZE, 2, 1, 2, 0);
 
@@ -381,19 +245,19 @@ public class LLRUnitTest
     output.set(0, 4);
     llr.add(input, output);
 
-    assertEquals(0.05, llr.relevance[0], DELTA);
-    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataInput.get(0, 1), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
-
-    assertEquals(2, llr.relevance[1], DELTA);
-    assertEquals(2, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(2, llr.dataInput.get(1, 1), DELTA);
-    assertEquals(4, llr.dataOutput.get(1, 0), DELTA);
+    assertEquals(2.5, llr.relevance[0], DELTA);
+    assertEquals(2, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(2, llr.dataInput.get(0, 1), DELTA);
+    assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
+    
+    assertEquals(0.05, llr.relevance[1], DELTA);
+    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
+    assertEquals(1, llr.dataInput.get(1, 1), DELTA);
+    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
   }
 
   @Test
-  public void testAdd_MemoryFull_EntryRelevant_ShouldAdd_2Input2Output()
+  public void ttestAdd_MemoryFull_2Input2Output()
   {
     LLR llr = new LLR(SIZE, 2, 2, 2, 0);
 
@@ -418,17 +282,17 @@ public class LLRUnitTest
     output.set(1, 4);
     llr.add(input, output);
 
-    assertEquals(0.07, llr.relevance[0], DELTA);
-    assertEquals(0, llr.dataInput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataInput.get(0, 1), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
-    assertEquals(0, llr.dataOutput.get(0, 1), DELTA);
+    assertEquals(Math.sqrt(Math.pow(2.5, 2)*2), llr.relevance[0], DELTA);
+    assertEquals(2, llr.dataInput.get(0, 0), DELTA);
+    assertEquals(2, llr.dataInput.get(0, 1), DELTA);
+    assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
+    assertEquals(4, llr.dataOutput.get(0, 1), DELTA);
     
-    assertEquals(2 * Math.sqrt(2), llr.relevance[1], DELTA);
-    assertEquals(2, llr.dataInput.get(1, 0), DELTA);
-    assertEquals(2, llr.dataInput.get(1, 1), DELTA);
-    assertEquals(4, llr.dataOutput.get(1, 0), DELTA);
-    assertEquals(4, llr.dataOutput.get(1, 1), DELTA);
+    assertEquals(0.07, llr.relevance[1], DELTA);
+    assertEquals(1, llr.dataInput.get(1, 0), DELTA);
+    assertEquals(1, llr.dataInput.get(1, 1), DELTA);
+    assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
+    assertEquals(1, llr.dataOutput.get(1, 1), DELTA);
   }
 
   @Test
