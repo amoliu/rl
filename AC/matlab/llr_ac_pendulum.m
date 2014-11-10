@@ -29,6 +29,10 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
     
     norm_factor = [ pi/10, pi ]; % Normalization factor used in observations
     
+    writerObj = VideoWriter('sac.avi');
+    open(writerObj);
+    fig = figure('units', 'normalized', 'outerposition', [0 0 1 1]);
+    
     for ee=1:episodes
         % Show progress
         disp(ee)
@@ -51,16 +55,44 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
             
             % Learn and choose next action
             action = agent.step(reward, norm_obs);
+            
+            subplot(1,2,1)
+            actorInput = agent.getActor.getLLR.getMatlabDataInput;
+            actorOutput = agent.getActor.getLLR.getMatlabDataOutput;
+            scatter(actorInput(:,1), actorInput(:,2), [], actorOutput, 'x');
+            title('Actor');
+            xlabel('angle[rad]');
+            ylabel('angular velocity[rad/s]');
+            axis([0 20 -12 12]);
+            colorbar;
+            
+            subplot(1,2,2)
+            criticInput = agent.getCritic.getLLR.getMatlabDataInput;
+            criticOutput = agent.getCritic.getLLR.getMatlabDataOutput;
+            scatter(criticInput(:,1), criticInput(:,2), [], criticOutput, 'x');
+            title('Critic');
+            xlabel('angle[rad]');
+            ylabel('angular velocity[rad/s]');
+            axis([0 20 -12 12]);
+            colorbar;
+
+            frame = getframe(fig);
+            writeVideo(writerObj, frame);
+            M((ee-1)*100 + tt) = frame;
                       
             % Keep track of learning curve
             cr(ee) = cr(ee) + reward;
         end
-    end
-
+    end  
+    
+    close(writerObj);
+    
     % Destroy simulation
     env_mops_sim('fini');
     agent.fini();
     
     critic = agent.getCritic();
     actor = agent.getActor();
+    
+    %movie(M,2,10);
 end
