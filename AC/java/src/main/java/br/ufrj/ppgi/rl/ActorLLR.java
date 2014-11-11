@@ -34,6 +34,14 @@ public class ActorLLR implements Serializable
 
   public SimpleMatrix action(SimpleMatrix observation)
   {
+    SimpleMatrix action = actionWithoutRandomness(observation);
+    nextRandom();
+
+    return EJMLMatlabUtils.wrap(action.plus(lastRandom), specification.getActorMax(), specification.getActorMin());
+  }
+
+  public SimpleMatrix actionWithoutRandomness(SimpleMatrix observation)
+  {
     if (observation.numRows() != 1)
     {
       throw new MatrixDimensionException("Observation is not a row vector");
@@ -45,10 +53,7 @@ public class ActorLLR implements Serializable
     }
 
     LLRQueryVO queryResult = llr.query(observation);
-    SimpleMatrix action = queryResult.getResult();
-    nextRandom();
-
-    return EJMLMatlabUtils.wrap(action.plus(lastRandom), specification.getActorMax(), specification.getActorMin());
+    return queryResult.getResult();
   }
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action)
@@ -56,7 +61,8 @@ public class ActorLLR implements Serializable
     delta = delta * lastRandom * specification.getActorAlpha();
 
     LLRQueryVO queryResult = llr.query(observation);
-    llr.add(observation, EJMLMatlabUtils.wrap(action.plus(delta), specification.getActorMax(), specification.getActorMin()));
+    llr.add(observation,
+            EJMLMatlabUtils.wrap(action.plus(delta), specification.getActorMax(), specification.getActorMin()));
 
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
