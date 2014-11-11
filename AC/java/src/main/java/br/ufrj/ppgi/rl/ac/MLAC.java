@@ -1,0 +1,112 @@
+package br.ufrj.ppgi.rl.ac;
+
+import org.ejml.simple.SimpleMatrix;
+
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
+import br.ufrj.ppgi.rl.ActorLLR;
+import br.ufrj.ppgi.rl.CriticLLR;
+import br.ufrj.ppgi.rl.Specification;
+import br.ufrj.ppgi.rl.fa.LLR;
+
+public class MLAC implements Agent
+{
+  private static final long serialVersionUID = -1297896020589293781L;
+
+  protected ActorLLR        actor;
+
+  protected CriticLLR       critic;
+
+  protected LLR             processModel;
+
+  private Specification     specification;
+
+  protected SimpleMatrix    lastObservation;
+
+  protected SimpleMatrix    lastAction;
+
+  public MLAC()
+  {
+    actor = new ActorLLR();
+    critic = new CriticLLR();
+
+    specification = null;
+
+    lastObservation = null;
+    lastAction = null;
+  }
+
+  @Override
+  public void init(Specification specification)
+  {
+    if (this.specification != null)
+    {
+      throw new IllegalStateException("Agent already started");
+    }
+
+    this.specification = specification;
+
+    actor.init(specification);
+    critic.init(specification);
+  }
+
+  @Override
+  public double[][] start(double[][] observation)
+  {
+    lastObservation = new SimpleMatrix(observation);
+
+    return chooseAction(new SimpleMatrix(observation));
+  }
+
+  @Override
+  public double[][] step(double reward, double[][] observation)
+  {
+    update(reward, new SimpleMatrix(observation));
+    lastObservation = new SimpleMatrix(observation);
+
+    return chooseAction(new SimpleMatrix(observation));
+  }
+
+  @Override
+  public double[][] end(double reward)
+  {
+    update(reward, lastObservation);
+
+    return chooseAction(lastObservation);
+  }
+
+  @Override
+  public void fini()
+  {
+    this.specification = null;
+  }
+
+  private void update(double reward, SimpleMatrix observation)
+  {
+    double delta = critic.update(lastObservation, lastAction, reward, observation);
+    actor.update(delta, lastObservation, lastAction);
+  }
+
+  private double[][] chooseAction(SimpleMatrix observation)
+  {
+    lastAction = actor.action(observation);
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
+  }
+
+  @Override
+  public CriticLLR getCritic()
+  {
+    return critic;
+  }
+
+  @Override
+  public ActorLLR getActor()
+  {
+    return actor;
+  }
+
+  @Override
+  public double[][] stepWithoutLearn(double[][] observation)
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(actor.actionWithoutRandomness(new SimpleMatrix(observation)));
+  }
+}
