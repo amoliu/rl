@@ -96,8 +96,8 @@ public class CriticLLRUnitTest
     specification.setCriticInitialValue(CRITIC_INITIAL_VALUE);
     specification.setSd(1f);
     
-    specification.setInputDimensions(1);
-    specification.setOutputDimensions(1);
+    specification.setObservationDimensions(1);
+    specification.setActionDimensions(1);
     return specification;
   }
 }

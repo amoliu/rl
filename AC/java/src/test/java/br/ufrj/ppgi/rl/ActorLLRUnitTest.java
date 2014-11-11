@@ -31,7 +31,7 @@ public class ActorLLRUnitTest
   public void testAction_1Input2Output()
   {
     Specification specification = getSpecification_1Input2Output();
-    specification.setOutputDimensions(2);
+    specification.setActionDimensions(2);
 
     ActorLLR actor = new ActorLLR();
     actor.init(specification);
@@ -122,8 +122,8 @@ public class ActorLLRUnitTest
     actorMax.set(0, 3);
     actorMax.set(1, 3);
 
-    specification.setInputDimensions(1);
-    specification.setOutputDimensions(2);
+    specification.setObservationDimensions(1);
+    specification.setActionDimensions(2);
     specification.setActorMax(actorMax);
     specification.setActorMin(actorMin);
     return specification;
@@ -138,8 +138,8 @@ public class ActorLLRUnitTest
     SimpleMatrix actorMax = new SimpleMatrix(1, 1);
     actorMax.set(0, 3);
 
-    specification.setInputDimensions(1);
-    specification.setOutputDimensions(1);
+    specification.setObservationDimensions(1);
+    specification.setActionDimensions(1);
     specification.setActorMax(actorMax);
     specification.setActorMin(actorMin);
     return specification;

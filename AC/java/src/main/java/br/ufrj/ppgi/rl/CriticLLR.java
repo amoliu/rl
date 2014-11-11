@@ -22,9 +22,8 @@ public class CriticLLR implements Serializable
   {
     this.specification = specification;
 
-    llr = new LLR(specification.getCriticMemory(), specification.getInputDimensions(),
-                  specification.getOutputDimensions(), specification.getCriticNeighbors(),
-                  this.specification.getCriticInitialValue());
+    llr = new LLR(specification.getCriticMemory(), specification.getObservationDimensions(), 1,
+                  specification.getCriticNeighbors(), this.specification.getCriticInitialValue());
 
     resetEligibilityTrace();
   }
@@ -69,7 +68,7 @@ public class CriticLLR implements Serializable
   {
     return llr;
   }
-  
+
   public double[][] getEligibilityTrace()
   {
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(eligibilityTrace);

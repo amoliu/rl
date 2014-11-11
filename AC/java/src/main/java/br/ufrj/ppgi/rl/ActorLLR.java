@@ -26,8 +26,8 @@ public class ActorLLR implements Serializable
   {
     this.specification = specification;
 
-    llr = new LLR(specification.getActorMemory(), specification.getInputDimensions(),
-                  specification.getOutputDimensions(), specification.getActorNeighbors(), 0);
+    llr = new LLR(specification.getActorMemory(), specification.getObservationDimensions(),
+                  specification.getActionDimensions(), specification.getActorNeighbors());
 
     random = new Random();
   }
@@ -47,7 +47,7 @@ public class ActorLLR implements Serializable
       throw new MatrixDimensionException("Observation is not a row vector");
     }
 
-    if (observation.numCols() != specification.getInputDimensions())
+    if (observation.numCols() != specification.getObservationDimensions())
     {
       throw new MatrixDimensionException("Observation is not the expected length");
     }

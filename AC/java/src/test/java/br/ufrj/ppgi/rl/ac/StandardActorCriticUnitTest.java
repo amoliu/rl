@@ -44,14 +44,14 @@ public class StandardActorCriticUnitTest
     SimpleMatrix actorMax = new SimpleMatrix(1, 1);
     actorMax.set(0, 3);
 
-    specification.setInputDimensions(1);
-    specification.setOutputDimensions(1);
+    specification.setObservationDimensions(1);
+    specification.setActionDimensions(1);
     specification.setActorMax(actorMax);
     specification.setActorMin(actorMin);
     
     specification.setSd(1f);
-    specification.setInputDimensions(1);
-    specification.setOutputDimensions(1);
+    specification.setObservationDimensions(1);
+    specification.setActionDimensions(1);
     return specification;
   }
 }

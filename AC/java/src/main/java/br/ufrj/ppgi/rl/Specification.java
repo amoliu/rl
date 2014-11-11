@@ -1,4 +1,3 @@
-
 package br.ufrj.ppgi.rl;
 
 import java.io.Serializable;
@@ -7,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = 4480686117748483071L;
+  private static final long serialVersionUID = 8714416835477632472L;
 
   private int               actorMemory;
 
@@ -27,15 +26,19 @@ public class Specification implements Serializable
 
   private int               criticNeighbors;
 
-  private int               inputDimensions;
+  private int               observationDimensions;
 
-  private int               outputDimensions;
+  private int               actionDimensions;
 
   private float             lamda;
 
   private float             gamma;
 
   private float             sd;
+
+  private int               processModelMemory;
+
+  private int               processModelNeighbors;
 
   public int getActorMemory()
   {
@@ -74,9 +77,9 @@ public class Specification implements Serializable
 
   public void setActorMin(double[][] value)
   {
-	setActorMin(new SimpleMatrix(value));
+    setActorMin(new SimpleMatrix(value));
   }
-  
+
   public void setActorMin(SimpleMatrix actorMin)
   {
     this.actorMin = actorMin;
@@ -89,9 +92,9 @@ public class Specification implements Serializable
 
   public void setActorMax(double[][] value)
   {
-	setActorMax(new SimpleMatrix(value));
+    setActorMax(new SimpleMatrix(value));
   }
-  
+
   public void setActorMax(SimpleMatrix actorMax)
   {
     this.actorMax = actorMax;
@@ -137,26 +140,6 @@ public class Specification implements Serializable
     this.criticNeighbors = criticNeighbors;
   }
 
-  public int getInputDimensions()
-  {
-    return inputDimensions;
-  }
-
-  public void setInputDimensions(int inputDimensions)
-  {
-    this.inputDimensions = inputDimensions;
-  }
-
-  public int getOutputDimensions()
-  {
-    return outputDimensions;
-  }
-
-  public void setOutputDimensions(int outputDimensions)
-  {
-    this.outputDimensions = outputDimensions;
-  }
-
   public float getLamda()
   {
     return lamda;
@@ -185,5 +168,45 @@ public class Specification implements Serializable
   public void setSd(float sd)
   {
     this.sd = sd;
+  }
+
+  public int getProcessModelMemory()
+  {
+    return processModelMemory;
+  }
+
+  public int getProcessModelNeighbors()
+  {
+    return processModelNeighbors;
+  }
+
+  public void setProcessModelMemory(int processModelMemory)
+  {
+    this.processModelMemory = processModelMemory;
+  }
+
+  public void setProcessModelNeighbors(int processModelNeighbors)
+  {
+    this.processModelNeighbors = processModelNeighbors;
+  }
+
+  public int getObservationDimensions()
+  {
+    return observationDimensions;
+  }
+
+  public int getActionDimensions()
+  {
+    return actionDimensions;
+  }
+
+  public void setObservationDimensions(int observationDimensions)
+  {
+    this.observationDimensions = observationDimensions;
+  }
+
+  public void setActionDimensions(int actionDimensions)
+  {
+    this.actionDimensions = actionDimensions;
   }
 }
