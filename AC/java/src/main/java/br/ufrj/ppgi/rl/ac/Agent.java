@@ -31,6 +31,14 @@ public interface Agent extends Serializable
   public double[][] step(double reward, double[][] observation);
 
   /**
+   * Following steps, given the observation, without learning
+   * 
+   * @param observation
+   * @return the next action to take
+   */
+  public double[][] stepWithoutLearn(double[][] observation);
+  
+  /**
    * Signal the end of an episode
    * 
    * @param reward

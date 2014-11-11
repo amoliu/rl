@@ -100,4 +100,10 @@ public class StandardActorCritic implements Agent
   {
     return actor;
   }
+
+  @Override
+  public double[][] stepWithoutLearn(double[][] observation)
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(actor.action(new SimpleMatrix(observation)));
+  }
 }
