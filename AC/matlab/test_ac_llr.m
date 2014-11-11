@@ -1,4 +1,4 @@
-function [cr] = test_ac_llr(actor, spec)    
+function [cr] = test_ac_llr(agent)    
     steps         = 100;      % Steps per episode
     norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
     
@@ -17,9 +17,7 @@ function [cr] = test_ac_llr(actor, spec)
         end
 
         % Calculate action
-        action = actor.llr.query(norm_old_obs);
-        action = max(action, spec.action_min);
-        action = min(action, spec.action_max);
+        action = agent.stepWithoutLearn(norm_old_obs);
 
         % Actuate
         [obs, reward, terminal] = env_mops_sim('step', action);
