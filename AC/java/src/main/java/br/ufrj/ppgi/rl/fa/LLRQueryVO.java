@@ -9,16 +9,19 @@ import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
 public class LLRQueryVO implements Serializable
 {
-  private static final long serialVersionUID = -7650673322560623412L;
+  private static final long serialVersionUID = 1314581578287330362L;
 
   private SimpleMatrix      result;
 
+  private SimpleMatrix      x;
+
   private List<Integer>     neighbors;
 
-  public LLRQueryVO(SimpleMatrix result, List<Integer> neighbors)
+  public LLRQueryVO(SimpleMatrix result, SimpleMatrix x, List<Integer> neighbors)
   {
     this.result = result;
     this.neighbors = neighbors;
+    this.x = x;
   }
 
   public SimpleMatrix getResult()
@@ -46,9 +49,19 @@ public class LLRQueryVO implements Serializable
     this.neighbors = neighbors;
   }
 
+  public SimpleMatrix getX()
+  {
+    return x;
+  }
+
+  public void setX(SimpleMatrix x)
+  {
+    this.x = x;
+  }
+
   @Override
   public String toString()
   {
-    return "LLRQueryVO [result=" + result + ", neighbors=" + neighbors + "]";
+    return "LLRQueryVO [result=" + result + ", x=" + x + ", neighbors=" + neighbors + "]";
   }
 }
