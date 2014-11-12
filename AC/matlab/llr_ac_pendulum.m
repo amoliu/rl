@@ -14,8 +14,8 @@ function [critic, actor, cr] = llr_ac_pendulum(episodes)
     javaSpec.setCriticMemory(4000);
     javaSpec.setCriticNeighbors(10);
 
-    javaSpec.setInputDimensions(spec.observation_dims);
-    javaSpec.setOutputDimensions(spec.action_dims);
+    javaSpec.setObservationDimensions(spec.observation_dims);
+    javaSpec.setActionDimensions(spec.action_dims);
 
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);

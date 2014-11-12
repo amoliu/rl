@@ -167,11 +167,11 @@ public class LLRUnitTest
     output.set(0, 4);
     llr.add(input, output);
 
-    assertEquals(2, llr.relevance[0], DELTA);
+    assertEquals(Math.pow(2,2), llr.relevance[0], DELTA);
     assertEquals(2, llr.dataInput.get(0, 0), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
 
-    assertEquals(0, llr.relevance[1], DELTA);
+    assertEquals(Math.pow(0,2), llr.relevance[1], DELTA);
     assertEquals(1, llr.dataInput.get(1, 0), DELTA);
     assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
 
@@ -179,11 +179,11 @@ public class LLRUnitTest
     output.set(0, 0);
     llr.add(input, output);
 
-    assertEquals(1.8, llr.relevance[0], DELTA);
+    assertEquals(3.6, llr.relevance[0], DELTA);
     assertEquals(2, llr.dataInput.get(0, 0), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
 
-    assertEquals(1.9, llr.relevance[1], DELTA);
+    assertEquals(4, llr.relevance[1], DELTA);
     assertEquals(0, llr.dataInput.get(1, 0), DELTA);
     assertEquals(0, llr.dataOutput.get(1, 0), DELTA);
   }
@@ -211,7 +211,7 @@ public class LLRUnitTest
     output.set(1, 4);
     llr.add(input, output);
 
-    assertEquals(2 * Math.sqrt(2), llr.relevance[0], DELTA);
+    assertEquals(8, llr.relevance[0], DELTA);
     assertEquals(2, llr.dataInput.get(0, 0), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 1), DELTA);
@@ -245,12 +245,12 @@ public class LLRUnitTest
     output.set(0, 4);
     llr.add(input, output);
 
-    assertEquals(2.5, llr.relevance[0], DELTA);
+    assertEquals(Math.pow(2.5,2), llr.relevance[0], DELTA);
     assertEquals(2, llr.dataInput.get(0, 0), DELTA);
     assertEquals(2, llr.dataInput.get(0, 1), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 0), DELTA);
     
-    assertEquals(0.05, llr.relevance[1], DELTA);
+    assertEquals(Math.pow(0.05,2), llr.relevance[1], DELTA);
     assertEquals(1, llr.dataInput.get(1, 0), DELTA);
     assertEquals(1, llr.dataInput.get(1, 1), DELTA);
     assertEquals(1, llr.dataOutput.get(1, 0), DELTA);
@@ -282,7 +282,7 @@ public class LLRUnitTest
     output.set(1, 4);
     llr.add(input, output);
 
-    assertEquals(Math.sqrt(Math.pow(2.5, 2)*2), llr.relevance[0], DELTA);
+    assertEquals(Math.pow(2.5, 2)*2, llr.relevance[0], DELTA);
     assertEquals(2, llr.dataInput.get(0, 0), DELTA);
     assertEquals(2, llr.dataInput.get(0, 1), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 0), DELTA);

@@ -279,7 +279,7 @@ public class LLR implements Serializable
 
       SimpleMatrix real_value = dataOutput.extractVector(true, pos);
 
-      double rel = NormOps.normP2(real_value.minus(predict_value).getMatrix());
+      double rel = Math.pow(NormOps.normP2(real_value.minus(predict_value).getMatrix()), 2);
       
       dataOutput.setRow(pos, 0, predict_value.getMatrix().data);
 
@@ -287,7 +287,7 @@ public class LLR implements Serializable
     }
 
     SimpleMatrix predict_value = queryForNeighbors(input, neighbors).transpose();
-    return NormOps.normP2(output.minus(predict_value).getMatrix());
+    return Math.pow(NormOps.normP2(output.minus(predict_value).getMatrix()), 2);
   }
 
   private boolean hasEnoughNeighbors()
