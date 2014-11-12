@@ -30,15 +30,15 @@ public class ProcessModelLLR implements Serializable
     return llr.query(observation);
   }
 
-  public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextAction)
+  public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
   {
     SimpleMatrix input = new SimpleMatrix(1, specification.getObservationDimensions()
                                           + specification.getActionDimensions());
     
-    input.setRow(1, 0, observation.getMatrix().data);
-    input.setRow(1, specification.getObservationDimensions(), nextAction.getMatrix().data);
+    input.setRow(0, 0, observation.getMatrix().data);
+    input.setRow(0, specification.getObservationDimensions(), action.getMatrix().data);
 
-    llr.add(input, nextAction);
+    llr.add(input, nextObservation);
   }
 
   public LLR getLLR()
