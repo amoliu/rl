@@ -20,7 +20,7 @@ import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction
 
 public class LLR implements Serializable
 {
-  private static final long   serialVersionUID      = 4191791627521406565L;
+  private static final long serialVersionUID = -776462075414272377L;
 
   private static final double DEFAUL_TIKHONOV       = 0.000001d;
 
@@ -114,7 +114,7 @@ public class LLR implements Serializable
     add(new SimpleMatrix(input), new SimpleMatrix(output));
   }
 
-  public void add(SimpleMatrix input, SimpleMatrix output)
+  public int add(SimpleMatrix input, SimpleMatrix output)
   {
     int pos = 0;
     double rel = updateRelevanceForPoint(input, output);
@@ -137,6 +137,8 @@ public class LLR implements Serializable
     dataOutput.setRow(pos, 0, output.getMatrix().getData());
 
     buildKDTree();
+    
+    return pos;
   }
 
   private int positionLessRelevant()

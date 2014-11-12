@@ -1,12 +1,15 @@
 package br.ufrj.ppgi.rl.ac;
 
+import static org.ejml.simple.SimpleMatrix.END;
+
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.ActorLLR;
 import br.ufrj.ppgi.rl.CriticLLR;
+import br.ufrj.ppgi.rl.ProcessModelLLR;
 import br.ufrj.ppgi.rl.Specification;
-import br.ufrj.ppgi.rl.fa.LLR;
+import br.ufrj.ppgi.rl.fa.LLRQueryVO;
 
 public class MLAC implements Agent
 {
@@ -16,7 +19,7 @@ public class MLAC implements Agent
 
   protected CriticLLR       critic;
 
-  protected LLR             processModel;
+  protected ProcessModelLLR processModel;
 
   private Specification     specification;
 
@@ -24,15 +27,19 @@ public class MLAC implements Agent
 
   protected SimpleMatrix    lastAction;
 
+  protected double          lastValueFunction;
+
   public MLAC()
   {
     actor = new ActorLLR();
     critic = new CriticLLR();
+    processModel = new ProcessModelLLR();
 
     specification = null;
 
     lastObservation = null;
     lastAction = null;
+    lastValueFunction = 0;
   }
 
   @Override
@@ -47,6 +54,7 @@ public class MLAC implements Agent
 
     actor.init(specification);
     critic.init(specification);
+    processModel.init(specification);
   }
 
   @Override
@@ -82,8 +90,17 @@ public class MLAC implements Agent
 
   private void update(double reward, SimpleMatrix observation)
   {
-    double delta = critic.update(lastObservation, lastAction, reward, observation);
-    actor.update(delta, lastObservation, lastAction);
+    LLRQueryVO model = processModel.query(lastObservation, lastAction);
+    processModel.add(lastObservation, lastAction, observation);
+
+    LLRQueryVO criticResult = critic.query(model.getResult());
+
+    // check if withinBounds
+
+    double actorUpdate = getXs(criticResult.getX()).mult(getXa(model.getX())).get(0);
+    actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction);
+
+    lastValueFunction = critic.update(lastObservation, lastAction, lastValueFunction, reward, observation);
   }
 
   private double[][] chooseAction(SimpleMatrix observation)
@@ -108,5 +125,16 @@ public class MLAC implements Agent
   public double[][] stepWithoutLearn(double[][] observation)
   {
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(actor.actionWithoutRandomness(new SimpleMatrix(observation)));
+  }
+
+  private SimpleMatrix getXs(SimpleMatrix x)
+  {
+    return x.extractMatrix(0, END, 0, specification.getObservationDimensions());
+  }
+
+  private SimpleMatrix getXa(SimpleMatrix x)
+  {
+    return x.extractMatrix(0, END, specification.getObservationDimensions() + 1,
+                           specification.getObservationDimensions() + specification.getActionDimensions());
   }
 }
