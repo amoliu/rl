@@ -85,14 +85,14 @@ public class ActorLLRUnitTest
 
     SimpleMatrix action = actor.action(observation);
     
-    actor.update(10, observation, action);
+    actor.updateWithRandomness(10, observation, action);
     Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
     Assert.assertEquals(2.5, actor.llr.getDataOutput().get(0), DELTA);
     
     observation.set(2);
     action = actor.action(observation);
     
-    actor.update(10, observation, action);
+    actor.updateWithRandomness(10, observation, action);
     Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
     Assert.assertEquals(2.5, actor.llr.getDataOutput().get(0), DELTA);
     Assert.assertEquals(2, actor.llr.getDataInput().get(1), DELTA);
@@ -101,7 +101,7 @@ public class ActorLLRUnitTest
     observation.set(3);
     action = actor.action(observation);
     
-    actor.update(1, observation, action);
+    actor.updateWithRandomness(1, observation, action);
     Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
     Assert.assertEquals(2.55, actor.llr.getDataOutput().get(0), DELTA);
     Assert.assertEquals(2, actor.llr.getDataInput().get(1), DELTA);

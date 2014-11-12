@@ -25,20 +25,26 @@ public class ProcessModelLLR implements Serializable
 
   }
 
-  public LLRQueryVO query(SimpleMatrix observation)
+  public LLRQueryVO query(SimpleMatrix observation, SimpleMatrix action)
   {
-    return llr.query(observation);
+    return llr.query(createProcessoModelQuery(observation, action));
   }
 
-  public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextAction)
+  public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
+  {
+    SimpleMatrix input = createProcessoModelQuery(observation, action);
+
+    llr.add(input, nextObservation);
+  }
+
+  public SimpleMatrix createProcessoModelQuery(SimpleMatrix observation, SimpleMatrix action)
   {
     SimpleMatrix input = new SimpleMatrix(1, specification.getObservationDimensions()
                                           + specification.getActionDimensions());
     
-    input.setRow(1, 0, observation.getMatrix().data);
-    input.setRow(1, specification.getObservationDimensions(), nextAction.getMatrix().data);
-
-    llr.add(input, nextAction);
+    input.setRow(0, 0, observation.getMatrix().data);
+    input.setRow(0, specification.getObservationDimensions(), action.getMatrix().data);
+    return input;
   }
 
   public LLR getLLR()

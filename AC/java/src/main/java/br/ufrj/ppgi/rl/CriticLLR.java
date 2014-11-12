@@ -10,7 +10,7 @@ import br.ufrj.ppgi.rl.fa.LLRQueryVO;
 
 public class CriticLLR implements Serializable
 {
-  private static final long serialVersionUID = -4078177597508652947L;
+  private static final long serialVersionUID = -3959243196946425444L;
 
   protected LLR             llr;
 
@@ -62,6 +62,42 @@ public class CriticLLR implements Serializable
     llr.update(eligibilityTrace.elementMult(update));
 
     return tdError;
+  }
+
+  public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double lastValueFunction, double reward,
+                       SimpleMatrix observation)
+  {
+    double valueFunction = llr.query(observation).getResult().get(0);
+
+    // Add to LLR
+    int pos = llr.add(lastObservation, new SimpleMatrix(new double[][] { { lastValueFunction } }));
+    LLRQueryVO oldResult = llr.query(lastObservation);
+
+    double tdError = reward + specification.getGamma() * valueFunction - lastValueFunction;
+
+    // Update ET
+    for (int i = 0; i < eligibilityTrace.getNumElements(); i++)
+    {
+      eligibilityTrace.set(i, eligibilityTrace.get(i) * specification.getLamda() * specification.getGamma());
+    }
+
+    for (Integer neighbor : oldResult.getNeighbors())
+    {
+      eligibilityTrace.set(neighbor, 1);
+    }
+    eligibilityTrace.set(pos, 1);
+
+    SimpleMatrix update = new SimpleMatrix(specification.getCriticMemory(), 1);
+    update.set(specification.getCriticAlpha() * tdError);
+
+    llr.update(eligibilityTrace.elementMult(update));
+
+    return valueFunction + specification.getCriticAlpha() * tdError;
+  }
+
+  public LLRQueryVO query(SimpleMatrix query)
+  {
+    return llr.query(query);
   }
 
   public LLR getLLR()

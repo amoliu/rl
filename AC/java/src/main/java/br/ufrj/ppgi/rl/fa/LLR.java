@@ -20,7 +20,7 @@ import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction
 
 public class LLR implements Serializable
 {
-  private static final long   serialVersionUID      = 4191791627521406565L;
+  private static final long serialVersionUID = -776462075414272377L;
 
   private static final double DEFAUL_TIKHONOV       = 0.000001d;
 
@@ -114,7 +114,7 @@ public class LLR implements Serializable
     add(new SimpleMatrix(input), new SimpleMatrix(output));
   }
 
-  public void add(SimpleMatrix input, SimpleMatrix output)
+  public int add(SimpleMatrix input, SimpleMatrix output)
   {
     int pos = 0;
     double rel = updateRelevanceForPoint(input, output);
@@ -137,6 +137,8 @@ public class LLR implements Serializable
     dataOutput.setRow(pos, 0, output.getMatrix().getData());
 
     buildKDTree();
+    
+    return pos;
   }
 
   private int positionLessRelevant()
@@ -215,18 +217,19 @@ public class LLR implements Serializable
     if (!hasEnoughNeighbors())
     {
       SimpleMatrix result = SimpleMatrix.random(1, output_dimension, 0, 1, random);
+      SimpleMatrix x = SimpleMatrix.random(output_dimension, input_dimension + 1, 0, 1, random).plus(initial_value);
       result = result.plus(initial_value);
 
       List<Integer> neighbors = Collections.emptyList();
 
-      return new LLRQueryVO(result, neighbors);
+      return new LLRQueryVO(result, x, neighbors);
     }
 
     List<Integer> neighbors = getNeighbors(query);
-    return new LLRQueryVO(queryForNeighbors(query, neighbors), neighbors);
+    return queryForNeighbors(query, neighbors);
   }
 
-  private SimpleMatrix queryForNeighbors(SimpleMatrix query, List<Integer> neighbors)
+  private LLRQueryVO queryForNeighbors(SimpleMatrix query, List<Integer> neighbors)
   {
     SimpleMatrix A = new SimpleMatrix(input_dimension + 1, neighbors.size());
     SimpleMatrix B = new SimpleMatrix(neighbors.size(), output_dimension);
@@ -258,7 +261,7 @@ public class LLR implements Serializable
     }
     queryBias.set(0, query.numCols(), 1);
 
-    return queryBias.mult(SimpleMatrix.wrap(X));
+    return new LLRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X), neighbors);
   }
 
   private double updateRelevanceForPoint(SimpleMatrix input, SimpleMatrix output)
@@ -275,7 +278,7 @@ public class LLR implements Serializable
       Integer pos = neighbors.get(n);
 
       SimpleMatrix query = dataInput.extractVector(true, pos);
-      SimpleMatrix predict_value = queryForNeighbors(query, neighbors);
+      SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
 
       SimpleMatrix real_value = dataOutput.extractVector(true, pos);
 
@@ -286,7 +289,7 @@ public class LLR implements Serializable
       relevance[pos] = gamma * relevance[pos] + (1 - gamma) * rel;
     }
 
-    SimpleMatrix predict_value = queryForNeighbors(input, neighbors).transpose();
+    SimpleMatrix predict_value = queryForNeighbors(input, neighbors).getResult().transpose();
     return Math.pow(NormOps.normP2(output.minus(predict_value).getMatrix()), 2);
   }
 
