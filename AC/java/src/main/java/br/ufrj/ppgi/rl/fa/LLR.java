@@ -260,6 +260,9 @@ public class LLR implements Serializable
       }
     }
     
+    SimpleMatrix AAT = tikhonov.copy();
+    CommonOps.multAddTransA(A.getMatrix(), A.getMatrix(), AAT.getMatrix());
+    
     solver.setA(A.mult(A.transpose()).plus(tikhonov).getMatrix());
     solver.solve(A.mult(B).getMatrix(), X);
 
