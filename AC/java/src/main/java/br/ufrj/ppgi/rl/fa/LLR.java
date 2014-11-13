@@ -9,6 +9,8 @@ import java.util.Random;
 import org.ejml.alg.dense.decomposition.chol.CholeskyDecompositionInner_D64;
 import org.ejml.alg.dense.linsol.chol.LinearSolverChol;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.equation.Equation;
+import org.ejml.ops.CommonOps;
 import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
@@ -20,7 +22,7 @@ import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction
 
 public class LLR implements Serializable
 {
-  private static final long serialVersionUID = -776462075414272377L;
+  private static final long   serialVersionUID      = -776462075414272377L;
 
   private static final double DEFAUL_TIKHONOV       = 0.000001d;
 
@@ -55,6 +57,8 @@ public class LLR implements Serializable
   private KdTree<Integer>     tree;
 
   private DistanceFunction    distanceFunction;
+
+  private int                 tree_size;
 
   private LinearSolverChol    solver;
 
@@ -103,6 +107,7 @@ public class LLR implements Serializable
 
     buildKDTree();
     distanceFunction = new SquareEuclideanDistanceFunction();
+    tree_size = 0;
     solver = new LinearSolverChol(new CholeskyDecompositionInner_D64());
   }
 
@@ -127,8 +132,8 @@ public class LLR implements Serializable
     else
     {
       pos = positionLessRelevant();
-      //if (rel <= relevance[pos])
-      //  return;
+      // if (rel <= relevance[pos])
+      // return;
     }
 
     relevance[pos] = rel;
@@ -136,8 +141,12 @@ public class LLR implements Serializable
     dataInput.setRow(pos, 0, input.getMatrix().getData());
     dataOutput.setRow(pos, 0, output.getMatrix().getData());
 
-    buildKDTree();
-    
+    tree_size++;
+    if (tree_size % k == 0)
+    {
+      buildKDTree();
+    }
+
     return pos;
   }
 
@@ -184,7 +193,7 @@ public class LLR implements Serializable
       }
     }
   }
-  
+
   public void update(List<Integer> points, double delta, SimpleMatrix maxValue, SimpleMatrix minValue)
   {
     for (Integer pos : points)
@@ -250,7 +259,7 @@ public class LLR implements Serializable
         B.set(n, i, dataOutput.get(pos, i));
       }
     }
-
+    
     solver.setA(A.mult(A.transpose()).plus(tikhonov).getMatrix());
     solver.solve(A.mult(B).getMatrix(), X);
 
@@ -283,7 +292,7 @@ public class LLR implements Serializable
       SimpleMatrix real_value = dataOutput.extractVector(true, pos);
 
       double rel = Math.pow(NormOps.normP2(real_value.minus(predict_value).getMatrix()), 2);
-      
+
       dataOutput.setRow(pos, 0, predict_value.getMatrix().data);
 
       relevance[pos] = gamma * relevance[pos] + (1 - gamma) * rel;
