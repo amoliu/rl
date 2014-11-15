@@ -9,16 +9,15 @@ import java.util.Random;
 import org.ejml.alg.dense.decomposition.chol.CholeskyDecompositionInner_D64;
 import org.ejml.alg.dense.linsol.chol.LinearSolverChol;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.equation.Equation;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
-import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import ags.utils.dataStructures.MaxHeap;
 import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
 import ags.utils.dataStructures.trees.thirdGenKD.KdTree;
 import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction;
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
 public class LLR implements Serializable
 {
@@ -261,9 +260,9 @@ public class LLR implements Serializable
     }
     
     SimpleMatrix AAT = tikhonov.copy();
-    CommonOps.multAddTransA(A.getMatrix(), A.getMatrix(), AAT.getMatrix());
+    CommonOps.multAddTransB(A.getMatrix(), A.getMatrix(), AAT.getMatrix());
     
-    solver.setA(A.mult(A.transpose()).plus(tikhonov).getMatrix());
+    solver.setA(AAT.getMatrix());
     solver.solve(A.mult(B).getMatrix(), X);
 
     SimpleMatrix queryBias = new SimpleMatrix(1, input_dimension + 1);
@@ -272,7 +271,7 @@ public class LLR implements Serializable
       queryBias.set(0, i, query.get(i));
     }
     queryBias.set(0, query.numCols(), 1);
-
+    
     return new LLRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X), neighbors);
   }
 
