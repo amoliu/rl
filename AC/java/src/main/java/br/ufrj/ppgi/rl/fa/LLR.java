@@ -45,7 +45,7 @@ public class LLR implements Serializable
 
   private int                 k;
 
-  private SimpleMatrix        tikhonov;
+  private double              tikhonov;
 
   private double              gamma;
 
@@ -90,7 +90,7 @@ public class LLR implements Serializable
     this.output_dimension = output_dimensions;
     this.initial_value = initial_value;
     this.k = k;
-    this.tikhonov = SimpleMatrix.identity(input_dimensions + 1).scale(tikhonov);
+    this.tikhonov = tikhonov;
     this.gamma = gamma;
 
     this.dataInput = new SimpleMatrix(size, input_dimensions);
@@ -258,10 +258,12 @@ public class LLR implements Serializable
         B.set(n, i, dataOutput.get(pos, i));
       }
     }
+
+    SimpleMatrix AAT = SimpleMatrix.identity(input_dimension + 1);
+    CommonOps.scale(tikhonov, AAT.getMatrix());
     
-    SimpleMatrix AAT = tikhonov.copy();
     CommonOps.multAddTransB(A.getMatrix(), A.getMatrix(), AAT.getMatrix());
-    
+
     solver.setA(AAT.getMatrix());
     solver.solve(A.mult(B).getMatrix(), X);
 
@@ -271,7 +273,7 @@ public class LLR implements Serializable
       queryBias.set(0, i, query.get(i));
     }
     queryBias.set(0, query.numCols(), 1);
-    
+
     return new LLRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X), neighbors);
   }
 

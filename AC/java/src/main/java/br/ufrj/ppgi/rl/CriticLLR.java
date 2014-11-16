@@ -18,6 +18,8 @@ public class CriticLLR implements Serializable
 
   protected SimpleMatrix    eligibilityTrace;
 
+  private SimpleMatrix      update;
+
   public void init(Specification specification)
   {
     this.specification = specification;
@@ -32,6 +34,8 @@ public class CriticLLR implements Serializable
   {
     eligibilityTrace = new SimpleMatrix(specification.getCriticMemory(), 1);
     eligibilityTrace.zero();
+
+    update = new SimpleMatrix(specification.getCriticMemory(), 1);
   }
 
   public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation)
@@ -49,17 +53,16 @@ public class CriticLLR implements Serializable
     for (int i = 0; i < eligibilityTrace.getNumElements(); i++)
     {
       eligibilityTrace.set(i, eligibilityTrace.get(i) * specification.getLamda() * specification.getGamma());
+      update.set(i, eligibilityTrace.get(i) * specification.getCriticAlpha() * tdError);
     }
 
     for (Integer neighbor : oldValueFunction.getNeighbors())
     {
       eligibilityTrace.set(neighbor, 1);
+      update.set(neighbor, specification.getCriticAlpha() * tdError);
     }
 
-    SimpleMatrix update = new SimpleMatrix(specification.getCriticMemory(), 1);
-    update.set(specification.getCriticAlpha() * tdError);
-
-    llr.update(eligibilityTrace.elementMult(update));
+    llr.update(update);
 
     return tdError;
   }
