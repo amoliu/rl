@@ -85,7 +85,7 @@ public class StandardActorCritic implements Agent
 
   private double[][] chooseAction(SimpleMatrix observation)
   {
-    lastAction = actor.action(observation);
+    lastAction = actor.action(observation).getAction();
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
   }
 

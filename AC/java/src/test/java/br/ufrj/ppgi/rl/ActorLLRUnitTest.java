@@ -21,10 +21,13 @@ public class ActorLLRUnitTest
     SimpleMatrix observation = new SimpleMatrix(1, 1);
     observation.zero();
 
-    SimpleMatrix action = actor.action(observation);
+    SimpleMatrix action = actor.action(observation).getAction();
     Assert.assertEquals(1, action.numCols());
     Assert.assertEquals(1, action.numRows());
     Assert.assertEquals(2, Math.abs(action.get(0)), DELTA);
+    
+    SimpleMatrix policyAction = actor.action(observation).getPolicyAction();
+    Assert.assertEquals(1.5, Math.abs(policyAction.get(0)), DELTA);
   }
 
   @Test
@@ -41,11 +44,15 @@ public class ActorLLRUnitTest
     SimpleMatrix observation = new SimpleMatrix(1, 1);
     observation.zero();
 
-    SimpleMatrix action = actor.action(observation);
+    SimpleMatrix action = actor.action(observation).getAction();
     Assert.assertEquals(2, action.numCols());
     Assert.assertEquals(1, action.numRows());
     Assert.assertEquals(2, Math.abs(action.get(0)), DELTA);
     Assert.assertEquals(2, Math.abs(action.get(1)), DELTA);
+    
+    SimpleMatrix policyAction = actor.action(observation).getPolicyAction();
+    Assert.assertEquals(1.5, Math.abs(policyAction.get(0)), DELTA);
+    Assert.assertEquals(1.5, Math.abs(policyAction.get(1)), DELTA);
   }
 
   @Test
@@ -61,12 +68,12 @@ public class ActorLLRUnitTest
     SimpleMatrix observation = new SimpleMatrix(1, 1);
     observation.zero();
 
-    SimpleMatrix action = actor.action(observation);
+    SimpleMatrix action = actor.action(observation).getAction();
     Assert.assertEquals(3, action.get(0), DELTA);
     
     actor.random = new RandomMock(-30);
     
-    action = actor.action(observation);
+    action = actor.action(observation).getAction();
     Assert.assertEquals(-3, action.get(0), DELTA);
   }
 
@@ -83,14 +90,14 @@ public class ActorLLRUnitTest
     SimpleMatrix observation = new SimpleMatrix(1, 1);
     observation.set(1);
 
-    SimpleMatrix action = actor.action(observation);
+    SimpleMatrix action = actor.action(observation).getAction();
     
     actor.updateWithRandomness(10, observation, action);
     Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
     Assert.assertEquals(2.5, actor.llr.getDataOutput().get(0), DELTA);
     
     observation.set(2);
-    action = actor.action(observation);
+    action = actor.action(observation).getAction();
     
     actor.updateWithRandomness(10, observation, action);
     Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);
@@ -99,7 +106,7 @@ public class ActorLLRUnitTest
     Assert.assertEquals(2.5, actor.llr.getDataOutput().get(1), DELTA);
     
     observation.set(3);
-    action = actor.action(observation);
+    action = actor.action(observation).getAction();
     
     actor.updateWithRandomness(1, observation, action);
     Assert.assertEquals(1, actor.llr.getDataInput().get(0), DELTA);

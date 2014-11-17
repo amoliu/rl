@@ -32,12 +32,14 @@ public class ActorLLR implements Serializable
     random = new Random();
   }
 
-  public SimpleMatrix action(SimpleMatrix observation)
+  public ActionVO action(SimpleMatrix observation)
   {
     SimpleMatrix action = actionWithoutRandomness(observation);
     nextRandom();
 
-    return EJMLMatlabUtils.wrap(action.plus(lastRandom), specification.getActorMax(), specification.getActorMin());
+    return new ActionVO(EJMLMatlabUtils.wrap(action.plus(lastRandom), specification.getActorMax(),
+                                             specification.getActorMin()),
+                        EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
   }
 
   public SimpleMatrix actionWithoutRandomness(SimpleMatrix observation)
@@ -65,10 +67,10 @@ public class ActorLLR implements Serializable
   public void updateWithoutRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
     delta = delta * specification.getActorAlpha();
-    
+
     update(delta, observation, action);
   }
-  
+
   private void update(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
     LLRQueryVO queryResult = llr.query(observation);
@@ -76,13 +78,12 @@ public class ActorLLR implements Serializable
 
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
-  
+
   private void add(SimpleMatrix observation, SimpleMatrix action)
   {
-    llr.add(observation,
-            EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
+    llr.add(observation, EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
   }
-  
+
   private void nextRandom()
   {
     lastRandom = random.nextGaussian() * specification.getSd();
