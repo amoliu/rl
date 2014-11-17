@@ -194,7 +194,7 @@ public class LLRUnitTest
     LLR llr = new LLR(SIZE, 1, 2, 2, 0);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
-    SimpleMatrix output = new SimpleMatrix(2, 1);
+    SimpleMatrix output = new SimpleMatrix(1, 2);
 
     input.set(0, 0);
     output.set(0, 0);
@@ -261,8 +261,8 @@ public class LLRUnitTest
   {
     LLR llr = new LLR(SIZE, 2, 2, 2, 0);
 
-    SimpleMatrix input = new SimpleMatrix(2, 1);
-    SimpleMatrix output = new SimpleMatrix(2, 1);
+    SimpleMatrix input = new SimpleMatrix(1, 2);
+    SimpleMatrix output = new SimpleMatrix(1, 2);
 
     input.set(0, 0);
     input.set(1, 0);
@@ -282,7 +282,7 @@ public class LLRUnitTest
     output.set(1, 4);
     llr.add(input, output);
 
-    assertEquals(Math.pow(2.5, 2)*2, llr.relevance[0], DELTA);
+    assertEquals(8, llr.relevance[0], DELTA);
     assertEquals(2, llr.dataInput.get(0, 0), DELTA);
     assertEquals(2, llr.dataInput.get(0, 1), DELTA);
     assertEquals(4, llr.dataOutput.get(0, 0), DELTA);

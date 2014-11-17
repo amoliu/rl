@@ -19,16 +19,16 @@ public interface Agent extends Serializable
    * @param observation
    * @return the action to take
    */
-  public double[][] start(double[][] observation);
+  public StepVO start(double[][] observation);
 
   /**
    * Following steps, given the current reward and the next observation
    * 
    * @param reward
    * @param observation
-   * @return the next action to take
+   * @return the next action to take and the squared error
    */
-  public double[][] step(double reward, double[][] observation);
+  public StepVO step(double reward, double[][] observation);
 
   /**
    * Following steps, given the observation, without learning

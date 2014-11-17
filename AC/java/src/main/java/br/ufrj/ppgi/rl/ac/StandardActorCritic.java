@@ -47,20 +47,20 @@ public class StandardActorCritic implements Agent
   }
 
   @Override
-  public double[][] start(double[][] observation)
+  public StepVO start(double[][] observation)
   {
     lastObservation = new SimpleMatrix(observation);
 
-    return chooseAction(new SimpleMatrix(observation));
+    return new StepVO(chooseAction(new SimpleMatrix(observation)));
   }
 
   @Override
-  public double[][] step(double reward, double[][] observation)
+  public StepVO step(double reward, double[][] observation)
   {
     update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
 
-    return chooseAction(new SimpleMatrix(observation));
+    return new StepVO(chooseAction(new SimpleMatrix(observation)));
   }
 
   @Override

@@ -18,11 +18,11 @@ public class StandardActorCriticUnitTest
 
     actorCritic.init(spec);
     
-    double[][] action = actorCritic.start(new double[][] { { 3 } });
+    double[][] action = actorCritic.start(new double[][] { { 3 } }).getAction();
     Assert.assertEquals(actorCritic.lastObservation.get(0), 3, DELTA);
     Assert.assertEquals(actorCritic.lastAction.get(0), action[0][0], DELTA);
 
-    action = actorCritic.step(5, new double[][] { { 2 } });
+    action = actorCritic.step(5, new double[][] { { 2 } }).getAction();
     Assert.assertEquals(actorCritic.lastObservation.get(0), 2, DELTA);
     Assert.assertEquals(actorCritic.lastAction.get(0), action[0][0], DELTA);
   }

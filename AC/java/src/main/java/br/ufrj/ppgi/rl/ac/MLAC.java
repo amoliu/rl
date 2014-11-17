@@ -2,6 +2,7 @@ package br.ufrj.ppgi.rl.ac;
 
 import static org.ejml.simple.SimpleMatrix.END;
 
+import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
@@ -58,20 +59,20 @@ public class MLAC implements Agent
   }
 
   @Override
-  public double[][] start(double[][] observation)
+  public StepVO start(double[][] observation)
   {
     lastObservation = new SimpleMatrix(observation);
 
-    return chooseAction(new SimpleMatrix(observation));
+    return new StepVO(chooseAction(new SimpleMatrix(observation)));
   }
 
   @Override
-  public double[][] step(double reward, double[][] observation)
+  public StepVO step(double reward, double[][] observation)
   {
-    update(reward, new SimpleMatrix(observation));
+    double error = update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
 
-    return chooseAction(new SimpleMatrix(observation));
+    return new StepVO(error, chooseAction(new SimpleMatrix(observation)));
   }
 
   @Override
@@ -88,7 +89,7 @@ public class MLAC implements Agent
     this.specification = null;
   }
 
-  private void update(double reward, SimpleMatrix observation)
+  private double update(double reward, SimpleMatrix observation)
   {
     LLRQueryVO model = processModel.query(lastObservation, lastAction);
     processModel.add(lastObservation, lastAction, observation);
@@ -101,6 +102,8 @@ public class MLAC implements Agent
     actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction);
 
     lastValueFunction = critic.update(lastObservation, lastAction, lastValueFunction, reward, observation);
+    
+    return Math.pow(NormOps.normP2(observation.minus(model.getResult()).getMatrix()), 2);
   }
 
   private double[][] chooseAction(SimpleMatrix observation)
@@ -134,7 +137,7 @@ public class MLAC implements Agent
 
   private SimpleMatrix getXa(SimpleMatrix x)
   {
-    return x.extractMatrix(0, END, specification.getObservationDimensions() + 1,
+    return x.extractMatrix(0, END, specification.getObservationDimensions(),
                            specification.getObservationDimensions() + specification.getActionDimensions());
   }
 }

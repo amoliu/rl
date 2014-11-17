@@ -274,7 +274,7 @@ public class LLR implements Serializable
     }
     queryBias.set(0, query.numCols(), 1);
 
-    return new LLRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X), neighbors);
+    return new LLRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X).transpose(), neighbors);
   }
 
   private double updateRelevanceForPoint(SimpleMatrix input, SimpleMatrix output)
@@ -302,7 +302,7 @@ public class LLR implements Serializable
       relevance[pos] = gamma * relevance[pos] + (1 - gamma) * rel;
     }
 
-    SimpleMatrix predict_value = queryForNeighbors(input, neighbors).getResult().transpose();
+    SimpleMatrix predict_value = queryForNeighbors(input, neighbors).getResult();
     return Math.pow(NormOps.normP2(output.minus(predict_value).getMatrix()), 2);
   }
 
