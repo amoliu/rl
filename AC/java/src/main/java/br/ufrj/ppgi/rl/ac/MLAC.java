@@ -97,12 +97,20 @@ public class MLAC implements Agent
 
     LLRQueryVO criticResult = critic.query(model.getResult());
 
-    // check if withinBounds
-    // if policy_action < spec.action_min*0.92 || policy_action >
-    // spec.action_max*0.92
-    // model.Xa = zeros(spec.observation_dims, spec.action_dims);
+    SimpleMatrix criticXs = getXs(criticResult.getX());
+    SimpleMatrix modelXa = getXa(model.getX());
 
-    double actorUpdate = getXs(criticResult.getX()).mult(getXa(model.getX())).get(0);
+    // check if withinBounds
+    for (int i = 0; i < lastAction.getPolicyAction().getNumElements(); i++)
+    {
+      if (lastAction.getPolicyAction().get(i) < specification.getActorMin().get(i) * 0.92
+          || lastAction.getPolicyAction().get(i) > specification.getActorMax().get(i) * 0.92)
+      {
+        modelXa.zero();
+      }
+    }
+
+    double actorUpdate = criticXs.mult(modelXa).get(0);
     actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction.getAction());
 
     lastValueFunction = critic.update(lastObservation, lastAction.getAction(), lastValueFunction, reward, observation);
