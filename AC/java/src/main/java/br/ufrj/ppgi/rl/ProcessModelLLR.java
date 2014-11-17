@@ -4,12 +4,13 @@ import java.io.Serializable;
 
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LLR;
 import br.ufrj.ppgi.rl.fa.LLRQueryVO;
 
 public class ProcessModelLLR implements Serializable
 {
-  private static final long serialVersionUID = -4759399854724315005L;
+  private static final long serialVersionUID = -2618952695582747034L;
 
   protected LLR             llr;
 
@@ -27,7 +28,11 @@ public class ProcessModelLLR implements Serializable
 
   public LLRQueryVO query(SimpleMatrix observation, SimpleMatrix action)
   {
-    return llr.query(createProcessoModelQuery(observation, action));
+    LLRQueryVO query = llr.query(createProcessoModelQuery(observation, action));
+    query.setResult(EJMLMatlabUtils.wrap(query.getResult(), specification.getObservationMaxValue(),
+                                         specification.getObservationMinValue()));
+
+    return query;
   }
 
   public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
@@ -40,8 +45,8 @@ public class ProcessModelLLR implements Serializable
   public SimpleMatrix createProcessoModelQuery(SimpleMatrix observation, SimpleMatrix action)
   {
     SimpleMatrix input = new SimpleMatrix(1, specification.getObservationDimensions()
-                                          + specification.getActionDimensions());
-    
+                                             + specification.getActionDimensions());
+
     input.setRow(0, 0, observation.getMatrix().data);
     input.setRow(0, specification.getObservationDimensions(), action.getMatrix().data);
     return input;

@@ -31,9 +31,32 @@ public class ProcessoModelLLRUnitTest
     SimpleMatrix inputLLR = processModelLLR.llr.getDataInput().extractVector(true, 0);
     Assert.assertEquals(1, inputLLR.get(0), DELTA);
     Assert.assertEquals(2, inputLLR.get(1), DELTA);
-    
+
     SimpleMatrix outputLLR = processModelLLR.llr.getDataOutput().extractVector(true, 0);
     Assert.assertEquals(3, outputLLR.get(0), DELTA);
+  }
+
+  @Test
+  public void testQuery_ShouldWrapResult()
+  {
+    ProcessModelLLR processModelLLR = new ProcessModelLLR();
+
+    Specification specification = getSpecification();
+
+    processModelLLR.init(specification);
+
+    processModelLLR.llr.setRandom(new RandomMock(30));
+
+    SimpleMatrix observation = new SimpleMatrix(new double[][] { { 1 } });
+    SimpleMatrix action = new SimpleMatrix(new double[][] { { 2 } });
+
+    SimpleMatrix query = processModelLLR.query(observation, action).getResult();
+    Assert.assertEquals(20, query.get(0), DELTA);
+
+    processModelLLR.llr.setRandom(new RandomMock(-15));
+
+    query = processModelLLR.query(observation, action).getResult();
+    Assert.assertEquals(0, query.get(0), DELTA);
   }
 
   private Specification getSpecification()
@@ -43,7 +66,8 @@ public class ProcessoModelLLRUnitTest
     specification.setActionDimensions(1);
     specification.setProcessModelMemory(10);
     specification.setProcessModelNeighbors(2);
+    specification.setObservationMaxValue(new double[][] { { 20 } });
+    specification.setObservationMinValue(new double[][] { { 0 } });
     return specification;
   }
-
 }

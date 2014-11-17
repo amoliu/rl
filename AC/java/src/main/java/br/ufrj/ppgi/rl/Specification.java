@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = 8714416835477632472L;
+  private static final long serialVersionUID = 9069308321270284946L;
 
   private int               actorMemory;
 
@@ -39,6 +39,10 @@ public class Specification implements Serializable
   private int               processModelMemory;
 
   private int               processModelNeighbors;
+
+  private SimpleMatrix      observationMinValue;
+
+  private SimpleMatrix      observationMaxValue;
 
   public int getActorMemory()
   {
@@ -208,5 +212,25 @@ public class Specification implements Serializable
   public void setActionDimensions(int actionDimensions)
   {
     this.actionDimensions = actionDimensions;
+  }
+
+  public SimpleMatrix getObservationMinValue()
+  {
+    return observationMinValue;
+  }
+
+  public void setObservationMinValue(double[][] value)
+  {
+    this.observationMinValue = new SimpleMatrix(value);
+  }
+
+  public SimpleMatrix getObservationMaxValue()
+  {
+    return observationMaxValue;
+  }
+
+  public void setObservationMaxValue(double[][] value)
+  {
+    this.observationMaxValue = new SimpleMatrix(value);
   }
 }
