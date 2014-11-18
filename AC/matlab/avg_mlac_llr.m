@@ -1,8 +1,8 @@
 clear all;
 close all;
 
-episodes = 500;
-trials = 40;
+episodes = 400;
+trials = 20;
 
 cr = zeros(trials,episodes);
 rmse = zeros(trials,episodes);
@@ -12,6 +12,9 @@ parfor i=1:trials
 end
 
 errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', strcat('mlac-', num2str(trials), '-iterations'));
+
+figure;
+errorbaralpha(mean(rmse), 1.96.*std(rmse)./sqrt(trials), 'title', strcat('mlac-rmse-', num2str(trials), '-iterations'));
 
 figure;
 title('All curves');
