@@ -37,9 +37,45 @@ public class ProcessModelLLR implements Serializable
 
   public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
   {
+    if (nextObservation.get(0) - observation.get(0) < -specification.getProcessModelCrossLimit())
+    {
+      addToLLR(observation, action, nextObservation.plus(specification.getProcessModelUpperBound()));
+      addToLLR(observation.minus(specification.getProcessModelUpperBound()), action, nextObservation);
+    }
+    else
+      if (nextObservation.get(0) - observation.get(0) > specification.getProcessModelCrossLimit())
+      {
+        addToLLR(observation.plus(specification.getProcessModelUpperBound()), action, nextObservation);
+        addToLLR(observation, action, nextObservation.minus(specification.getProcessModelUpperBound()));
+      }
+      else
+      {
+        addToLLR(observation, action, nextObservation);
+      }
+  }
+
+  private void addToLLR(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
+  {
     SimpleMatrix input = createProcessoModelQuery(observation, action);
 
     llr.add(input, nextObservation);
+
+    if (observation.get(0) - specification.getProcessModelThreshold() < 0)
+    {
+      SimpleMatrix newObservation = observation.plus(specification.getProcessModelUpperBound());
+      SimpleMatrix newNextObservation = nextObservation.plus(specification.getProcessModelUpperBound());
+
+      llr.add(createProcessoModelQuery(newObservation, action), newNextObservation);
+    }
+
+    if (observation.get(0) + specification.getProcessModelThreshold() > specification.getProcessModelUpperBound()
+                                                                                     .get(0))
+    {
+      SimpleMatrix newObservation = observation.minus(specification.getProcessModelUpperBound());
+      SimpleMatrix newNextObservation = nextObservation.minus(specification.getProcessModelUpperBound());
+
+      llr.add(createProcessoModelQuery(newObservation, action), newNextObservation);
+    }
   }
 
   public SimpleMatrix createProcessoModelQuery(SimpleMatrix observation, SimpleMatrix action)

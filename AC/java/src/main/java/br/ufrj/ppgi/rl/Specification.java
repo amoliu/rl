@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = 9069308321270284946L;
+  private static final long serialVersionUID = 9162519647167533849L;
 
   private int               actorMemory;
 
@@ -39,6 +39,12 @@ public class Specification implements Serializable
   private int               processModelMemory;
 
   private int               processModelNeighbors;
+
+  private double            processModelCrossLimit;
+
+  private SimpleMatrix      processModelUpperBound;
+
+  private double            processModelThreshold;
 
   private SimpleMatrix      observationMinValue;
 
@@ -219,6 +225,11 @@ public class Specification implements Serializable
     return observationMinValue;
   }
 
+  public void setObservationMinValue(SimpleMatrix observationMinValue)
+  {
+    this.observationMinValue = observationMinValue;
+  }
+
   public void setObservationMinValue(double[][] value)
   {
     this.observationMinValue = new SimpleMatrix(value);
@@ -229,8 +240,48 @@ public class Specification implements Serializable
     return observationMaxValue;
   }
 
+  public void setObservationMaxValue(SimpleMatrix observationMaxValue)
+  {
+    this.observationMaxValue = observationMaxValue;
+  }
+
   public void setObservationMaxValue(double[][] value)
   {
     this.observationMaxValue = new SimpleMatrix(value);
+  }
+
+  public double getProcessModelCrossLimit()
+  {
+    return processModelCrossLimit;
+  }
+
+  public void setProcessModelCrossLimit(double processModelCrossLimit)
+  {
+    this.processModelCrossLimit = processModelCrossLimit;
+  }
+
+  public SimpleMatrix getProcessModelUpperBound()
+  {
+    return processModelUpperBound;
+  }
+
+  public void setProcessModelUpperBound(SimpleMatrix processModelUpperBound)
+  {
+    this.processModelUpperBound = processModelUpperBound;
+  }
+
+  public void setProcessModelUpperBound(double[][] value)
+  {
+    this.processModelUpperBound = new SimpleMatrix(value);
+  }
+
+  public double getProcessModelThreshold()
+  {
+    return processModelThreshold;
+  }
+
+  public void setProcessModelThreshold(double processModelThreshold)
+  {
+    this.processModelThreshold = processModelThreshold;
   }
 }
