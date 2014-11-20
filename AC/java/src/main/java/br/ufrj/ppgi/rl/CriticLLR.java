@@ -67,6 +67,19 @@ public class CriticLLR implements Serializable
     return tdError;
   }
 
+  public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation,
+                       double alpha, double gamma)
+  {
+    LWRQueryVO valueFunction = llr.query(observation);
+    LWRQueryVO oldValueFunction = llr.query(lastObservation);
+
+    double tdError = reward + gamma * valueFunction.getResult().get(0) - oldValueFunction.getResult().get(0);
+
+    llr.update(oldValueFunction.getNeighbors(), alpha * tdError);
+
+    return tdError;
+  }
+
   public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double lastValueFunction, double reward,
                        SimpleMatrix observation)
   {

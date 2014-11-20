@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = 9162519647167533849L;
+  private static final long serialVersionUID = 3146240409176714062L;
 
   private int               actorMemory;
 
@@ -45,6 +45,14 @@ public class Specification implements Serializable
   private SimpleMatrix      processModelUpperBound;
 
   private double            processModelThreshold;
+
+  private int               processModelStepsPerEpisode;
+
+  private double            processModelCriticAlpha;
+
+  private double            processModelActorAplha;
+
+  private double            processModelGamma;
 
   private SimpleMatrix      observationMinValue;
 
@@ -283,5 +291,45 @@ public class Specification implements Serializable
   public void setProcessModelThreshold(double processModelThreshold)
   {
     this.processModelThreshold = processModelThreshold;
+  }
+
+  public int getProcessModelStepsPerEpisode()
+  {
+    return processModelStepsPerEpisode;
+  }
+
+  public void setProcessModelStepsPerEpisode(int processModelStepsPerEpisode)
+  {
+    this.processModelStepsPerEpisode = processModelStepsPerEpisode;
+  }
+
+  public double getProcessModelCriticAlpha()
+  {
+    return processModelCriticAlpha;
+  }
+
+  public void setProcessModelCriticAlpha(double processModelCriticAlpha)
+  {
+    this.processModelCriticAlpha = processModelCriticAlpha;
+  }
+
+  public double getProcessModelActorAplha()
+  {
+    return processModelActorAplha;
+  }
+
+  public void setProcessModelActorAplha(double processModelActorAplha)
+  {
+    this.processModelActorAplha = processModelActorAplha;
+  }
+
+  public double getProcessModelGamma()
+  {
+    return processModelGamma;
+  }
+
+  public void setProcessModelGamma(double processModelGamma)
+  {
+    this.processModelGamma = processModelGamma;
   }
 }

@@ -58,6 +58,14 @@ public class ActorLLR implements Serializable
     return queryResult.getResult();
   }
 
+  public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha)
+  {
+    delta = delta * lastRandom * alpha;
+
+    LWRQueryVO queryResult = llr.query(observation);
+    llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
+  }
+
   public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
     delta = delta * lastRandom * specification.getActorAlpha();
