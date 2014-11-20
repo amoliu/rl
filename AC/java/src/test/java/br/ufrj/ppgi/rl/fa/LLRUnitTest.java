@@ -304,7 +304,7 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 0);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
   }
@@ -318,7 +318,7 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 0);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
     assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 1), DELTA);
@@ -334,7 +334,7 @@ public class LLRUnitTest
     query.set(0, 0);
     query.set(1, 0);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
   }
@@ -349,7 +349,7 @@ public class LLRUnitTest
     query.set(0, 0);
     query.set(1, 0);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 0), DELTA);
     assertEquals(RANDOM_VALUE, queryResult.getResult().get(0, 1), DELTA);
@@ -374,7 +374,7 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 1);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
   }
@@ -401,7 +401,7 @@ public class LLRUnitTest
     query.set(0, 1);
     query.set(1, 1);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
   }
@@ -427,7 +427,7 @@ public class LLRUnitTest
     SimpleMatrix query = new SimpleMatrix(1, 1);
     query.set(0, 1);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
     assertEquals(1, queryResult.getResult().get(0, 1), DELTA);
@@ -457,7 +457,7 @@ public class LLRUnitTest
     query.set(0, 1);
     query.set(1, 1);
 
-    LLRQueryVO queryResult = llr.query(query);
+    LWRQueryVO queryResult = llr.query(query);
 
     assertEquals(1, queryResult.getResult().get(0, 0), DELTA);
     assertEquals(1, queryResult.getResult().get(0, 1), DELTA);

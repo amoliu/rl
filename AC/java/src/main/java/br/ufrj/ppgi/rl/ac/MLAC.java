@@ -11,7 +11,7 @@ import br.ufrj.ppgi.rl.ActorLLR;
 import br.ufrj.ppgi.rl.CriticLLR;
 import br.ufrj.ppgi.rl.ProcessModelLLR;
 import br.ufrj.ppgi.rl.Specification;
-import br.ufrj.ppgi.rl.fa.LLRQueryVO;
+import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class MLAC implements Agent
 {
@@ -92,10 +92,10 @@ public class MLAC implements Agent
 
   private double update(double reward, SimpleMatrix observation)
   {
-    LLRQueryVO model = processModel.query(lastObservation, lastAction.getPolicyAction());
+    LWRQueryVO model = processModel.query(lastObservation, lastAction.getPolicyAction());
     processModel.add(lastObservation, lastAction.getPolicyAction(), observation);
 
-    LLRQueryVO criticResult = critic.query(model.getResult());
+    LWRQueryVO criticResult = critic.query(model.getResult());
 
     SimpleMatrix criticXs = getXs(criticResult.getX());
     SimpleMatrix modelXa = getXa(model.getX());

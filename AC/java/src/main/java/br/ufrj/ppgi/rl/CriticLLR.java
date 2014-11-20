@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LLR;
-import br.ufrj.ppgi.rl.fa.LLRQueryVO;
+import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class CriticLLR implements Serializable
 {
@@ -40,8 +40,8 @@ public class CriticLLR implements Serializable
 
   public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation)
   {
-    LLRQueryVO valueFunction = llr.query(observation);
-    LLRQueryVO oldValueFunction = llr.query(lastObservation);
+    LWRQueryVO valueFunction = llr.query(observation);
+    LWRQueryVO oldValueFunction = llr.query(lastObservation);
 
     double tdError = reward + specification.getGamma() * valueFunction.getResult().get(0)
                      - oldValueFunction.getResult().get(0);
@@ -74,7 +74,7 @@ public class CriticLLR implements Serializable
 
     // Add to LLR
     int pos = llr.add(lastObservation, new SimpleMatrix(new double[][] { { lastValueFunction } }));
-    LLRQueryVO oldResult = llr.query(lastObservation);
+    LWRQueryVO oldResult = llr.query(lastObservation);
 
     double tdError = reward + specification.getGamma() * valueFunction - lastValueFunction;
 
@@ -98,7 +98,7 @@ public class CriticLLR implements Serializable
     return valueFunction + specification.getCriticAlpha() * tdError;
   }
 
-  public LLRQueryVO query(SimpleMatrix query)
+  public LWRQueryVO query(SimpleMatrix query)
   {
     return llr.query(query);
   }

@@ -19,7 +19,7 @@ import ags.utils.dataStructures.trees.thirdGenKD.KdTree;
 import ags.utils.dataStructures.trees.thirdGenKD.SquareEuclideanDistanceFunction;
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
-public class LLR implements Serializable
+public class LWR implements Serializable
 {
   private static final long   serialVersionUID      = -776462075414272377L;
 
@@ -63,17 +63,19 @@ public class LLR implements Serializable
 
   private Random              random;
 
-  public LLR(int size, int input_dimensions, int output_dimensions, int k)
+  private LWRWeightFunction   weightFunction;
+
+  public LWR(int size, int input_dimensions, int output_dimensions, int k)
   {
     this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_TIKHONOV, DEFAUL_GAMMA);
   }
 
-  public LLR(int size, int input_dimensions, int output_dimensions, int k, double initial_value)
+  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value)
   {
     this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_TIKHONOV, DEFAUL_GAMMA);
   }
 
-  public LLR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, double tikhonov,
+  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, double tikhonov,
              double gamma)
   {
     if (k <= 1)
@@ -108,6 +110,8 @@ public class LLR implements Serializable
     distanceFunction = new SquareEuclideanDistanceFunction();
     tree_size = 0;
     solver = new LinearSolverChol(new CholeskyDecompositionInner_D64());
+
+    weightFunction = new br.ufrj.ppgi.rl.fa.DistanceFunction();
   }
 
   /**
@@ -215,12 +219,12 @@ public class LLR implements Serializable
     dataOutput = dataOutput.plus(delta);
   }
 
-  public LLRQueryVO query(double[][] query)
+  public LWRQueryVO query(double[][] query)
   {
     return query(new SimpleMatrix(query));
   }
 
-  public LLRQueryVO query(SimpleMatrix query)
+  public LWRQueryVO query(SimpleMatrix query)
   {
     if (!hasEnoughNeighbors())
     {
@@ -230,14 +234,14 @@ public class LLR implements Serializable
 
       List<Integer> neighbors = Collections.emptyList();
 
-      return new LLRQueryVO(result, x, neighbors);
+      return new LWRQueryVO(result, x, neighbors);
     }
 
     List<Integer> neighbors = getNeighbors(query);
     return queryForNeighbors(query, neighbors);
   }
 
-  private LLRQueryVO queryForNeighbors(SimpleMatrix query, List<Integer> neighbors)
+  private LWRQueryVO queryForNeighbors(SimpleMatrix query, List<Integer> neighbors)
   {
     SimpleMatrix A = new SimpleMatrix(input_dimension + 1, neighbors.size());
     SimpleMatrix B = new SimpleMatrix(neighbors.size(), output_dimension);
@@ -259,22 +263,45 @@ public class LLR implements Serializable
       }
     }
 
+    SimpleMatrix queryBias = getQueryBias(query);
+
+    double[] weights = weightFunction.calculateWeight(A, queryBias);
+    for (int i = 0; i < A.numRows(); i++)
+    {
+      for (int j = 0; j < A.numCols(); j++)
+      {
+        A.set(i, j, A.get(i, j) * weights[j]);
+      }
+    }
+
+    for (int i = 0; i < B.numRows(); i++)
+    {
+      for (int j = 0; j < B.numCols(); j++)
+      {
+        B.set(i, j, B.get(i, j) * weights[i]);
+      }
+    }
+
     SimpleMatrix AAT = SimpleMatrix.identity(input_dimension + 1);
     CommonOps.scale(tikhonov, AAT.getMatrix());
-    
+
     CommonOps.multAddTransB(A.getMatrix(), A.getMatrix(), AAT.getMatrix());
 
     solver.setA(AAT.getMatrix());
     solver.solve(A.mult(B).getMatrix(), X);
 
+    return new LWRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X).transpose(), neighbors);
+  }
+
+  private SimpleMatrix getQueryBias(SimpleMatrix query)
+  {
     SimpleMatrix queryBias = new SimpleMatrix(1, input_dimension + 1);
     for (int i = 0; i < query.numCols(); i++)
     {
       queryBias.set(0, i, query.get(i));
     }
     queryBias.set(0, query.numCols(), 1);
-
-    return new LLRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X).transpose(), neighbors);
+    return queryBias;
   }
 
   private double updateRelevanceForPoint(SimpleMatrix input, SimpleMatrix output)
@@ -364,5 +391,15 @@ public class LLR implements Serializable
   public double[] getRelevance()
   {
     return relevance;
+  }
+
+  public LWRWeightFunction getWeightFunction()
+  {
+    return weightFunction;
+  }
+
+  public void setWeightFunction(LWRWeightFunction weightFunction)
+  {
+    this.weightFunction = weightFunction;
   }
 }

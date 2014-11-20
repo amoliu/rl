@@ -7,7 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
-public class LLRQueryVO implements Serializable
+public class LWRQueryVO implements Serializable
 {
   private static final long serialVersionUID = 1314581578287330362L;
 
@@ -17,7 +17,7 @@ public class LLRQueryVO implements Serializable
 
   private List<Integer>     neighbors;
 
-  public LLRQueryVO(SimpleMatrix result, SimpleMatrix x, List<Integer> neighbors)
+  public LWRQueryVO(SimpleMatrix result, SimpleMatrix x, List<Integer> neighbors)
   {
     this.result = result;
     this.neighbors = neighbors;

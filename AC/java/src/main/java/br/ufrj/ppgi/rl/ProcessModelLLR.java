@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LLR;
-import br.ufrj.ppgi.rl.fa.LLRQueryVO;
+import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class ProcessModelLLR implements Serializable
 {
@@ -26,9 +26,9 @@ public class ProcessModelLLR implements Serializable
 
   }
 
-  public LLRQueryVO query(SimpleMatrix observation, SimpleMatrix action)
+  public LWRQueryVO query(SimpleMatrix observation, SimpleMatrix action)
   {
-    LLRQueryVO query = llr.query(createProcessoModelQuery(observation, action));
+    LWRQueryVO query = llr.query(createProcessoModelQuery(observation, action));
     query.setResult(EJMLMatlabUtils.wrap(query.getResult(), specification.getObservationMaxValue(),
                                          specification.getObservationMinValue()));
 

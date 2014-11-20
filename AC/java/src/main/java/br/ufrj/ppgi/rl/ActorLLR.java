@@ -8,7 +8,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LLR;
-import br.ufrj.ppgi.rl.fa.LLRQueryVO;
+import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class ActorLLR implements Serializable
 {
@@ -54,7 +54,7 @@ public class ActorLLR implements Serializable
       throw new MatrixDimensionException("Observation is not the expected length");
     }
 
-    LLRQueryVO queryResult = llr.query(observation);
+    LWRQueryVO queryResult = llr.query(observation);
     return queryResult.getResult();
   }
 
@@ -73,7 +73,7 @@ public class ActorLLR implements Serializable
 
   private void update(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
-    LLRQueryVO queryResult = llr.query(observation);
+    LWRQueryVO queryResult = llr.query(observation);
     add(observation, action.plus(delta));
 
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
