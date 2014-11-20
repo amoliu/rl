@@ -2,7 +2,7 @@ clear all;
 close all;
 
 episodes = 300;
-trials = 10;
+trials = 25;
 
 cr = zeros(trials,episodes);
 

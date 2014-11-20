@@ -1,8 +1,8 @@
 clear all;
 close all;
 
-episodes = 400;
-trials = 20;
+episodes = 200;
+trials = 25;
 
 cr = zeros(trials,episodes);
 rmse = zeros(trials,episodes);
