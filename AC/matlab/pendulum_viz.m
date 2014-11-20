@@ -1,4 +1,11 @@
-function llr_pendulum_viz(actor, critic, cr, rmse)
+function pendulum_viz(actor, critic, cr, rmse)
+%PENDULUM_VIZ Vizualizer for the pendulum swing-up problem.
+%   PENDULUM_VIZ(A, C, CR) show the Actor and Critic memory, plot the
+%   learning curve CR and shows a video for the Actor iteration with the
+%   environment.
+%
+%   AUTHOR:
+%       Bruno Costa <doravante2@gmail.com>
     steps   = 100;   % Steps per episode
     radius  = 2;     % Radius for plot
     

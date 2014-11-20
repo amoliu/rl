@@ -1,4 +1,16 @@
 function [critic, actor, cr] = sac_pendulum(episodes)
+%SAC_AC_PENDULUM Runs the standard ac algorithim on the pendulum swing-up.
+%   SAC_AC_PENDULUM(E) learns during E episodes
+%
+%   C = SAC_AC_PENDULUM(...) return a handle to the Critic
+%   [C, A] = SAC_AC_PENDULUM(...) also returns a handle to the Actor
+%   [C, A, CR] = SAC_AC_PENDULUM(...) also returns the learning curve.
+%
+%   EXAMPLES:
+%      [critic, actor, cr] = sac_pendulum(100);
+%  
+%   AUTHOR:
+%       Bruno Costa <doravante2@gmail.com>
     % Initialize environment
     spec = env_mops_sim('init');
     

@@ -1,4 +1,18 @@
 function [critic, actor, cr, rmse] = mlac_pendulum(episodes)
+%MLAC_AC_PENDULUM Runs the MLAC algorithim on the pendulum swing-up.
+%   MLAC_AC_PENDULUM(E) learns during E episodes
+%
+%   C = MLAC_AC_PENDULUM(...) return a handle to the Critic
+%   [C, A] = MLAC_AC_PENDULUM(...) also returns a handle to the Actor
+%   [C, A, CR] = MLAC_AC_PENDULUM(...) also returns the learning curve.
+%   [C, A, CR, E] = MLAC_AC_PENDULUM(...) also returns the error curve.
+%
+%   EXAMPLES:
+%      [critic, actor, cr, rmse] = mlac_pendulum(100);
+%  
+%   AUTHOR:
+%       Bruno Costa <doravante2@gmail.com>
+
     % Initialize simulation
     spec = env_mops_sim('init');
     

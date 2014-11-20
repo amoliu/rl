@@ -2,7 +2,7 @@ close all;
 clear all;
 
 % Critic-like
-llr = LLR(2000, 2, 1, 15);
+llr = br.ufrj.ppgi.rl.fa.LLR(2000, 2, 1, 15);
 
 total_add = 20000;
 total_query = 500000;
