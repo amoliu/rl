@@ -25,7 +25,7 @@ function [critic, actor, cr, rmse] = mlac_pendulum(episodes)
     javaSpec.setGamma(0.97);
     javaSpec.setSd(1.0);  
     
-    javaSpec.setProcessModelMemory(100);
+    javaSpec.setProcessModelMemory(300);
     javaSpec.setProcessModelNeighbors(10);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
