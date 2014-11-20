@@ -7,7 +7,7 @@ trials = 25;
 cr = zeros(trials,episodes);
 
 parfor i=1:trials
-    [~, ~, cr(i,:)] = llr_ac_pendulum(episodes);
+    [~, ~, cr(i,:)] = sac_pendulum(episodes);
 end
 
 errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes'));

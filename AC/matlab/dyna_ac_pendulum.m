@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse] = llr_lwr_ac_pendulum(episodes, steps_per_episode)
+function [critic, actor, cr, rmse] = dyna_ac_pendulum(episodes, steps_per_episode)
     % Initialize environment
     spec = env_mops_sim('init');
     

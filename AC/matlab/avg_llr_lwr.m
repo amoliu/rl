@@ -1,8 +1,8 @@
 clear all;
 close all;
 
-episodes = 100;
-trials = 10;
+episodes = 200;
+trials = 25;
 steps_per_iteration = 0;
 
 for step=0:steps_per_iteration
@@ -10,7 +10,7 @@ for step=0:steps_per_iteration
     rmse = zeros(trials,episodes);
 
     parfor i=1:trials
-        [~, ~, cr(i,:), rmse(i,:)] = llr_lwr_ac_pendulum(episodes, step);
+        [~, ~, cr(i,:), rmse(i,:)] = dyna_ac_pendulum(episodes, step);
     end
 
     figure;

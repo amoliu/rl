@@ -1,4 +1,4 @@
-function [critic, actor, cr] = llr_ac_pendulum(episodes)
+function [critic, actor, cr] = sac_pendulum(episodes)
     % Initialize environment
     spec = env_mops_sim('init');
     
