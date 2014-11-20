@@ -9,9 +9,9 @@ public class ConstantFunction implements LWRWeightFunction
   @Override
   public double[] calculateWeight(SimpleMatrix A, SimpleMatrix query)
   {
-    double[] distance = new double[A.numRows()];
+    double[] distance = new double[A.numCols()];
 
-    for (int i = 0; i < A.numRows(); i++)
+    for (int i = 0; i < distance.length; i++)
     {
       distance[i] = 1.0;
     }
