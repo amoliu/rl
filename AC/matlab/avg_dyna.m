@@ -3,9 +3,11 @@ close all;
 
 episodes = 200;
 trials = 25;
-steps_per_iteration = 0;
+power_of_two = 5;
 
-for step=0:steps_per_iteration
+for power=0:power_of_two
+    step = 2^power;
+    
     cr = zeros(trials,episodes);
     rmse = zeros(trials,episodes);
 
