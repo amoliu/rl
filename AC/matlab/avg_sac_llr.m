@@ -1,7 +1,7 @@
 clear all;
 close all;
 
-episodes = 200;
+episodes = 300;
 trials = 25;
 
 cr = zeros(trials,episodes);
