@@ -122,7 +122,7 @@ public class DynaActorCritic implements Agent
 
       // Restart model transition if hit a terminal state or
       // if we had model.steps iterations
-      if (modelStep >= specification.getProcessModelStepsPerEpisode())
+      if (modelStep >= 100)
       {
         restartModel();
       }
