@@ -94,7 +94,7 @@ public class ActorLLR implements Serializable
 
   private void nextRandom()
   {
-    lastRandom = random.nextGaussian() * specification.getSd();
+    lastRandom = random.nextDouble() * specification.getSd();
   }
 
   public LLR getLLR()
