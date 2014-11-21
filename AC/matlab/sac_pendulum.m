@@ -24,11 +24,13 @@ function [critic, actor, cr] = sac_pendulum(episodes)
     javaSpec.setActorNeighbors(20)
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
+    javaSpec.setActorValuesToRebuildTree(20);
     
     javaSpec.setCriticInitialValue(0);
     javaSpec.setCriticAlpha(0.3);
     javaSpec.setCriticMemory(4000);
     javaSpec.setCriticNeighbors(10);
+    javaSpec.setCriticValuesToRebuildTree(10)
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);

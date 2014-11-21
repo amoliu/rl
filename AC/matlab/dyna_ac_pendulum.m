@@ -27,11 +27,13 @@ function [critic, actor, cr, rmse] = dyna_ac_pendulum(episodes, steps_per_episod
     javaSpec.setActorNeighbors(20)
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
+    javaSpec.setActorValuesToRebuildTree(1);
     
     javaSpec.setCriticInitialValue(0);
     javaSpec.setCriticAlpha(0.3);
     javaSpec.setCriticMemory(4000);
     javaSpec.setCriticNeighbors(10);
+    javaSpec.setCriticValuesToRebuildTree(1);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
@@ -42,6 +44,7 @@ function [critic, actor, cr, rmse] = dyna_ac_pendulum(episodes, steps_per_episod
     
     javaSpec.setProcessModelMemory(300);
     javaSpec.setProcessModelNeighbors(10);
+    javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
     
