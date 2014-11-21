@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = 3146240409176714062L;
+  private static final long serialVersionUID = -3317461734407630816L;
 
   private int               actorMemory;
 
@@ -18,6 +18,8 @@ public class Specification implements Serializable
 
   private SimpleMatrix      actorMax;
 
+  private int               actorValuesToRebuildTree;
+
   private double            criticInitialValue;
 
   private int               criticMemory;
@@ -25,6 +27,8 @@ public class Specification implements Serializable
   private double            criticAlpha;
 
   private int               criticNeighbors;
+
+  private int               criticValuesToRebuildTree;
 
   private int               observationDimensions;
 
@@ -53,6 +57,8 @@ public class Specification implements Serializable
   private double            processModelActorAplha;
 
   private double            processModelGamma;
+
+  private int               processModelValuesToRebuildTree;
 
   private SimpleMatrix      observationMinValue;
 
@@ -331,5 +337,35 @@ public class Specification implements Serializable
   public void setProcessModelGamma(double processModelGamma)
   {
     this.processModelGamma = processModelGamma;
+  }
+
+  public int getActorValuesToRebuildTree()
+  {
+    return actorValuesToRebuildTree;
+  }
+
+  public void setActorValuesToRebuildTree(int actorValuesToRebuildTree)
+  {
+    this.actorValuesToRebuildTree = actorValuesToRebuildTree;
+  }
+
+  public int getCriticValuesToRebuildTree()
+  {
+    return criticValuesToRebuildTree;
+  }
+
+  public void setCriticValuesToRebuildTree(int criticValuesToRebuildTree)
+  {
+    this.criticValuesToRebuildTree = criticValuesToRebuildTree;
+  }
+
+  public int getProcessModelValuesToRebuildTree()
+  {
+    return processModelValuesToRebuildTree;
+  }
+
+  public void setProcessModelValuesToRebuildTree(int processModelValuesToRebuildTree)
+  {
+    this.processModelValuesToRebuildTree = processModelValuesToRebuildTree;
   }
 }

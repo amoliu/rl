@@ -158,6 +158,7 @@ public class ActorLLRUnitTest
     specification.setActorAlpha(0.1);
     specification.setActorMemory(10);
     specification.setActorNeighbors(2);
+    specification.setActorValuesToRebuildTree(2);
     specification.setSd(1f);
     return specification;
   }

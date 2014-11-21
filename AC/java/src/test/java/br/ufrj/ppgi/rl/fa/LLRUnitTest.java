@@ -19,7 +19,7 @@ public class LLRUnitTest
   @Test
   public void testInitParams_1Input1Output()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
 
     assertEquals(1, llr.dataInput.getMatrix().numCols);
     assertEquals(SIZE, llr.dataInput.getMatrix().numRows);
@@ -33,7 +33,7 @@ public class LLRUnitTest
   @Test
   public void testInitParams_2Input1Output()
   {
-    LLR llr = new LLR(SIZE, 2, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 1, 2, 2);
 
     assertEquals(2, llr.dataInput.getMatrix().numCols);
     assertEquals(SIZE, llr.dataInput.getMatrix().numRows);
@@ -47,7 +47,7 @@ public class LLRUnitTest
   @Test
   public void testInitParams_1Input2Output()
   {
-    LLR llr = new LLR(SIZE, 1, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 2, 2, 2);
 
     assertEquals(1, llr.dataInput.getMatrix().numCols);
     assertEquals(SIZE, llr.dataInput.getMatrix().numRows);
@@ -61,7 +61,7 @@ public class LLRUnitTest
   @Test
   public void testAdd_MemoryEmpty_ShouldHaveOneEntry_1Input1Output()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -79,7 +79,7 @@ public class LLRUnitTest
   @Test
   public void testAdd_MemoryEmpty_ShouldHaveOneEntry_1Input2Output()
   {
-    LLR llr = new LLR(SIZE, 1, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 2, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(2, 1);
@@ -102,7 +102,7 @@ public class LLRUnitTest
   @Test
   public void testAdd_MemoryEmpty_ShouldHaveOneEntry_2Input1Output()
   {
-    LLR llr = new LLR(SIZE, 2, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(2, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -125,7 +125,7 @@ public class LLRUnitTest
   @Test
   public void testAdd_MemoryEmpty_ShouldHaveOneEntry_2Input2Output()
   {
-    LLR llr = new LLR(SIZE, 2, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 2, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(2, 1);
     SimpleMatrix output = new SimpleMatrix(2, 1);
@@ -150,7 +150,7 @@ public class LLRUnitTest
   @Test
   public void testAdd_MemoryFull_1Input1Output()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -191,7 +191,7 @@ public class LLRUnitTest
   @Test
   public void testAdd_MemoryFull_1Input2Output()
   {
-    LLR llr = new LLR(SIZE, 1, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 2, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(1, 2);
@@ -225,7 +225,7 @@ public class LLRUnitTest
   @Test
   public void testAdd_MemoryFull_2Input1Output()
   {
-    LLR llr = new LLR(SIZE, 2, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(2, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -259,7 +259,7 @@ public class LLRUnitTest
   @Test
   public void ttestAdd_MemoryFull_2Input2Output()
   {
-    LLR llr = new LLR(SIZE, 2, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 2, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 2);
     SimpleMatrix output = new SimpleMatrix(1, 2);
@@ -298,7 +298,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryEmpy_ShouldReturnRandom_1Input1Output()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
     llr.setRandom(RANDOM_MOCK);
 
     SimpleMatrix query = new SimpleMatrix(1, 1);
@@ -312,7 +312,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryEmpy_ShouldReturnRandom_1Input2Output()
   {
-    LLR llr = new LLR(SIZE, 1, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 2, 2, 2);
     llr.setRandom(RANDOM_MOCK);
 
     SimpleMatrix query = new SimpleMatrix(1, 1);
@@ -327,7 +327,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryEmpy_ShouldReturnRandom_2Input1Output()
   {
-    LLR llr = new LLR(SIZE, 2, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 1, 2, 2);
     llr.setRandom(RANDOM_MOCK);
 
     SimpleMatrix query = new SimpleMatrix(2, 1);
@@ -342,7 +342,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryEmpy_ShouldReturnRandom_2Input2Output()
   {
-    LLR llr = new LLR(SIZE, 2, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 2, 2, 2);
     llr.setRandom(RANDOM_MOCK);
 
     SimpleMatrix query = new SimpleMatrix(2, 1);
@@ -358,7 +358,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryFull_1Input1Output()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -382,7 +382,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryFull_2Input1Output()
   {
-    LLR llr = new LLR(SIZE, 2, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(2, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -409,7 +409,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryFull_1Input2Output()
   {
-    LLR llr = new LLR(SIZE, 1, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 2, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(2, 1);
@@ -436,7 +436,7 @@ public class LLRUnitTest
   @Test
   public void testQuery_MemoryFull_2Input2Output()
   {
-    LLR llr = new LLR(SIZE, 2, 2, 2, 0);
+    LLR llr = new LLR(SIZE, 2, 2, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(2, 1);
     SimpleMatrix output = new SimpleMatrix(2, 1);
@@ -466,7 +466,7 @@ public class LLRUnitTest
   @Test
   public void testUpdate_SimpleMatrix()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -495,7 +495,7 @@ public class LLRUnitTest
   @Test
   public void testUpdate_doubleValue()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);
@@ -517,7 +517,7 @@ public class LLRUnitTest
   @Test
   public void testUpdate_NeighborsAndDelta()
   {
-    LLR llr = new LLR(SIZE, 1, 1, 2, 0);
+    LLR llr = new LLR(SIZE, 1, 1, 2, 2);
 
     SimpleMatrix input = new SimpleMatrix(1, 1);
     SimpleMatrix output = new SimpleMatrix(1, 1);

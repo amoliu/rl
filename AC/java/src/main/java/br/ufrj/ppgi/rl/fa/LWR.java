@@ -21,7 +21,7 @@ import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
 public class LWR implements Serializable
 {
-  private static final long   serialVersionUID      = -776462075414272377L;
+  private static final long serialVersionUID = 1741267570461500906L;
 
   private static final double DEFAUL_TIKHONOV       = 0.000001d;
 
@@ -65,18 +65,26 @@ public class LWR implements Serializable
 
   private LWRWeightFunction   weightFunction;
 
+  private int                 valuesToRebuildTree;
+
   public LWR(int size, int input_dimensions, int output_dimensions, int k)
   {
-    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_TIKHONOV, DEFAUL_GAMMA);
+    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_TIKHONOV, DEFAUL_GAMMA, k);
   }
 
-  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value)
+  public LWR(int size, int input_dimensions, int output_dimensions, int k, int valuesToRebuildTree)
   {
-    this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_TIKHONOV, DEFAUL_GAMMA);
+    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_TIKHONOV, DEFAUL_GAMMA,
+         valuesToRebuildTree);
+  }
+
+  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, int valuesToRebuildTree)
+  {
+    this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_TIKHONOV, DEFAUL_GAMMA, valuesToRebuildTree);
   }
 
   public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, double tikhonov,
-             double gamma)
+             double gamma, int valuesToRebuildTree)
   {
     if (k <= 1)
       throw new IllegalArgumentException("K must be greater than one");
@@ -109,6 +117,8 @@ public class LWR implements Serializable
     buildKDTree();
     distanceFunction = new SquareEuclideanDistanceFunction();
     tree_size = 0;
+    this.valuesToRebuildTree = valuesToRebuildTree;
+
     solver = new LinearSolverChol(new CholeskyDecompositionInner_D64());
 
     weightFunction = new br.ufrj.ppgi.rl.fa.DistanceFunction();
@@ -145,7 +155,7 @@ public class LWR implements Serializable
     dataOutput.setRow(pos, 0, output.getMatrix().getData());
 
     tree_size++;
-    if (tree_size % k == 0)
+    if (tree_size % valuesToRebuildTree == 0)
     {
       buildKDTree();
     }

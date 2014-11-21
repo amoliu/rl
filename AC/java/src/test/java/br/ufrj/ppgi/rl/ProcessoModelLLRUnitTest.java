@@ -213,6 +213,7 @@ public class ProcessoModelLLRUnitTest
     specification.setProcessModelCrossLimit(10);
     specification.setProcessModelThreshold(0.5);
     specification.setProcessModelUpperBound(new double[][] { { 20, 0 } });
+    specification.setProcessModelValuesToRebuildTree(2);
 
     return specification;
   }

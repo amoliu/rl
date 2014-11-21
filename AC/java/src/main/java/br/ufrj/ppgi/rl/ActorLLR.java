@@ -12,7 +12,7 @@ import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class ActorLLR implements Serializable
 {
-  private static final long serialVersionUID = -8562342529211372018L;
+  private static final long serialVersionUID = 2707511383411801819L;
 
   protected LLR             llr;
 
@@ -27,7 +27,8 @@ public class ActorLLR implements Serializable
     this.specification = specification;
 
     llr = new LLR(specification.getActorMemory(), specification.getObservationDimensions(),
-                  specification.getActionDimensions(), specification.getActorNeighbors());
+                  specification.getActionDimensions(), specification.getActorNeighbors(),
+                  specification.getActorValuesToRebuildTree());
 
     random = new Random();
   }

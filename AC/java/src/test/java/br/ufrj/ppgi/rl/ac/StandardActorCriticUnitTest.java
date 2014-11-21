@@ -34,10 +34,12 @@ public class StandardActorCriticUnitTest
     specification.setCriticMemory(10);
     specification.setCriticNeighbors(2);
     specification.setCriticInitialValue(0);
+    specification.setCriticValuesToRebuildTree(2);
 
     specification.setActorAlpha(0.1);
     specification.setActorMemory(10);
     specification.setActorNeighbors(2);
+    specification.setActorValuesToRebuildTree(2);
     SimpleMatrix actorMin = new SimpleMatrix(1, 1);
     actorMin.set(0, -3);
 

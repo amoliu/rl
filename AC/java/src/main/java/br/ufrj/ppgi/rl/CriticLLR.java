@@ -10,7 +10,7 @@ import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class CriticLLR implements Serializable
 {
-  private static final long serialVersionUID = -3959243196946425444L;
+  private static final long serialVersionUID = -8821872302477032620L;
 
   protected LLR             llr;
 
@@ -25,7 +25,8 @@ public class CriticLLR implements Serializable
     this.specification = specification;
 
     llr = new LLR(specification.getCriticMemory(), specification.getObservationDimensions(), 1,
-                  specification.getCriticNeighbors(), this.specification.getCriticInitialValue());
+                  specification.getCriticNeighbors(), this.specification.getCriticInitialValue(),
+                  specification.getCriticValuesToRebuildTree());
 
     resetEligibilityTrace();
   }

@@ -94,6 +94,7 @@ public class CriticLLRUnitTest
     specification.setCriticMemory(10);
     specification.setCriticNeighbors(2);
     specification.setCriticInitialValue(CRITIC_INITIAL_VALUE);
+    specification.setCriticValuesToRebuildTree(2);
     specification.setSd(1f);
     
     specification.setObservationDimensions(1);

@@ -25,7 +25,7 @@ public class LLRPerformanceTest
     long queryTime = 0;
 
     Random rand = new Random();
-    LLR llr = new LLR(size, inputDimension, outputDimension, neighbors, initialValue);
+    LLR llr = new LLR(size, inputDimension, outputDimension, neighbors, initialValue, neighbors);
 
     StopWatch watch = new StopWatch();
 

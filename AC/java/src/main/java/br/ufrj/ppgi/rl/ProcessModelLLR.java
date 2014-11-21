@@ -10,7 +10,7 @@ import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class ProcessModelLLR implements Serializable
 {
-  private static final long serialVersionUID = -2618952695582747034L;
+  private static final long serialVersionUID = 6886121151297463522L;
 
   protected LLR             llr;
 
@@ -22,7 +22,8 @@ public class ProcessModelLLR implements Serializable
 
     llr = new LLR(specification.getProcessModelMemory(), specification.getObservationDimensions()
                                                          + specification.getActionDimensions(),
-                  specification.getObservationDimensions(), specification.getProcessModelNeighbors());
+                  specification.getObservationDimensions(), specification.getProcessModelNeighbors(),
+                  specification.getProcessModelValuesToRebuildTree());
 
   }
 
