@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent)
+function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args)
 %LEARN Make the agent learn about the environment.
 %   LEARN(E, N, A) learns during E episodes, using N as norm factor to the
 %   observations, given the agent A.
@@ -19,7 +19,9 @@ function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent)
 
     for ee=1:episodes
         % Show progress
-        disp(ee);
+        if args.verbose
+            disp(ee);
+        end
 
         % Reset simulation to initial condition
         first_obs = env_mops_sim('start');

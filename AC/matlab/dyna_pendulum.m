@@ -1,18 +1,26 @@
-function [critic, actor, cr, rmse] = dyna_ac_pendulum(episodes, steps_per_episode)
-%DYNA_AC_PENDULUM Runs the dyna algorithim on the pendulum swing-up.
-%   DYNA_AC_PENDULUM(E, S) learns during E episodes,
+function [critic, actor, cr, rmse] = dyna_pendulum(episodes, steps_per_episode, varargin)
+%DYNA_PENDULUM Runs the dyna algorithim on the pendulum swing-up.
+%   DYNA_PENDULUM(E, S) learns during E episodes,
 %   doing S model steps per real step.
 %
-%   C = DYNA_AC_PENDULUM(...) return a handle to the Critic
-%   [C, A] = DYNA_AC_PENDULUM(...) also returns a handle to the Actor
-%   [C, A, CR] = DYNA_AC_PENDULUM(...) also returns the learning curve.
-%   [C, A, CR, E] = DYNA_AC_PENDULUM(...) also returns the error curve.
+%   DYNA_PENDULUM(..., 'verbose', 1) sets the output to verbose
+%
+%   C = DYNA_PENDULUM(...) return a handle to the Critic
+%   [C, A] = DYNA_PENDULUM(...) also returns a handle to the Actor
+%   [C, A, CR] = DYNA_PENDULUM(...) also returns the learning curve.
+%   [C, A, CR, E] = DYNA_PENDULUM(...) also returns the error curve.
 %
 %   EXAMPLES:
-%      [critic, actor, cr, rmse] = dyna_ac_pendulum(100, 10);
+%      [critic, actor, cr, rmse] = dyna_pendulum(100, 10);
 %  
 %   AUTHOR:
 %       Bruno Costa <doravante2@gmail.com>
+
+    % Argument parsing
+    p = inputParser;
+    p.addOptional('verbose', 0);
+    p.parse(varargin{:});
+    args = p.Results;
 
     % Initialize environment
     spec = env_mops_sim('init');
@@ -60,5 +68,5 @@ function [critic, actor, cr, rmse] = dyna_ac_pendulum(episodes, steps_per_episod
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent); 
+    [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args); 
 end

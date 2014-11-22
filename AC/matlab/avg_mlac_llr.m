@@ -7,9 +7,12 @@ trials = 25;
 cr = zeros(trials,episodes);
 rmse = zeros(trials,episodes);
 
+parfor_progress(trials);
 parfor i=1:trials
     [~, ~, cr(i,:), rmse(i,:)] = mlac_pendulum(episodes);
+    parfor_progress;
 end
+parfor_progress(0);
 
 errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', strcat('mlac-', num2str(trials), '-iterations'));
 

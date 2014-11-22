@@ -5,6 +5,7 @@ episodes = 200;
 trials = 25;
 power_of_two = 5;
 
+parfor_progress(trials*power_of_two);
 for power=0:power_of_two
     step = 2^power;
     
@@ -12,7 +13,8 @@ for power=0:power_of_two
     rmse = zeros(trials,episodes);
 
     parfor i=1:trials
-        [~, ~, cr(i,:), rmse(i,:)] = dyna_ac_pendulum(episodes, step);
+        [~, ~, cr(i,:), rmse(i,:)] = dyna_pendulum(episodes, step);
+        parfor_progress;
     end
 
     figure;
@@ -31,3 +33,4 @@ for power=0:power_of_two
     end
     hold off;
 end
+parfor_progress(0);
