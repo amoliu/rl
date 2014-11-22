@@ -10,12 +10,13 @@ import br.ufrj.ppgi.rl.ActionVO;
 import br.ufrj.ppgi.rl.ActorLLR;
 import br.ufrj.ppgi.rl.CriticLLR;
 import br.ufrj.ppgi.rl.ProcessModelLLR;
+import br.ufrj.ppgi.rl.ProcessModelQueryVO;
 import br.ufrj.ppgi.rl.Specification;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class MLAC implements Agent
 {
-  private static final long serialVersionUID = -1297896020589293781L;
+  private static final long serialVersionUID = 4327216385743752778L;
 
   protected ActorLLR        actor;
 
@@ -92,13 +93,13 @@ public class MLAC implements Agent
 
   private double update(double reward, SimpleMatrix observation)
   {
-    LWRQueryVO model = processModel.query(lastObservation, lastAction.getPolicyAction());
-    processModel.add(lastObservation, lastAction.getPolicyAction(), observation);
+    ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastAction.getPolicyAction());
+    processModel.add(lastObservation, lastAction.getPolicyAction(), observation, reward, 0);
 
-    LWRQueryVO criticResult = critic.query(model.getResult());
+    LWRQueryVO criticResult = critic.query(modelQuery.getLWRQueryVO().getResult());
 
     SimpleMatrix criticXs = getXs(criticResult.getX());
-    SimpleMatrix modelXa = getXa(model.getX());
+    SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
     // check if withinBounds
     for (int i = 0; i < lastAction.getPolicyAction().getNumElements(); i++)
@@ -115,7 +116,7 @@ public class MLAC implements Agent
 
     lastValueFunction = critic.update(lastObservation, lastAction.getAction(), lastValueFunction, reward, observation);
 
-    return Math.pow(NormOps.normP2(observation.minus(model.getResult()).getMatrix()), 2);
+    return Math.pow(NormOps.normP2(observation.minus(modelQuery.getLWRQueryVO().getResult()).getMatrix()), 2);
   }
 
   private double[][] chooseAction(SimpleMatrix observation)

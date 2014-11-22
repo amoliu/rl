@@ -47,6 +47,7 @@ public class ProcessoModelLWRUnitTest
     specification.setActionDimensions(1);
     specification.setProcessModelMemory(10);
     specification.setProcessModelNeighbors(2);
+    specification.setProcessModelValuesToRebuildTree(2);
     specification.setObservationMaxValue(new double[][] { { 20, 12 } });
     specification.setObservationMinValue(new double[][] { { 0, -12 } });
     specification.setProcessModelCrossLimit(10);

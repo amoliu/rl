@@ -21,7 +21,7 @@ import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
 public class LWR implements Serializable
 {
-  private static final long serialVersionUID = 1741267570461500906L;
+  private static final long   serialVersionUID      = 1741267570461500906L;
 
   private static final double DEFAUL_TIKHONOV       = 0.000001d;
 
@@ -80,7 +80,8 @@ public class LWR implements Serializable
 
   public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, int valuesToRebuildTree)
   {
-    this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_TIKHONOV, DEFAUL_GAMMA, valuesToRebuildTree);
+    this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_TIKHONOV, DEFAUL_GAMMA,
+         valuesToRebuildTree);
   }
 
   public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, double tikhonov,

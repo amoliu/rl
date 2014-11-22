@@ -2,33 +2,33 @@ package br.ufrj.ppgi.rl;
 
 import java.io.Serializable;
 
-import org.ejml.simple.SimpleMatrix;
+import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class ProcessModelQueryVO implements Serializable
 {
-  private static final long serialVersionUID = 1233875606427979503L;
+  private static final long serialVersionUID = -711054600461999634L;
 
-  private SimpleMatrix      observation;
+  private LWRQueryVO        lwrQueryVO;
 
   private double            reward;
 
   private int               terminal;
 
-  public ProcessModelQueryVO(SimpleMatrix observation, double reward, int terminal)
+  public ProcessModelQueryVO(LWRQueryVO lwrQueryVO, double reward, int terminal)
   {
-    this.observation = observation;
+    this.lwrQueryVO = lwrQueryVO;
     this.reward = reward;
     this.terminal = terminal;
   }
 
-  public SimpleMatrix getObservation()
+  public LWRQueryVO getLWRQueryVO()
   {
-    return observation;
+    return lwrQueryVO;
   }
 
-  public void setObservation(SimpleMatrix observation)
+  public void setLWRQueryVO(LWRQueryVO lwrQueryVO)
   {
-    this.observation = observation;
+    this.lwrQueryVO = lwrQueryVO;
   }
 
   public double getReward()

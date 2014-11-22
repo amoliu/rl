@@ -19,24 +19,25 @@ public class ProcessModelLWR implements Serializable
   {
     this.specification = specification;
 
-    lwr = new LWR(specification.getProcessModelMemory(), specification.getObservationDimensions()
-                                                         + specification.getActionDimensions(),
-                  specification.getObservationDimensions() + 2, specification.getProcessModelNeighbors());
+    lwr = new LWR(specification.getProcessModelMemory(), getInputDimension(), getOutputDimension(),
+                  specification.getProcessModelNeighbors(), specification.getProcessModelValuesToRebuildTree());
 
   }
 
   public ProcessModelQueryVO query(SimpleMatrix observation, SimpleMatrix action)
   {
     LWRQueryVO query = lwr.query(createProcessoModelInput(observation, action));
-    ProcessModelQueryVO result = decomposeProcessModelOutput(query.getResult());
+    ProcessModelQueryVO result = decomposeProcessModelOutput(query);
 
-    if (result.getObservation().get(0) < 0)
+    if (result.getLWRQueryVO().getResult().get(0) < 0)
     {
-      result.setObservation(result.getObservation().plus(specification.getProcessModelUpperBound()));
+      result.getLWRQueryVO().setResult(result.getLWRQueryVO().getResult()
+                                             .plus(specification.getProcessModelUpperBound()));
     }
-    if (result.getObservation().get(0) > specification.getProcessModelUpperBound().get(0))
+    if (result.getLWRQueryVO().getResult().get(0) > specification.getProcessModelUpperBound().get(0))
     {
-      result.setObservation(result.getObservation().minus(specification.getProcessModelUpperBound()));
+      result.getLWRQueryVO().setResult(result.getLWRQueryVO().getResult()
+                                             .minus(specification.getProcessModelUpperBound()));
     }
 
     return result;
@@ -108,15 +109,29 @@ public class ProcessModelLWR implements Serializable
     return output;
   }
 
-  private ProcessModelQueryVO decomposeProcessModelOutput(SimpleMatrix output)
+  private ProcessModelQueryVO decomposeProcessModelOutput(LWRQueryVO lwrQueryVO)
   {
-    return new ProcessModelQueryVO(output.extractMatrix(0, 1, 0, specification.getObservationDimensions()),
-                                   output.get(specification.getObservationDimensions()),
-                                   (int) output.get(specification.getObservationDimensions() + 1));
+    SimpleMatrix result = lwrQueryVO.getResult();
+    double reward = result.get(specification.getObservationDimensions());
+    int terminal = (int) result.get(specification.getObservationDimensions() + 1);
+
+    lwrQueryVO.setResult(lwrQueryVO.getResult().extractMatrix(0, 1, 0, specification.getObservationDimensions()));
+
+    return new ProcessModelQueryVO(lwrQueryVO, reward, terminal);
   }
 
   public LWR getLWR()
   {
     return lwr;
+  }
+
+  public int getOutputDimension()
+  {
+    return specification.getObservationDimensions() + 2;
+  }
+
+  public int getInputDimension()
+  {
+    return specification.getObservationDimensions() + specification.getActionDimensions();
   }
 }

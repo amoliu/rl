@@ -71,7 +71,7 @@ public class DynaActorCritic implements Agent
   @Override
   public StepVO step(double reward, double[][] observation)
   {
-    SimpleMatrix model = processModel.query(lastObservation, lastAction).getObservation();
+    SimpleMatrix model = processModel.query(lastObservation, lastAction).getLWRQueryVO().getResult();
 
     update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
@@ -118,11 +118,12 @@ public class DynaActorCritic implements Agent
       SimpleMatrix action = actor.action(lastModelObservation).getAction();
       ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
-      double delta = critic.update(lastModelObservation, action, modelQuery.getReward(), modelQuery.getObservation(),
+      double delta = critic.update(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
+                                                                                                   .getResult(),
                                    specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
       actor.updateWithRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
 
-      lastModelObservation = modelQuery.getObservation();
+      lastModelObservation = modelQuery.getLWRQueryVO().getResult();
       modelStep++;
 
       // Restart model transition if hit a terminal state or
