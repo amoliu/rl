@@ -1,5 +1,6 @@
 package br.ufrj.ppgi.rl.ac;
 
+import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
@@ -70,10 +71,14 @@ public class DynaActorCritic implements Agent
   @Override
   public StepVO step(double reward, double[][] observation)
   {
+    SimpleMatrix model = processModel.query(lastObservation, lastAction).getObservation();
+
     update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
 
-    return new StepVO(chooseAction(new SimpleMatrix(observation)));
+    double error = Math.pow(NormOps.normP2(lastObservation.minus(model).getMatrix()), 2);
+
+    return new StepVO(error, chooseAction(new SimpleMatrix(observation)));
   }
 
   @Override

@@ -42,10 +42,12 @@ function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent)
             % Learn and choose next action
             stepVO = agent.step(reward, norm_obs);
         end
-
-       cr(ee) = agent_performance(agent);
+        
+        cr(ee) = agent_performance(agent);
     end
 
+    rmse = sqrt(rmse ./ 100);
+    
     % Destroy simulation
     env_mops_sim('fini');
     agent.fini();
