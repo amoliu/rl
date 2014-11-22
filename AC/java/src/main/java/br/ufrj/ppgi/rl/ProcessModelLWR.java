@@ -13,7 +13,7 @@ public class ProcessModelLWR implements Serializable
 
   protected LWR             lwr;
 
-  private Specification     specification;
+  protected Specification   specification;
 
   public void init(Specification specification)
   {
@@ -101,19 +101,29 @@ public class ProcessModelLWR implements Serializable
 
   private SimpleMatrix createProcessoModelOutput(SimpleMatrix observation, double reward, int terminal)
   {
-    SimpleMatrix output = new SimpleMatrix(1, specification.getObservationDimensions() + 2);
+    SimpleMatrix output = new SimpleMatrix(1, getOutputDimension());
 
     output.setRow(0, 0, observation.getMatrix().data);
-    output.setRow(0, specification.getObservationDimensions(), reward);
-    output.setRow(0, specification.getObservationDimensions() + 1, terminal);
+    if (isLWR())
+    {
+      output.setRow(0, specification.getObservationDimensions(), reward);
+      output.setRow(0, specification.getObservationDimensions() + 1, terminal);
+    }
+
     return output;
   }
 
   private ProcessModelQueryVO decomposeProcessModelOutput(LWRQueryVO lwrQueryVO)
   {
     SimpleMatrix result = lwrQueryVO.getResult();
-    double reward = result.get(specification.getObservationDimensions());
-    int terminal = (int) result.get(specification.getObservationDimensions() + 1);
+    double reward = 0;
+    int terminal = 0;
+
+    if (isLWR())
+    {
+      reward = result.get(specification.getObservationDimensions());
+      terminal = (int) result.get(specification.getObservationDimensions() + 1);
+    }
 
     lwrQueryVO.setResult(lwrQueryVO.getResult().extractMatrix(0, 1, 0, specification.getObservationDimensions()));
 
@@ -125,13 +135,18 @@ public class ProcessModelLWR implements Serializable
     return lwr;
   }
 
-  public int getOutputDimension()
+  protected int getOutputDimension()
   {
     return specification.getObservationDimensions() + 2;
   }
 
-  public int getInputDimension()
+  protected int getInputDimension()
   {
     return specification.getObservationDimensions() + specification.getActionDimensions();
+  }
+
+  protected boolean isLWR()
+  {
+    return true;
   }
 }

@@ -26,7 +26,7 @@ public class ProcessoModelLLRUnitTest
     processModelLLR.add(observation, action, new_observation, 0, 0);
 
     Assert.assertEquals(processModelLLR.lwr.getDataInput().numCols(), 3);
-    Assert.assertEquals(processModelLLR.lwr.getDataOutput().numCols(), 4);
+    Assert.assertEquals(processModelLLR.lwr.getDataOutput().numCols(), 2);
 
     SimpleMatrix inputLLR = processModelLLR.lwr.getDataInput().extractVector(true, 0);
     Assert.assertEquals(1, inputLLR.get(0), DELTA);

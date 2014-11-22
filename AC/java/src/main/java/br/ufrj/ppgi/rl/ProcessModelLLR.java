@@ -14,4 +14,22 @@ public class ProcessModelLLR extends ProcessModelLWR
                   specification.getProcessModelNeighbors(), specification.getProcessModelValuesToRebuildTree());
 
   }
+
+  @Override
+  protected int getOutputDimension()
+  {
+    return specification.getObservationDimensions();
+  }
+
+  @Override
+  protected int getInputDimension()
+  {
+    return specification.getObservationDimensions() + specification.getActionDimensions();
+  }
+  
+  @Override
+  protected boolean isLWR()
+  {
+    return false;
+  }
 }
