@@ -1,8 +1,10 @@
 clear all;
 close all;
 
-episodes = 300;
-trials = 25;
+path = make_save_folder();
+
+episodes = 200;
+trials = 2;
 
 cr = zeros(trials,episodes);
 
@@ -13,10 +15,14 @@ parfor i=1:trials
 end
 parfor_progress(0);
 
-errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes'));
+t = strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
+h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', t);
 
-figure;
-title('All curves');
+saveas(h, strcat(path, '/', t), 'png');
+
+h = figure;
+t = strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-curves');
+title(t);
 xlabel('Trials');
 ylabel('Average reward');
 hold on;
@@ -24,3 +30,5 @@ for i=1:trials
     plot(cr(i,:));
 end
 hold off;
+
+saveas(h, strcat(path, '/', t), 'png');
