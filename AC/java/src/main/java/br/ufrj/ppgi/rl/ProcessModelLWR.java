@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import org.ejml.simple.SimpleMatrix;
 
-import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LWR;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
@@ -31,8 +30,14 @@ public class ProcessModelLWR implements Serializable
     LWRQueryVO query = lwr.query(createProcessoModelInput(observation, action));
     ProcessModelQueryVO result = decomposeProcessModelOutput(query.getResult());
 
-    result.setObservation(EJMLMatlabUtils.wrap(result.getObservation(), specification.getObservationMaxValue(),
-                                               specification.getObservationMinValue()));
+    if (result.getObservation().get(0) < 0)
+    {
+      result.setObservation(result.getObservation().plus(specification.getProcessModelUpperBound()));
+    }
+    if (result.getObservation().get(0) > specification.getProcessModelUpperBound().get(0))
+    {
+      result.setObservation(result.getObservation().minus(specification.getProcessModelUpperBound()));
+    }
 
     return result;
   }

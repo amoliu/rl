@@ -187,18 +187,18 @@ public class ProcessoModelLLRUnitTest
 
     processModelLLR.init(specification);
 
-    processModelLLR.llr.setRandom(new RandomMock(30));
+    processModelLLR.llr.setRandom(new RandomMock(21));
 
     SimpleMatrix observation = new SimpleMatrix(new double[][] { { 1 } });
     SimpleMatrix action = new SimpleMatrix(new double[][] { { 2 } });
 
     SimpleMatrix query = processModelLLR.query(observation, action).getResult();
-    Assert.assertEquals(20, query.get(0), DELTA);
+    Assert.assertEquals(1, query.get(0), DELTA);
 
-    processModelLLR.llr.setRandom(new RandomMock(-15));
+    processModelLLR.llr.setRandom(new RandomMock(-1));
 
     query = processModelLLR.query(observation, action).getResult();
-    Assert.assertEquals(0, query.get(0), DELTA);
+    Assert.assertEquals(19, query.get(0), DELTA);
   }
 
   private Specification getSpecification()
