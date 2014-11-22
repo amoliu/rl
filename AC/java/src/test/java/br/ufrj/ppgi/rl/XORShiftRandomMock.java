@@ -1,14 +1,14 @@
 package br.ufrj.ppgi.rl;
 
-import ec.util.MersenneTwisterFast;
+import org.uncommons.maths.random.XORShiftRNG;
 
-public class MersenneRandomMock extends MersenneTwisterFast
+public class XORShiftRandomMock extends XORShiftRNG
 {
   private static final long serialVersionUID = -7624248686008825101L;
-  
+
   private double            rand;
 
-  public MersenneRandomMock(double rand)
+  public XORShiftRandomMock(double rand)
   {
     this.rand = rand;
   }

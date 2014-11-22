@@ -15,7 +15,7 @@ public class ActorLLRUnitTest
 
     ActorLLR actor = new ActorLLR();
     actor.init(specification);
-    actor.random = new MersenneRandomMock(0.5);
+    actor.random = new XORShiftRandomMock(0.5);
     actor.llr.setRandom(new RandomMock(1.5));
     
     SimpleMatrix observation = new SimpleMatrix(1, 1);
@@ -38,7 +38,7 @@ public class ActorLLRUnitTest
 
     ActorLLR actor = new ActorLLR();
     actor.init(specification);
-    actor.random = new MersenneRandomMock(0.5);
+    actor.random = new XORShiftRandomMock(0.5);
     actor.llr.setRandom(new RandomMock(1.5));
 
     SimpleMatrix observation = new SimpleMatrix(1, 1);
@@ -63,7 +63,7 @@ public class ActorLLRUnitTest
     ActorLLR actor = new ActorLLR();
     actor.init(specification);
 
-    actor.random = new MersenneRandomMock(30);
+    actor.random = new XORShiftRandomMock(30);
 
     SimpleMatrix observation = new SimpleMatrix(1, 1);
     observation.zero();
@@ -71,7 +71,7 @@ public class ActorLLRUnitTest
     SimpleMatrix action = actor.action(observation).getAction();
     Assert.assertEquals(3, action.get(0), DELTA);
     
-    actor.random = new MersenneRandomMock(-30);
+    actor.random = new XORShiftRandomMock(-30);
     
     action = actor.action(observation).getAction();
     Assert.assertEquals(-3, action.get(0), DELTA);
@@ -84,7 +84,7 @@ public class ActorLLRUnitTest
 
     ActorLLR actor = new ActorLLR();
     actor.init(specification);
-    actor.random = new MersenneRandomMock(0.5);
+    actor.random = new XORShiftRandomMock(0.5);
     actor.llr.setRandom(new RandomMock(1.5));
     
     SimpleMatrix observation = new SimpleMatrix(1, 1);

@@ -4,23 +4,23 @@ import java.io.Serializable;
 
 import org.ejml.alg.dense.mult.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
+import org.uncommons.maths.random.XORShiftRNG;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.fa.LLR;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
-import ec.util.MersenneTwisterFast;
 
 public class ActorLLR implements Serializable
 {
-  private static final long     serialVersionUID = -9178817118835693301L;
+  private static final long serialVersionUID = -9178817118835693301L;
 
-  protected LLR                 llr;
+  protected LLR             llr;
 
-  private Specification         specification;
+  private Specification     specification;
 
-  protected MersenneTwisterFast random;
+  protected XORShiftRNG     random;
 
-  private double                lastRandom;
+  private double            lastRandom;
 
   public void init(Specification specification)
   {
@@ -30,7 +30,7 @@ public class ActorLLR implements Serializable
                   specification.getActionDimensions(), specification.getActorNeighbors(),
                   specification.getActorValuesToRebuildTree());
 
-    random = new MersenneTwisterFast();
+    random = new XORShiftRNG();
   }
 
   public ActionVO action(SimpleMatrix observation)
