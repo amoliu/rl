@@ -68,5 +68,5 @@ function [critic, actor, cr, rmse] = dyna_pendulum(episodes, steps_per_episode, 
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args); 
+    [critic, actor, cr, rmse] = learn('mops_sim', episodes, norm_factor, agent, args); 
 end

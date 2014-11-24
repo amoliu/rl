@@ -62,5 +62,5 @@ function [critic, actor, cr, rmse] = mlac_pendulum(episodes, varargin)
     agent = br.ufrj.ppgi.rl.ac.MLAC;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args);
+    [critic, actor, cr, rmse] = learn('mops_sim', episodes, norm_factor, agent, args);
 end

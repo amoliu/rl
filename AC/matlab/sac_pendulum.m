@@ -51,5 +51,5 @@ function [critic, actor, cr] = sac_pendulum(episodes, varargin)
     agent = br.ufrj.ppgi.rl.ac.StandardActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr] = learn(episodes, norm_factor, agent, args);
+    [critic, actor, cr] = learn('mops_sim', episodes, norm_factor, agent, args);
 end

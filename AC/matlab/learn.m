@@ -1,7 +1,7 @@
-function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args)
+function [critic, actor, cr, rmse] = learn(env_name, episodes, norm_factor, agent, args)
 %LEARN Make the agent learn about the environment.
-%   LEARN(E, N, A) learns during E episodes, using N as norm factor to the
-%   observations, given the agent A.
+%   LEARN(ENV, E, N, A) learns during E episodes, using N as norm factor to the
+%   observations, given the agent A in the ENV environment.
 %
 %   C = LEARN(...) return a handle to the Critic
 %   [C, A] = LEARN(...) also returns a handle to the Actor
@@ -10,6 +10,8 @@ function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args)
 %
 %   AUTHOR:
 %       Bruno Costa <doravante2@gmail.com>
+
+    env = str2func(['env_' env_name]);
 
     % Initialize learning curve
     cr = zeros(1, episodes);
@@ -24,14 +26,14 @@ function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args)
         end
 
         % Reset simulation to initial condition
-        first_obs = env_mops_sim('start');
+        first_obs = env('start');
         norm_first_obs = first_obs ./ norm_factor;
 
         stepVO = agent.start(norm_first_obs);
 
         for tt=1:100
              % Actuate
-            [obs, reward, terminal] = env_mops_sim('step', stepVO.getAction);
+            [obs, reward, terminal] = env('step', stepVO.getAction);
             norm_obs = obs ./ norm_factor;
 
             if terminal
@@ -51,7 +53,7 @@ function [critic, actor, cr, rmse] = learn(episodes, norm_factor, agent, args)
     rmse = sqrt(rmse ./ 100);
     
     % Destroy simulation
-    env_mops_sim('fini');
+    env('fini');
     agent.fini();
 
     critic = agent.getCritic();
