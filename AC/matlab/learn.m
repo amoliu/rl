@@ -30,8 +30,8 @@ function [critic, actor, cr, rmse] = learn(env_name, episodes, norm_factor, agen
         norm_first_obs = first_obs ./ norm_factor;
 
         stepVO = agent.start(norm_first_obs);
-
-        for tt=1:100
+        
+        while 1
              % Actuate
             [obs, reward, terminal] = env('step', stepVO.getAction);
             norm_obs = obs ./ norm_factor;
@@ -47,7 +47,7 @@ function [critic, actor, cr, rmse] = learn(env_name, episodes, norm_factor, agen
             stepVO = agent.step(reward, norm_obs);
         end
         
-        cr(ee) = agent_performance(agent);
+        cr(ee) = agent_performance(agent, norm_factor);
     end
 
     rmse = sqrt(rmse ./ 100);

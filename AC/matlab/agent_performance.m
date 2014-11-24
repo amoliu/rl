@@ -1,4 +1,4 @@
-function [cr] = agent_performance(agent)    
+function [cr] = agent_performance(agent, norm_factor)    
 %AGENT_PERFORMANCE Calculate the reward for this agent on the pendulum swing-up environment
 %   
 %   CR = AGENT_PERFORMANCE(...) returns the reward a full trial on the environment, i.e., 100 steps.
@@ -7,7 +7,6 @@ function [cr] = agent_performance(agent)
 %       Bruno Costa <doravante2@gmail.com>
 
     steps         = 100;      % Steps per episode
-    norm_factor   = [ pi/10, pi ]; % Normalization factor used in observations
     
     % Initialize learning curve
     cr = 0;
