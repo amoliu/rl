@@ -1,6 +1,8 @@
 clear all;
 close all;
 
+path = make_save_folder('dyna');
+
 episodes = 200;
 trials = 25;
 power_of_two = 5;
@@ -18,13 +20,18 @@ for power=0:power_of_two
     end
 
     figure;
-    errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations'));
+    t = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
+    h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', t);
+    saveas(h, strcat(path, t), 'png');
     
     figure;
-    errorbaralpha(mean(rmse), 1.96.*std(rmse)./sqrt(trials), 'title', strcat('rmse-dyna-', num2str(step), '-', num2str(trials), '-iterations'));
+    t = strcat('dyna-rmse-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
+    h = errorbaralpha(mean(rmse), 1.96.*std(rmse)./sqrt(trials), 'title', t);
+    saveas(h, strcat(path, t), 'png');
     
-    figure;
-    title(strcat('All curves - step', num2str(step)));
+    h = figure;
+    t = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-curves');
+    title(t);
     xlabel('Trials');
     ylabel('Average reward');
     hold on;
@@ -32,5 +39,6 @@ for power=0:power_of_two
         plot(cr(i,:));
     end
     hold off;
+    saveas(h, strcat(path, t), 'png');
 end
 parfor_progress(0);
