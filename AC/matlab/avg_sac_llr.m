@@ -15,13 +15,16 @@ parfor i=1:trials
 end
 parfor_progress(0);
 
+axis_limits = [0,episodes,-6000,0];
+
 t = strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
-h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', t);
+h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'Title', t, 'Rendering', 'opaque', 'Axis', axis_limits);
 saveas(h, strcat(path, t), 'png');
 
 h = figure;
 t = strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-curves');
 title(t);
+axis(axis_limits);
 xlabel('Trials');
 ylabel('Average reward');
 hold on;

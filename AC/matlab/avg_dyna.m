@@ -7,6 +7,8 @@ episodes = 200;
 trials = 25;
 power_of_two = 5;
 
+axis_limits = [0,episodes,-6000,0];
+
 parfor_progress(trials*power_of_two);
 for power=0:power_of_two
     step = 2^power;
@@ -21,17 +23,18 @@ for power=0:power_of_two
 
     figure;
     t = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
-    h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'title', t);
+    h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'Title', t, 'Rendering', 'opaque', 'Axis', axis_limits);
     saveas(h, strcat(path, t), 'png');
     
     figure;
     t = strcat('dyna-rmse-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
-    h = errorbaralpha(mean(rmse), 1.96.*std(rmse)./sqrt(trials), 'title', t);
+    h = errorbaralpha(mean(rmse), 1.96.*std(rmse)./sqrt(trials), 'Title', t, 'Rendering', 'opaque');
     saveas(h, strcat(path, t), 'png');
     
     h = figure;
     t = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-curves');
     title(t);
+    axis(axis_limits);
     xlabel('Trials');
     ylabel('Average reward');
     hold on;
