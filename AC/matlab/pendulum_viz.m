@@ -7,17 +7,7 @@ function pendulum_viz(actor, critic, cr, rmse)
 %   AUTHOR:
 %       Bruno Costa <doravante2@gmail.com>
     steps   = 100;   % Steps per episode
-    radius  = 2;     % Radius for plot
-    
-    % Initialize simulation
-    spec = env_mops_sim('init');
-    
-    % Reset simulation to initial condition
-    obs = env_mops_sim('start');
-    norm_obs = obs ./ [ pi/10, pi];
-
-    terminal = 0;
-    
+        
     trials = size(cr, 2);
     x = linspace(1, trials, trials);
     plot(x, cr);
@@ -51,8 +41,19 @@ function pendulum_viz(actor, critic, cr, rmse)
     ylabel('angular velocity[rad/s]');
     colorbar;
         
-    % Movie
-    figure;
+    % Simulation
+    % Initialize simulation
+    env_mops_sim('init');
+    
+    % Reset simulation to initial condition
+    obs = env_mops_sim('start');
+    norm_obs = obs ./ [ pi/10, pi];
+
+    terminal = 0;
+    
+    f = figure;
+    h = viz_mops_sim(obs);
+    title('Pendulum Swing-up');
     for tt=1:steps       
         if terminal
             break;
@@ -60,27 +61,15 @@ function pendulum_viz(actor, critic, cr, rmse)
             
         % Calculate action
         a = actor.getLLR.query(norm_obs).getMatlabResult;
-        disp(a);
 
         % Actuate
         [obs, ~, terminal] = env_mops_sim('step', a);
         norm_obs = obs ./ [ pi/10, pi];
         
-        x = radius * cos(obs(1)-pi/2) + radius;
-        y = radius * sin(obs(1)-pi/2) + radius;
-        
-        plot(x,y,'r*', [radius x], [radius y], '-');
-        xlabel('x');
-        ylabel('y');
-        axis([0,2*radius,0,2*radius]);
-        axis square
-        title('Policy');
-        M(tt)=getframe;
+        viz_mops_sim(obs, h);
+        pause(0.05);
     end
 
     % Destroy simulation
     env_mops_sim('fini');
-    
-    % Plays animation
-    movie(M,2,10);
 end
