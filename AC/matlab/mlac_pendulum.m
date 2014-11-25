@@ -21,6 +21,9 @@ function [critic, actor, cr, rmse] = mlac_pendulum(episodes, varargin)
     p.parse(varargin{:});
     args = p.Results;
 
+    args.mode = 'episodes';
+    args.episodes = episodes;
+    
     % Initialize simulation
     spec = env_mops_sim('init');
     

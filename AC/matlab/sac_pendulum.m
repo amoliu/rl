@@ -19,7 +19,10 @@ function [critic, actor, cr] = sac_pendulum(episodes, varargin)
     p.addOptional('verbose', 0);
     p.parse(varargin{:});
     args = p.Results;
-
+    
+    args.mode = 'episodes';
+    args.episodes = episodes;
+    
     % Initialize environment
     spec = env_mops_sim('init');
     

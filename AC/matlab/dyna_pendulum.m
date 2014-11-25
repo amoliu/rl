@@ -22,6 +22,9 @@ function [critic, actor, cr, rmse] = dyna_pendulum(episodes, steps_per_episode, 
     p.parse(varargin{:});
     args = p.Results;
 
+    args.mode = 'episodes';
+    args.episodes = episodes;
+    
     % Initialize environment
     spec = env_mops_sim('init');
     
