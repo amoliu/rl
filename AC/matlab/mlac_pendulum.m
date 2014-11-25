@@ -1,8 +1,9 @@
-function [critic, actor, cr, rmse] = mlac_pendulum(episodes, varargin)
+function [critic, actor, cr, rmse] = mlac_pendulum(varargin)
 %MLAC_PENDULUM Runs the MLAC algorithim on the pendulum swing-up.
 %   MLAC_PENDULUM(E) learns during E episodes
 %
-%   MLAC_PENDULUM(..., 'verbose', 1) sets the output to verbose
+%   MLAC_PENDULUM(..., 'verbose', true) sets the output to verbose
+%   See LEARN for more params.
 %
 %   C = MLAC_PENDULUM(...) return a handle to the Critic
 %   [C, A] = MLAC_PENDULUM(...) also returns a handle to the Actor
@@ -17,12 +18,18 @@ function [critic, actor, cr, rmse] = mlac_pendulum(episodes, varargin)
 
     % Argument parsing
     p = inputParser;
-    p.addOptional('verbose', 0);
+    expectedModes = {'episode','performance'};
+    p.addParameter('mode','episode',...
+                 @(x) any(validatestring(x,expectedModes)));
+    
+    p.addOptional('episodes', 100, @isnumeric);
+    
+    p.addOptional('performance', -900, @isnumeric);
+    p.addOptional('trialsInARow', 3, @isnumeric);
+    
+    p.addOptional('verbose', false, @islogical);
     p.parse(varargin{:});
     args = p.Results;
-
-    args.mode = 'episodes';
-    args.episodes = episodes;
     
     % Initialize simulation
     spec = env_mops_sim('init');
@@ -65,5 +72,5 @@ function [critic, actor, cr, rmse] = mlac_pendulum(episodes, varargin)
     agent = br.ufrj.ppgi.rl.ac.MLAC;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse] = learn('mops_sim', episodes, norm_factor, agent, args);
+    [critic, actor, cr, rmse] = learn('mops_sim', norm_factor, agent, args);
 end

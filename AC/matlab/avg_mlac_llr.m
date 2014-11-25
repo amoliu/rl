@@ -11,7 +11,7 @@ rmse = zeros(trials,episodes);
 
 parfor_progress(trials);
 parfor i=1:trials
-    [~, ~, cr(i,:), rmse(i,:)] = mlac_pendulum(episodes);
+    [~, ~, cr(i,:), rmse(i,:)] = mlac_pendulum('mode', 'episode', 'episodes', episodes);
     parfor_progress;
 end
 parfor_progress(0);

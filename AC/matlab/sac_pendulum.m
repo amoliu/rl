@@ -1,8 +1,9 @@
-function [critic, actor, cr] = sac_pendulum(episodes, varargin)
+function [critic, actor, cr, episodes] = sac_pendulum(varargin)
 %SAC_PENDULUM Runs the standard ac algorithim on the pendulum swing-up.
 %   SAC_PENDULUM(E) learns during E episodes
 %
-%   SAC_PENDULUM(..., 'verbose', 1) sets the output to verbose
+%   SAC_PENDULUM(..., 'verbose', true) sets the output to verbose
+%   See LEARN for more params.
 %
 %   C = SAC_PENDULUM(...) return a handle to the Critic
 %   [C, A] = SAC_PENDULUM(...) also returns a handle to the Actor
@@ -16,13 +17,19 @@ function [critic, actor, cr] = sac_pendulum(episodes, varargin)
 
     % Argument parsing
     p = inputParser;
-    p.addOptional('verbose', 0);
+    expectedModes = {'episode','performance'};
+    p.addParameter('mode','episode',...
+                 @(x) any(validatestring(x,expectedModes)));
+    
+    p.addOptional('episodes', 100, @isnumeric);
+    
+    p.addOptional('performance', -900, @isnumeric);
+    p.addOptional('trialsInARow', 3, @isnumeric);
+    
+    p.addOptional('verbose', false, @islogical);
     p.parse(varargin{:});
     args = p.Results;
-    
-    args.mode = 'episodes';
-    args.episodes = episodes;
-    
+        
     % Initialize environment
     spec = env_mops_sim('init');
     
@@ -54,5 +61,5 @@ function [critic, actor, cr] = sac_pendulum(episodes, varargin)
     agent = br.ufrj.ppgi.rl.ac.StandardActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr] = learn('mops_sim', episodes, norm_factor, agent, args);
+    [critic, actor, cr, ~, episodes] = learn('mops_sim', norm_factor, agent, args);
 end

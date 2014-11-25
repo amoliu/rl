@@ -17,7 +17,7 @@ for power=0:power_of_two
     rmse = zeros(trials,episodes);
 
     parfor i=1:trials
-        [~, ~, cr(i,:), rmse(i,:)] = dyna_pendulum(episodes, step);
+        [~, ~, cr(i,:), rmse(i,:)] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', step);
         parfor_progress;
     end
 

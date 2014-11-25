@@ -1,9 +1,11 @@
-function [critic, actor, cr, rmse] = dyna_pendulum(episodes, steps_per_episode, varargin)
+function [critic, actor, cr, rmse] = dyna_pendulum(varargin)
 %DYNA_PENDULUM Runs the dyna algorithim on the pendulum swing-up.
 %   DYNA_PENDULUM(E, S) learns during E episodes,
 %   doing S model steps per real step.
 %
-%   DYNA_PENDULUM(..., 'verbose', 1) sets the output to verbose
+%   DYNA_PENDULUM(..., 'verbose', true) sets the output to verbose
+%   DYNA_PENDULUM(..., 'steps', S) sets the total steps per iteration
+%   See LEARN for more params.
 %
 %   C = DYNA_PENDULUM(...) return a handle to the Critic
 %   [C, A] = DYNA_PENDULUM(...) also returns a handle to the Actor
@@ -18,12 +20,19 @@ function [critic, actor, cr, rmse] = dyna_pendulum(episodes, steps_per_episode, 
 
     % Argument parsing
     p = inputParser;
-    p.addOptional('verbose', 0);
+    expectedModes = {'episode','performance'};
+    p.addParameter('mode','episode',...
+                 @(x) any(validatestring(x,expectedModes)));
+             
+    p.addParameter('steps', 2, @isnumeric);
+    p.addOptional('episodes', 100, @isnumeric);
+    
+    p.addOptional('performance', -900, @isnumeric);
+    p.addOptional('trialsInARow', 3, @isnumeric);
+    
+    p.addOptional('verbose', false, @islogical);
     p.parse(varargin{:});
     args = p.Results;
-
-    args.mode = 'episodes';
-    args.episodes = episodes;
     
     % Initialize environment
     spec = env_mops_sim('init');
@@ -63,7 +72,7 @@ function [critic, actor, cr, rmse] = dyna_pendulum(episodes, steps_per_episode, 
     javaSpec.setProcessModelUpperBound([20 0]);
     javaSpec.setProcessModelThreshold(0.5);
     
-    javaSpec.setProcessModelStepsPerEpisode(steps_per_episode);
+    javaSpec.setProcessModelStepsPerEpisode(args.steps);
     javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1500);
     javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1500);
     javaSpec.setProcessModelGamma(0.67);
@@ -71,5 +80,5 @@ function [critic, actor, cr, rmse] = dyna_pendulum(episodes, steps_per_episode, 
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse] = learn('mops_sim', episodes, norm_factor, agent, args); 
+    [critic, actor, cr, rmse] = learn('mops_sim', norm_factor, agent, args); 
 end
