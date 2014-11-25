@@ -88,6 +88,8 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
     function r = condition_mode_performance()
         if episodes <= args.trialsInARow
             r = 1;
+        elseif episodes >= 300
+            r = 0;
         else
             r = 0;
             for i=1:args.trialsInARow

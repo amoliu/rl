@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse] = mlac_pendulum(varargin)
+function [critic, actor, cr, rmse, episodes] = mlac_pendulum(varargin)
 %MLAC_PENDULUM Runs the MLAC algorithim on the pendulum swing-up.
 %   MLAC_PENDULUM(E) learns during E episodes
 %
@@ -72,5 +72,5 @@ function [critic, actor, cr, rmse] = mlac_pendulum(varargin)
     agent = br.ufrj.ppgi.rl.ac.MLAC;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse] = learn('mops_sim', norm_factor, agent, args);
+    [critic, actor, cr, rmse, episodes] = learn('mops_sim', norm_factor, agent, args);
 end
