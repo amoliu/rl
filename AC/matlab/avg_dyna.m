@@ -9,7 +9,7 @@ power_of_two = 5;
 
 axis_limits = [0,episodes,-6000,0];
 
-parfor_progress(trials*power_of_two);
+parfor_progress(trials*(power_of_two+1));
 for power=0:power_of_two
     step = 2^power;
     
