@@ -2,7 +2,7 @@ close all;
 clear all;
 clc;
 
-trials = 10;
+trials = 20;
 performance = -900;
 times_in_row = 5;
 
@@ -15,23 +15,28 @@ dyna_episodes = zeros(1, power_of_two+1);
 
 % sac dashed line
 disp('SAC');
+tic;
 parfor_progress(trials);
 parfor i=1:trials
     [~, ~, ~, sac_episodes(i)] = sac_pendulum('mode', 'performance', 'performance', performance, 'trialsInARow', times_in_row);
     parfor_progress;
 end
 parfor_progress(0);
+toc;
 
 % sac dashed line
 disp('MLAC');
+tic;
 parfor_progress(trials);
 parfor i=1:trials
     [~, ~, ~, ~, mlac_episodes(i)] = mlac_pendulum('mode', 'performance', 'performance', performance, 'trialsInARow', times_in_row);
     parfor_progress;
 end
 parfor_progress(0);
+toc;
 
 disp('DYNA');
+tic;
 parfor_progress(trials*(power_of_two+1));
 for power=0:power_of_two
     step = 2^power;
@@ -45,6 +50,7 @@ for power=0:power_of_two
     
     dyna_episodes(power+1) = mean(dyna_episodes_step);
 end
+toc;
 
 dyna_y = zeros(1, 2^power_of_two);
 for i=power_of_two+1:-1:1
