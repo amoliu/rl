@@ -64,6 +64,7 @@ public class MLAC implements Agent
   public StepVO start(double[][] observation)
   {
     lastObservation = new SimpleMatrix(observation);
+    critic.resetEligibilityTrace();
 
     return new StepVO(chooseAction(new SimpleMatrix(observation)));
   }

@@ -27,6 +27,26 @@ public class StandardActorCriticUnitTest
     Assert.assertEquals(actorCritic.lastAction.get(0), action[0][0], DELTA);
   }
   
+  @Test
+  public void testStart_ShouldResetCriticET()
+  {
+    StandardActorCritic actorCritic = new StandardActorCritic();
+    Specification spec = getSpecification();
+
+    actorCritic.init(spec);
+    
+    actorCritic.start(new double[][] { { 3 } });
+    actorCritic.step(5, new double[][] { { 2 } });
+    actorCritic.step(4, new double[][] { { 3 } });
+    actorCritic.step(5.5, new double[][] { { 4 } });
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[0][0], 1, DELTA);
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[1][0], 1, DELTA);
+    
+    actorCritic.start(new double[][] { { 5 } });
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[0][0], 0, DELTA);
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[1][0], 0, DELTA);
+  }
+  
   private Specification getSpecification()
   {
     Specification specification = new Specification();

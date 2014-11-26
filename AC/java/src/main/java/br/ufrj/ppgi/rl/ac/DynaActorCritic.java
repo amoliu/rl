@@ -63,6 +63,8 @@ public class DynaActorCritic implements Agent
   public StepVO start(double[][] observation)
   {
     firstObservation = lastObservation = new SimpleMatrix(observation);
+    
+    critic.resetEligibilityTrace();
     restartModel();
 
     return new StepVO(chooseAction(new SimpleMatrix(observation)));
