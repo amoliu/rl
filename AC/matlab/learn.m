@@ -63,7 +63,7 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
             stepVO = agent.step(reward, norm_obs);
         end
         
-        cr(episodes) = agent_performance(agent, norm_factor);
+        cr(episodes) = agent_performance(env, agent, norm_factor);
         
          % Show progress
         if args.verbose
