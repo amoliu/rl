@@ -40,11 +40,6 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
     end
     
     while while_cond()
-        % Show progress
-        if args.verbose
-            disp(episodes);
-        end
-
         % Reset simulation to initial condition
         first_obs = env('start');
         norm_first_obs = first_obs ./ norm_factor;
@@ -69,6 +64,12 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
         end
         
         cr(episodes) = agent_performance(agent, norm_factor);
+        
+         % Show progress
+        if args.verbose
+            disp([episodes cr(episodes)]);
+        end
+        
         episodes = episodes + 1;
     end
 
@@ -88,7 +89,7 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
     function r = condition_mode_performance()
         if episodes <= args.trialsInARow
             r = 1;
-        elseif episodes >= 300
+        elseif episodes >= 3000
             r = 0;
         else
             r = 0;
