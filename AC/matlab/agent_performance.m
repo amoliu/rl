@@ -1,4 +1,4 @@
-function [cr] = agent_performance(agent, norm_factor)    
+function cr = agent_performance(env, agent, norm_factor)    
 %AGENT_PERFORMANCE Calculate the reward for this agent on the pendulum swing-up environment
 %   
 %   CR = AGENT_PERFORMANCE(...) returns the reward for a full trial on the
@@ -10,7 +10,7 @@ function [cr] = agent_performance(agent, norm_factor)
     cr = 0;
     
     % Reset simulation to initial condition
-    first_obs = env_mops_sim('start');
+    first_obs = env('start');
     norm_old_obs = first_obs ./ norm_factor;
         
     terminal = 0;
@@ -24,7 +24,7 @@ function [cr] = agent_performance(agent, norm_factor)
         action = agent.stepWithoutLearn(norm_old_obs);
 
         % Actuate
-        [obs, reward, terminal] = env_mops_sim('step', action);
+        [obs, reward, terminal] = env('step', action);
         norm_obs = obs ./ norm_factor;
 
         % Prepare for next timestep
