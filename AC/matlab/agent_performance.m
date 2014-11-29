@@ -11,7 +11,7 @@ function cr = agent_performance(env, agent, norm_factor)
     
     % Reset simulation to initial condition
     first_obs = env('start');
-    norm_old_obs = first_obs ./ norm_factor;
+    norm_obs = first_obs ./ norm_factor;
         
     terminal = 0;
     
@@ -21,14 +21,11 @@ function cr = agent_performance(env, agent, norm_factor)
         end
 
         % Calculate action
-        action = agent.stepWithoutLearn(norm_old_obs);
+        action = agent.stepWithoutLearn(norm_obs);
 
         % Actuate
         [obs, reward, terminal] = env('step', action);
         norm_obs = obs ./ norm_factor;
-
-        % Prepare for next timestep
-        norm_old_obs = norm_obs;
 
         % Keep track of learning curve
         cr = cr + reward;
