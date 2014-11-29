@@ -40,7 +40,7 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
 
     javaSpec.setActorAlpha(0.01);
     javaSpec.setActorMemory(5000);
-    javaSpec.setActorNeighbors(20)
+    javaSpec.setActorNeighbors(20);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(20);
