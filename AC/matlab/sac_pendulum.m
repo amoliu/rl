@@ -49,14 +49,15 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
     javaSpec.setCriticAlpha(0.3);
     javaSpec.setCriticMemory(4000);
     javaSpec.setCriticNeighbors(10);
-    javaSpec.setCriticValuesToRebuildTree(10)
+    javaSpec.setCriticValuesToRebuildTree(10);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
-
+    
+    javaSpec.setExplorationRate(2);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
-    javaSpec.setSd(1.0);  
+    javaSpec.setSd(3.0);  
     
     agent = br.ufrj.ppgi.rl.ac.StandardActorCritic;
     agent.init(javaSpec);
