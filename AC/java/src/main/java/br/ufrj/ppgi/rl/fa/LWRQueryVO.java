@@ -1,7 +1,7 @@
 package br.ufrj.ppgi.rl.fa;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -9,15 +9,15 @@ import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
 public class LWRQueryVO implements Serializable
 {
-  private static final long serialVersionUID = 1314581578287330362L;
+  private static final long  serialVersionUID = 1314581578287330362L;
 
-  private SimpleMatrix      result;
+  private SimpleMatrix       result;
 
-  private SimpleMatrix      x;
+  private SimpleMatrix       x;
 
-  private List<Integer>     neighbors;
+  private ArrayList<Integer> neighbors;
 
-  public LWRQueryVO(SimpleMatrix result, SimpleMatrix x, List<Integer> neighbors)
+  public LWRQueryVO(SimpleMatrix result, SimpleMatrix x, ArrayList<Integer> neighbors)
   {
     this.result = result;
     this.neighbors = neighbors;
@@ -39,12 +39,12 @@ public class LWRQueryVO implements Serializable
     this.result = result;
   }
 
-  public List<Integer> getNeighbors()
+  public ArrayList<Integer> getNeighbors()
   {
     return neighbors;
   }
 
-  public void setNeighbors(List<Integer> neighbors)
+  public void setNeighbors(ArrayList<Integer> neighbors)
   {
     this.neighbors = neighbors;
   }

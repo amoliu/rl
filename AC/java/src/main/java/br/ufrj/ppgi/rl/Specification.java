@@ -64,6 +64,8 @@ public class Specification implements Serializable
 
   private SimpleMatrix      observationMaxValue;
 
+  private int               explorationRate;
+
   public int getActorMemory()
   {
     return actorMemory;
@@ -367,5 +369,15 @@ public class Specification implements Serializable
   public void setProcessModelValuesToRebuildTree(int processModelValuesToRebuildTree)
   {
     this.processModelValuesToRebuildTree = processModelValuesToRebuildTree;
+  }
+
+  public int getExplorationRate()
+  {
+    return explorationRate;
+  }
+
+  public void setExplorationRate(int explorationRate)
+  {
+    this.explorationRate = explorationRate;
   }
 }

@@ -48,7 +48,7 @@ public class CriticLLR implements Serializable
                      - oldValueFunction.getResult().get(0);
 
     // Add to LLR
-    llr.add(lastObservation, oldValueFunction.getResult());
+    int insertIndex = llr.add(lastObservation, oldValueFunction.getResult());
 
     // Update ET
     for (int i = 0; i < eligibilityTrace.getNumElements(); i++)
@@ -62,6 +62,10 @@ public class CriticLLR implements Serializable
       eligibilityTrace.set(neighbor, 1);
       update.set(neighbor, specification.getCriticAlpha() * tdError);
     }
+    
+    //set ET of inserted sample to 1
+    eligibilityTrace.set(insertIndex, 1);
+    update.set(insertIndex, specification.getCriticAlpha() * tdError);
 
     llr.update(update);
 

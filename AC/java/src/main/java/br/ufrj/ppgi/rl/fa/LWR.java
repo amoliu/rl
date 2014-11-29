@@ -2,7 +2,6 @@ package br.ufrj.ppgi.rl.fa;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -243,16 +242,16 @@ public class LWR implements Serializable
       SimpleMatrix x = SimpleMatrix.random(output_dimension, input_dimension + 1, 0, 1, random).plus(initial_value);
       result = result.plus(initial_value);
 
-      List<Integer> neighbors = Collections.emptyList();
+      ArrayList<Integer> neighbors = new ArrayList<Integer>();
 
       return new LWRQueryVO(result, x, neighbors);
     }
 
-    List<Integer> neighbors = getNeighbors(query);
+    ArrayList<Integer> neighbors = getNeighbors(query);
     return queryForNeighbors(query, neighbors);
   }
 
-  private LWRQueryVO queryForNeighbors(SimpleMatrix query, List<Integer> neighbors)
+  private LWRQueryVO queryForNeighbors(SimpleMatrix query, ArrayList<Integer> neighbors)
   {
     SimpleMatrix A = new SimpleMatrix(input_dimension + 1, neighbors.size());
     SimpleMatrix B = new SimpleMatrix(neighbors.size(), output_dimension);
@@ -322,7 +321,7 @@ public class LWR implements Serializable
       return 0;
     }
 
-    List<Integer> neighbors = getNeighbors(input);
+    ArrayList<Integer> neighbors = getNeighbors(input);
 
     for (int n = 0; n < k; n++)
     {
@@ -349,10 +348,10 @@ public class LWR implements Serializable
     return last_llr >= k;
   }
 
-  private List<Integer> getNeighbors(SimpleMatrix query)
+  private ArrayList<Integer> getNeighbors(SimpleMatrix query)
   {
     MaxHeap<Integer> heap = tree.findNearestNeighbors(query.getMatrix().getData(), k, distanceFunction);
-    List<Integer> neighbors = new ArrayList<Integer>();
+    ArrayList<Integer> neighbors = new ArrayList<Integer>();
 
     for (int i = 0; i < k; i++)
     {

@@ -74,6 +74,8 @@ public class StandardActorCriticUnitTest
     specification.setSd(1f);
     specification.setObservationDimensions(1);
     specification.setActionDimensions(1);
+    
+    specification.setExplorationRate(1);
     return specification;
   }
 }

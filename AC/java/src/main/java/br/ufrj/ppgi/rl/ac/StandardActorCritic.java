@@ -21,6 +21,8 @@ public class StandardActorCritic implements Agent
 
   protected SimpleMatrix    lastAction;
 
+  private int               step;
+
   public StandardActorCritic()
   {
     actor = new ActorLLR();
@@ -44,6 +46,8 @@ public class StandardActorCritic implements Agent
 
     actor.init(specification);
     critic.init(specification);
+    
+    step = 0;
   }
 
   @Override
@@ -81,7 +85,15 @@ public class StandardActorCritic implements Agent
   private void update(double reward, SimpleMatrix observation)
   {
     double delta = critic.update(lastObservation, lastAction, reward, observation);
-    actor.updateWithRandomness(delta, lastObservation, lastAction);
+    
+    if (step % specification.getExplorationRate() == 0)
+    {
+      actor.updateWithRandomness(delta, lastObservation, lastAction);
+    }
+    else
+    {
+      actor.updateWithoutRandomness(delta, lastObservation, lastAction);
+    }
   }
 
   private double[][] chooseAction(SimpleMatrix observation)

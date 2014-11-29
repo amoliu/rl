@@ -83,14 +83,16 @@ public class ActorLLR implements Serializable
   private void update(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
     LWRQueryVO queryResult = llr.query(observation);
-    add(observation, action.plus(delta));
+    int insertIndex = add(observation, action);
+    
+    queryResult.getNeighbors().add(insertIndex);
 
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
 
-  private void add(SimpleMatrix observation, SimpleMatrix action)
+  private int add(SimpleMatrix observation, SimpleMatrix action)
   {
-    llr.add(observation, EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
+    return llr.add(observation, EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
   }
 
   private void nextRandom()

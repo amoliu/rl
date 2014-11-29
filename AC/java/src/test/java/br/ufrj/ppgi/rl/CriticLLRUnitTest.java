@@ -31,12 +31,13 @@ public class CriticLLRUnitTest
     action.set(2);
     
     critic.update(observation, action, 0, observation);
-    Assert.assertArrayEquals(zeroET, critic.eligibilityTrace.getMatrix().data, DELTA);
+    Assert.assertEquals(1, critic.eligibilityTrace.get(0), DELTA);
     
     observation.set(2);
     action.set(2);
     critic.update(observation, action, 0, observation);
-    Assert.assertArrayEquals(zeroET, critic.eligibilityTrace.getMatrix().data, DELTA);
+    Assert.assertEquals(0, critic.eligibilityTrace.get(0), DELTA);
+    Assert.assertEquals(1, critic.eligibilityTrace.get(1), DELTA);
     
     observation.set(3);
     action.set(2);
@@ -66,25 +67,25 @@ public class CriticLLRUnitTest
     
     critic.update(observation, action, 0, observation);
     Assert.assertEquals(1, critic.llr.getDataInput().get(0), DELTA);
-    Assert.assertEquals(CRITIC_INITIAL_VALUE, critic.llr.getDataOutput().get(0), DELTA);
+    Assert.assertEquals(CRITIC_INITIAL_VALUE + 100, critic.llr.getDataOutput().get(0), DELTA);
     
     observation.set(2);
     action.set(2);
     critic.update(observation, action, 0, observation);
     Assert.assertEquals(2, critic.llr.getDataInput().get(1), DELTA);
-    Assert.assertEquals(CRITIC_INITIAL_VALUE, critic.llr.getDataOutput().get(1), DELTA);
+    Assert.assertEquals(CRITIC_INITIAL_VALUE + 100, critic.llr.getDataOutput().get(1), DELTA);
     
     observation.set(3);
     action.set(2);
     critic.update(observation, action, CRITIC_INITIAL_VALUE + 10, observation);
     Assert.assertEquals(1, critic.llr.getDataInput().get(0), DELTA);
-    Assert.assertEquals(CRITIC_INITIAL_VALUE + 1, critic.llr.getDataOutput().get(0), DELTA);
+    Assert.assertEquals(-909, critic.llr.getDataOutput().get(0), DELTA);
     
     Assert.assertEquals(2, critic.llr.getDataInput().get(1), DELTA);
-    Assert.assertEquals(CRITIC_INITIAL_VALUE + 1, critic.llr.getDataOutput().get(1), DELTA);
+    Assert.assertEquals(-909, critic.llr.getDataOutput().get(1), DELTA);
     
     Assert.assertEquals(3, critic.llr.getDataInput().get(2), DELTA);
-    Assert.assertEquals(CRITIC_INITIAL_VALUE, critic.llr.getDataOutput().get(2), DELTA);
+    Assert.assertEquals(-909, critic.llr.getDataOutput().get(2), DELTA);
   }
   
   private Specification getSpecification()
