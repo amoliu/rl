@@ -44,13 +44,13 @@ function [critic, actor, cr, rmse, episodes] = mlac_pendulum(varargin)
     javaSpec.setActorNeighbors(20);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
-    javaSpec.setActorValuesToRebuildTree(20);
+    javaSpec.setActorValuesToRebuildTree(1);
     
     javaSpec.setCriticInitialValue(0);
     javaSpec.setCriticAlpha(0.3);
     javaSpec.setCriticMemory(4000);
     javaSpec.setCriticNeighbors(10);
-    javaSpec.setCriticValuesToRebuildTree(10);
+    javaSpec.setCriticValuesToRebuildTree(1);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
@@ -60,7 +60,7 @@ function [critic, actor, cr, rmse, episodes] = mlac_pendulum(varargin)
     javaSpec.setGamma(0.97);
     javaSpec.setSd(2.0);
     
-    javaSpec.setProcessModelMemory(600);
+    javaSpec.setProcessModelMemory(1000);
     javaSpec.setProcessModelNeighbors(10);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
