@@ -63,7 +63,7 @@ public class DynaActorCritic implements Agent
   public StepVO start(double[][] observation)
   {
     firstObservation = lastObservation = new SimpleMatrix(observation);
-    
+
     critic.resetEligibilityTrace();
     restartModel();
 
@@ -120,9 +120,10 @@ public class DynaActorCritic implements Agent
       SimpleMatrix action = actor.action(lastModelObservation).getAction();
       ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
-      double delta = critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
-                                                                                                   .getResult(),
-                                   specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
+      double delta = critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(),
+                                                   modelQuery.getLWRQueryVO().getResult(),
+                                                   specification.getProcessModelCriticAlpha(),
+                                                   specification.getProcessModelGamma());
       actor.updateWithRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
 
       lastModelObservation = modelQuery.getLWRQueryVO().getResult();
