@@ -120,7 +120,7 @@ public class DynaActorCritic implements Agent
       SimpleMatrix action = actor.action(lastModelObservation).getAction();
       ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
-      double delta = critic.update(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
+      double delta = critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
                                                                                                    .getResult(),
                                    specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
       actor.updateWithRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());

@@ -95,7 +95,7 @@ public class MLAC implements Agent
   private double update(double reward, SimpleMatrix observation)
   {
     ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastAction.getPolicyAction());
-    processModel.add(lastObservation, lastAction.getPolicyAction(), observation, reward, 0);
+    processModel.add(lastObservation, lastAction.getAction(), observation, reward, 0);
 
     LWRQueryVO criticResult = critic.query(modelQuery.getLWRQueryVO().getResult());
 
@@ -103,6 +103,7 @@ public class MLAC implements Agent
     SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
     // check if withinBounds
+    /*
     for (int i = 0; i < lastAction.getPolicyAction().getNumElements(); i++)
     {
       if (lastAction.getPolicyAction().get(i) < specification.getActorMin().get(i) * 0.92
@@ -111,11 +112,12 @@ public class MLAC implements Agent
         modelXa.zero();
       }
     }
+    */
 
     double actorUpdate = criticXs.mult(modelXa).get(0);
     actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction.getAction());
 
-    lastValueFunction = critic.update(lastObservation, lastAction.getAction(), lastValueFunction, reward, observation);
+    critic.update(lastObservation, lastAction.getAction(), reward, observation);
 
     return Math.pow(NormOps.normP2(observation.minus(modelQuery.getLWRQueryVO().getResult()).getMatrix()), 2);
   }

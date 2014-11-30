@@ -75,7 +75,7 @@ public class CriticLLR implements Serializable
     return tdError;
   }
 
-  public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation,
+  public double updateWithoutAddSample(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation,
                        double alpha, double gamma)
   {
     LWRQueryVO valueFunction = llr.query(observation);
@@ -86,39 +86,6 @@ public class CriticLLR implements Serializable
     llr.update(oldValueFunction.getNeighbors(), alpha * tdError);
 
     return tdError;
-  }
-
-  public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double lastValueFunction, double reward,
-                       SimpleMatrix observation)
-  {
-    double valueFunction = llr.query(observation).getResult().get(0);
-
-    // Add to LLR
-    int pos = llr.add(lastObservation, new SimpleMatrix(new double[][] { { lastValueFunction } }));
-    LWRQueryVO oldResult = llr.query(lastObservation);
-
-    double tdError = reward + specification.getGamma() * valueFunction - lastValueFunction;
-
-    // Update ET
-    for (int i = 0; i < eligibilityTrace.getNumElements(); i++)
-    {
-      eligibilityTrace.set(i, eligibilityTrace.get(i) * specification.getLamda() * specification.getGamma());
-    }
-
-    for (Integer neighbor : oldResult.getNeighbors())
-    {
-      eligibilityTrace.set(neighbor, 1);
-    }
-    
-    if (pos != -1)
-      eligibilityTrace.set(pos, 1);
-
-    SimpleMatrix update = new SimpleMatrix(specification.getCriticMemory(), 1);
-    update.set(specification.getCriticAlpha() * tdError);
-
-    llr.update(eligibilityTrace.elementMult(update));
-
-    return valueFunction + specification.getCriticAlpha() * tdError;
   }
 
   public LWRQueryVO query(SimpleMatrix query)
