@@ -3,28 +3,15 @@ package br.ufrj.ppgi.rl.ac;
 import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
-import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
-import br.ufrj.ppgi.rl.ActorLLR;
-import br.ufrj.ppgi.rl.CriticLLR;
 import br.ufrj.ppgi.rl.ProcessModelLWR;
 import br.ufrj.ppgi.rl.ProcessModelQueryVO;
 import br.ufrj.ppgi.rl.Specification;
 
-public class DynaActorCritic implements Agent
+public class DynaActorCritic extends StandardActorCritic
 {
-  private static final long serialVersionUID = 5199782775154605824L;
-
-  protected ActorLLR        actor;
-
-  protected CriticLLR       critic;
+  private static final long serialVersionUID = -8686323211453331278L;
 
   protected ProcessModelLWR processModel;
-
-  private Specification     specification;
-
-  protected SimpleMatrix    lastObservation;
-
-  protected SimpleMatrix    lastAction;
 
   private SimpleMatrix      firstObservation;
 
@@ -34,83 +21,49 @@ public class DynaActorCritic implements Agent
 
   public DynaActorCritic()
   {
-    actor = new ActorLLR();
-    critic = new CriticLLR();
+    super();
     processModel = new ProcessModelLWR();
-
-    specification = null;
-
-    lastObservation = null;
-    lastAction = null;
   }
 
   @Override
   public void init(Specification specification)
   {
-    if (this.specification != null)
-    {
-      throw new IllegalStateException("Agent already started");
-    }
-
-    this.specification = specification;
-
-    actor.init(specification);
-    critic.init(specification);
+    super.init(specification);
     processModel.init(specification);
   }
 
   @Override
   public StepVO start(double[][] observation)
   {
-    firstObservation = lastObservation = new SimpleMatrix(observation);
+    StepVO step = super.start(observation);
 
-    critic.resetEligibilityTrace();
+    firstObservation = new SimpleMatrix(observation);
     restartModel();
 
-    return new StepVO(chooseAction(new SimpleMatrix(observation)));
+    return step;
   }
 
   @Override
   public StepVO step(double reward, double[][] observation)
   {
+    SimpleMatrix matrixObservation = new SimpleMatrix(observation);
+    super.update(reward, matrixObservation);
+
     SimpleMatrix model = processModel.query(lastObservation, lastAction).getLWRQueryVO().getResult();
+    double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
 
-    update(reward, new SimpleMatrix(observation));
-    lastObservation = new SimpleMatrix(observation);
+    processModel.add(lastObservation, lastAction, matrixObservation, reward, 0);
+    updateUsingModel();
 
-    double error = Math.pow(NormOps.normP2(lastObservation.minus(model).getMatrix()), 2);
+    lastObservation = matrixObservation;
 
-    return new StepVO(error, chooseAction(new SimpleMatrix(observation)));
-  }
-
-  @Override
-  public double[][] end(double reward)
-  {
-    update(reward, lastObservation);
-
-    return chooseAction(lastObservation);
-  }
-
-  @Override
-  public void fini()
-  {
-    this.specification = null;
+    return new StepVO(error, chooseAction(matrixObservation));
   }
 
   private void restartModel()
   {
     modelStep = 0;
     lastModelObservation = firstObservation;
-  }
-
-  private void update(double reward, SimpleMatrix observation)
-  {
-    double delta = critic.update(lastObservation, lastAction, reward, observation);
-    actor.updateWithRandomness(delta, lastObservation, lastAction);
-
-    processModel.add(lastObservation, lastAction, observation, reward, 0);
-
-    updateUsingModel();
   }
 
   private void updateUsingModel()
@@ -124,7 +77,15 @@ public class DynaActorCritic implements Agent
                                                    modelQuery.getLWRQueryVO().getResult(),
                                                    specification.getProcessModelCriticAlpha(),
                                                    specification.getProcessModelGamma());
-      actor.updateWithRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
+
+      if (i % specification.getExplorationRate() == 0)
+      {
+        actor.updateWithRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
+      }
+      else
+      {
+        actor.updateWithoutRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
+      }
 
       lastModelObservation = modelQuery.getLWRQueryVO().getResult();
       modelStep++;
@@ -136,29 +97,5 @@ public class DynaActorCritic implements Agent
         restartModel();
       }
     }
-  }
-
-  private double[][] chooseAction(SimpleMatrix observation)
-  {
-    lastAction = actor.action(observation).getAction();
-    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
-  }
-
-  @Override
-  public CriticLLR getCritic()
-  {
-    return critic;
-  }
-
-  @Override
-  public ActorLLR getActor()
-  {
-    return actor;
-  }
-
-  @Override
-  public double[][] stepWithoutLearn(double[][] observation)
-  {
-    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(actor.actionWithoutRandomness(new SimpleMatrix(observation)));
   }
 }

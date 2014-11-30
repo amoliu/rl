@@ -15,7 +15,7 @@ public class StandardActorCritic implements Agent
 
   protected CriticLLR       critic;
 
-  private Specification     specification;
+  protected Specification   specification;
 
   protected SimpleMatrix    lastObservation;
 
@@ -46,7 +46,7 @@ public class StandardActorCritic implements Agent
 
     actor.init(specification);
     critic.init(specification);
-    
+
     step = 0;
   }
 
@@ -82,10 +82,10 @@ public class StandardActorCritic implements Agent
     this.specification = null;
   }
 
-  private void update(double reward, SimpleMatrix observation)
+  protected void update(double reward, SimpleMatrix observation)
   {
     double delta = critic.update(lastObservation, lastAction, reward, observation);
-    
+
     if (step % specification.getExplorationRate() == 0)
     {
       actor.updateWithRandomness(delta, lastObservation, lastAction);
@@ -96,7 +96,7 @@ public class StandardActorCritic implements Agent
     }
   }
 
-  private double[][] chooseAction(SimpleMatrix observation)
+  protected double[][] chooseAction(SimpleMatrix observation)
   {
     lastAction = actor.action(observation).getAction();
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
