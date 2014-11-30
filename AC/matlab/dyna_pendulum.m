@@ -58,11 +58,12 @@ function [critic, actor, cr, rmse, episodes] = dyna_pendulum(varargin)
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
 
+    javaSpec.setExplorationRate(2);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
-    javaSpec.setSd(1.0);  
+    javaSpec.setSd(3.0);
     
-    javaSpec.setProcessModelMemory(300);
+    javaSpec.setProcessModelMemory(1000);
     javaSpec.setProcessModelNeighbors(10);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
