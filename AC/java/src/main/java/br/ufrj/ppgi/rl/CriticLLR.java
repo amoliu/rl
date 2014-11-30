@@ -64,8 +64,11 @@ public class CriticLLR implements Serializable
     }
     
     //set ET of inserted sample to 1
-    eligibilityTrace.set(insertIndex, 1);
-    update.set(insertIndex, specification.getCriticAlpha() * tdError);
+    if (insertIndex != -1)
+    {
+      eligibilityTrace.set(insertIndex, 1);
+      update.set(insertIndex, specification.getCriticAlpha() * tdError);
+    }
 
     llr.update(update);
 
@@ -106,7 +109,9 @@ public class CriticLLR implements Serializable
     {
       eligibilityTrace.set(neighbor, 1);
     }
-    eligibilityTrace.set(pos, 1);
+    
+    if (pos != -1)
+      eligibilityTrace.set(pos, 1);
 
     SimpleMatrix update = new SimpleMatrix(specification.getCriticMemory(), 1);
     update.set(specification.getCriticAlpha() * tdError);

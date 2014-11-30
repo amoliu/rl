@@ -145,8 +145,8 @@ public class LWR implements Serializable
     else
     {
       pos = positionLessRelevant();
-      // if (rel <= relevance[pos])
-      // return;
+      if (rel <= relevance[pos])
+        return -1;
     }
 
     relevance[pos] = rel;
@@ -155,12 +155,22 @@ public class LWR implements Serializable
     dataOutput.setRow(pos, 0, output.getMatrix().getData());
 
     tree_size++;
-    if (tree_size % valuesToRebuildTree == 0)
+    if (hasToRebuildKDTree())
     {
       buildKDTree();
     }
 
     return pos;
+  }
+
+  private boolean hasToRebuildKDTree()
+  {
+    if (last_llr < size)
+    {
+      return true;
+      
+    }
+    return tree_size % valuesToRebuildTree == 0;
   }
 
   private int positionLessRelevant()
@@ -257,7 +267,7 @@ public class LWR implements Serializable
     SimpleMatrix B = new SimpleMatrix(neighbors.size(), output_dimension);
     DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, output_dimension);
 
-    for (int n = 0; n < k; n++)
+    for (int n = 0; n < neighbors.size(); n++)
     {
       Integer pos = neighbors.get(n);
 
@@ -323,7 +333,7 @@ public class LWR implements Serializable
 
     ArrayList<Integer> neighbors = getNeighbors(input);
 
-    for (int n = 0; n < k; n++)
+    for (int n = 0; n < neighbors.size(); n++)
     {
       Integer pos = neighbors.get(n);
 
@@ -345,15 +355,25 @@ public class LWR implements Serializable
 
   private boolean hasEnoughNeighbors()
   {
-    return last_llr >= k;
+    return last_llr > 1;
   }
 
   private ArrayList<Integer> getNeighbors(SimpleMatrix query)
   {
-    MaxHeap<Integer> heap = tree.findNearestNeighbors(query.getMatrix().getData(), k, distanceFunction);
+    int totalNeighbors = 0;
+    if (last_llr <= k)
+    {
+      totalNeighbors = last_llr;
+    }
+    else
+    {
+      totalNeighbors = k;
+    }
+
+    MaxHeap<Integer> heap = tree.findNearestNeighbors(query.getMatrix().getData(), totalNeighbors, distanceFunction);
     ArrayList<Integer> neighbors = new ArrayList<Integer>();
 
-    for (int i = 0; i < k; i++)
+    for (int i = 0; i < totalNeighbors; i++)
     {
       Integer n = heap.getMax();
       heap.removeMax();
