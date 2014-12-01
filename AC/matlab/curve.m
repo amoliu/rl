@@ -48,7 +48,7 @@ for power=0:power_of_two
         parfor_progress;
     end
     
-    dyna_episodes(power+1) = mean_without_outiler(dyna_episodes_step);
+    dyna_episodes(power+1) = mean_without_outlier(dyna_episodes_step);
 end
 toc;
 
@@ -60,8 +60,8 @@ end
 path = make_save_folder('curve');
 h = figure;
 hold on;
-plot(x, repmat(mean_without_outiler(sac_episodes), 1, 2^power_of_two), '--r');
-plot(x, repmat(mean_without_outiler(mlac_episodes), 1, 2^power_of_two), '--b');
+plot(x, repmat(mean_without_outlier(sac_episodes), 1, 2^power_of_two), '--r');
+plot(x, repmat(mean_without_outlier(mlac_episodes), 1, 2^power_of_two), '--b');
 plot(x, dyna_y, '--g');
 legend('SAC','MLAC', 'DYNA');
 xlabel('Computation time');
