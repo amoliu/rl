@@ -24,6 +24,7 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
 %       Bruno Costa <doravante2@gmail.com>
 
     env = str2func(['env_' env_name]);
+    viz = str2func(['viz_' env_name]);
 
     % Initialize learning curve
     cr = [];
@@ -39,11 +40,18 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
         while_cond = @condition_mode_performance;
     end
     
+    if args.verbose
+        figure;
+        first_obs = env('start');
+        h = viz(first_obs);
+        title('Training');
+    end
+    
     while while_cond()
         % Reset simulation to initial condition
         first_obs = env('start');
         norm_first_obs = first_obs ./ norm_factor;
-
+        
         stepVO = agent.start(norm_first_obs);
         rmse(episodes) = 0;
         
@@ -52,6 +60,11 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
             [obs, reward, terminal] = env('step', stepVO.getAction);
             norm_obs = obs ./ norm_factor;
 
+            if args.verbose
+                viz(obs, h);
+                pause(0.005);
+            end
+            
             if terminal
                 agent.end(reward);
                 break;
