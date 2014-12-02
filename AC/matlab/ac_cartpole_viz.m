@@ -21,7 +21,8 @@ function ac_cartpole_viz(actor, cr, rmse)
     while terminal == 0
         viz_cartpole(obs, h);
         
-        a = actor.getLLR.query(norm_obs).getMatlabResult;
+        a = actor.actionWithoutRandomness(norm_obs);
+        disp(a);
         [obs, ~, terminal] = env_cartpole('step', a);
         norm_obs = obs ./ norm_factor;
         

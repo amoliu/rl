@@ -43,6 +43,11 @@ public class ActorLLR implements Serializable
                         EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
   }
 
+  public double[][] actionWithoutRandomness(double[][] observation)
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(actionWithoutRandomness(new SimpleMatrix(observation)));
+  }
+  
   public SimpleMatrix actionWithoutRandomness(SimpleMatrix observation)
   {
     if (observation.numRows() != 1)
@@ -56,7 +61,7 @@ public class ActorLLR implements Serializable
     }
 
     LWRQueryVO queryResult = llr.query(observation);
-    return queryResult.getResult();
+    return EJMLMatlabUtils.wrap(queryResult.getResult(), specification.getActorMax(), specification.getActorMin());
   }
 
   public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha)
@@ -74,7 +79,7 @@ public class ActorLLR implements Serializable
     LWRQueryVO queryResult = llr.query(observation);
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
-  
+
   public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
     delta = delta * lastRandom * specification.getActorAlpha();
@@ -92,7 +97,7 @@ public class ActorLLR implements Serializable
   {
     LWRQueryVO queryResult = llr.query(observation);
     int insertIndex = add(observation, action);
-    
+
     if (insertIndex != -1)
       queryResult.getNeighbors().add(insertIndex);
 
