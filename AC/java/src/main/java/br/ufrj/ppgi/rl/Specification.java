@@ -60,6 +60,8 @@ public class Specification implements Serializable
 
   private int               processModelValuesToRebuildTree;
 
+  private int               processModelIterationsWithoutLearning;
+
   private SimpleMatrix      observationMinValue;
 
   private SimpleMatrix      observationMaxValue;
@@ -379,5 +381,15 @@ public class Specification implements Serializable
   public void setExplorationRate(int explorationRate)
   {
     this.explorationRate = explorationRate;
+  }
+
+  public int getProcessModelIterationsWithoutLearning()
+  {
+    return processModelIterationsWithoutLearning;
+  }
+
+  public void setProcessModelIterationsWithoutLearning(int processModelIterationsWithoutLearning)
+  {
+    this.processModelIterationsWithoutLearning = processModelIterationsWithoutLearning;
   }
 }

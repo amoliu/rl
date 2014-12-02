@@ -3,7 +3,7 @@ close all;
 
 path = make_save_folder('dyna');
 
-episodes = 200;
+episodes = 100;
 trials = 25;
 power_of_two = 5;
 

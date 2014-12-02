@@ -78,6 +78,7 @@ function [critic, actor, cr, rmse, episodes] = dyna_pendulum(varargin)
     javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/200);
     javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/200);
     javaSpec.setProcessModelGamma(0.97);
+    javaSpec.setProcessModelIterationsWithoutLearning(10);
        
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);

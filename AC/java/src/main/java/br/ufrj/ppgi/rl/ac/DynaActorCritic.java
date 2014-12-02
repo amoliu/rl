@@ -19,6 +19,8 @@ public class DynaActorCritic extends StandardActorCritic
 
   private SimpleMatrix      lastModelObservation;
 
+  private int               environmentStep;
+
   public DynaActorCritic()
   {
     super();
@@ -30,6 +32,8 @@ public class DynaActorCritic extends StandardActorCritic
   {
     super.init(specification);
     processModel.init(specification);
+    
+    environmentStep = 0;
   }
 
   @Override
@@ -56,6 +60,7 @@ public class DynaActorCritic extends StandardActorCritic
     updateUsingModel();
 
     lastObservation = matrixObservation;
+    environmentStep++;
 
     return new StepVO(error, chooseAction(matrixObservation));
   }
@@ -68,9 +73,12 @@ public class DynaActorCritic extends StandardActorCritic
 
   private void updateUsingModel()
   {
+    if (environmentStep <= specification.getProcessModelIterationsWithoutLearning()*100)
+      return;
+    
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
-      SimpleMatrix action = actor.action(lastModelObservation).getAction();
+      SimpleMatrix action = actor.actionWithoutRandomness(lastModelObservation);
       ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
       double delta = critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(),
@@ -78,14 +86,7 @@ public class DynaActorCritic extends StandardActorCritic
                                                    specification.getProcessModelCriticAlpha(),
                                                    specification.getProcessModelGamma());
 
-      if (i % specification.getExplorationRate() == 0)
-      {
-        actor.updateWithRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
-      }
-      else
-      {
-        actor.updateWithoutRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
-      }
+      actor.updateWithoutRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
 
       lastModelObservation = modelQuery.getLWRQueryVO().getResult();
       modelStep++;
