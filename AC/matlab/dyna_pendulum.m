@@ -31,6 +31,7 @@ function [critic, actor, cr, rmse, episodes] = dyna_pendulum(varargin)
     p.addOptional('trialsInARow', 3, @isnumeric);
     
     p.addOptional('verbose', false, @islogical);
+    p.addOptional('figure', false, @islogical);
     p.parse(varargin{:});
     args = p.Results;
     
@@ -58,10 +59,10 @@ function [critic, actor, cr, rmse, episodes] = dyna_pendulum(varargin)
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
 
-    javaSpec.setExplorationRate(2);
+    javaSpec.setExplorationRate(1);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
-    javaSpec.setSd(3.0);
+    javaSpec.setSd(2.0);
     
     javaSpec.setProcessModelMemory(1000);
     javaSpec.setProcessModelNeighbors(10);
@@ -74,9 +75,9 @@ function [critic, actor, cr, rmse, episodes] = dyna_pendulum(varargin)
     javaSpec.setProcessModelThreshold(0.5);
     
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
-    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1500);
-    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1500);
-    javaSpec.setProcessModelGamma(0.67);
+    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/200);
+    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/200);
+    javaSpec.setProcessModelGamma(0.97);
        
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);

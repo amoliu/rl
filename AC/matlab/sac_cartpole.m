@@ -11,6 +11,7 @@ function [critic, actor, cr] = sac_cartpole(varargin)
     p.addOptional('trialsInARow', 3, @isnumeric);
     
     p.addOptional('verbose', false, @islogical);
+    p.addOptional('figure', false, @islogical);
     p.parse(varargin{:});
     args = p.Results;
 

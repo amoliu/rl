@@ -40,7 +40,7 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
         while_cond = @condition_mode_performance;
     end
     
-    if args.verbose
+    if args.figure
         figure;
         first_obs = env('start');
         h = viz(first_obs);
@@ -60,7 +60,7 @@ function [critic, actor, cr, rmse, episodes] = learn(env_name, norm_factor, agen
             [obs, reward, terminal] = env('step', stepVO.getAction);
             norm_obs = obs ./ norm_factor;
 
-            if args.verbose
+            if args.figure
                 viz(obs, h);
                 pause(0.005);
             end
