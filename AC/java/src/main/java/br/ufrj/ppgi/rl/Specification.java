@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = -3317461734407630816L;
+  private static final long serialVersionUID = 3994811158443931724L;
 
   private int               actorMemory;
 
@@ -17,6 +17,8 @@ public class Specification implements Serializable
   private SimpleMatrix      actorMin;
 
   private SimpleMatrix      actorMax;
+
+  private SimpleMatrix      actorRange;
 
   private int               actorValuesToRebuildTree;
 
@@ -65,6 +67,8 @@ public class Specification implements Serializable
   private SimpleMatrix      observationMinValue;
 
   private SimpleMatrix      observationMaxValue;
+
+  private SimpleMatrix      observationRange;
 
   private int               explorationRate;
 
@@ -391,5 +395,25 @@ public class Specification implements Serializable
   public void setProcessModelIterationsWithoutLearning(int processModelIterationsWithoutLearning)
   {
     this.processModelIterationsWithoutLearning = processModelIterationsWithoutLearning;
+  }
+
+  public SimpleMatrix getActorRange()
+  {
+    if (actorRange == null)
+    {
+      actorRange = actorMax.minus(actorMin);
+    }
+
+    return actorRange;
+  }
+
+  public SimpleMatrix getObservationRange()
+  {
+    if (observationRange == null)
+    {
+      observationRange = observationMaxValue.minus(observationMinValue);
+    }
+
+    return observationRange;
   }
 }

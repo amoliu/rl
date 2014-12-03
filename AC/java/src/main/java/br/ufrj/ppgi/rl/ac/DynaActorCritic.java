@@ -9,7 +9,7 @@ import br.ufrj.ppgi.rl.Specification;
 
 public class DynaActorCritic extends StandardActorCritic
 {
-  private static final long serialVersionUID = -8686323211453331278L;
+  private static final long serialVersionUID = -5704315970654225615L;
 
   protected ProcessModelLWR processModel;
 
@@ -32,7 +32,7 @@ public class DynaActorCritic extends StandardActorCritic
   {
     super.init(specification);
     processModel.init(specification);
-    
+
     environmentStep = 0;
   }
 
@@ -73,13 +73,21 @@ public class DynaActorCritic extends StandardActorCritic
 
   private void updateUsingModel()
   {
-    if (environmentStep <= specification.getProcessModelIterationsWithoutLearning()*100)
+    if (environmentStep <= specification.getProcessModelIterationsWithoutLearning() * 100)
       return;
-    
+
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
       SimpleMatrix action = actor.actionWithoutRandomness(lastModelObservation);
       ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
+
+      // If the variance is greater exceeds the range of state params, restart
+      // model
+      if (!isModelGood(modelQuery))
+      {
+        restartModel();
+        continue;
+      }
 
       double delta = critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(),
                                                    modelQuery.getLWRQueryVO().getResult(),
@@ -98,5 +106,18 @@ public class DynaActorCritic extends StandardActorCritic
         restartModel();
       }
     }
+  }
+
+  private boolean isModelGood(ProcessModelQueryVO modelQuery)
+  {
+    for (int k = 0; k < specification.getObservationDimensions(); k++)
+    {
+      if (modelQuery.getLWRQueryVO().getVariance().get(k) > Math.abs(specification.getObservationRange().get(k)))
+      {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

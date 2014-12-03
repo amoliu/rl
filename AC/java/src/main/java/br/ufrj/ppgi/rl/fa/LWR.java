@@ -5,9 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.ejml.alg.dense.decomposition.chol.CholeskyDecompositionInner_D64;
-import org.ejml.alg.dense.linsol.chol.LinearSolverChol;
+import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.LinearSolverFactory;
+import org.ejml.interfaces.linsol.LinearSolver;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
@@ -20,51 +21,51 @@ import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
 public class LWR implements Serializable
 {
-  private static final long   serialVersionUID      = 1741267570461500906L;
+  private static final long            serialVersionUID      = 1741267570461500906L;
 
-  private static final double DEFAUL_TIKHONOV       = 0.000001d;
+  private static final double          DEFAUL_TIKHONOV       = 0.000001d;
 
-  private static final double DEFAUL_GAMMA          = 0.9d;
+  private static final double          DEFAUL_GAMMA          = 0.9d;
 
-  private static final double DEFAULT_INITIAL_VALUE = 0;
+  private static final double          DEFAULT_INITIAL_VALUE = 0;
 
-  private static final double BIAS                  = 1d;
+  private static final double          BIAS                  = 1d;
 
-  protected SimpleMatrix      dataInput;
+  protected SimpleMatrix               dataInput;
 
-  protected SimpleMatrix      dataOutput;
+  protected SimpleMatrix               dataOutput;
 
-  protected double[]          relevance;
+  protected double[]                   relevance;
 
-  protected int               size;
+  protected int                        size;
 
-  private int                 input_dimension;
+  private int                          input_dimension;
 
-  private int                 output_dimension;
+  private int                          output_dimension;
 
-  private int                 k;
+  private int                          k;
 
-  private double              tikhonov;
+  private double                       tikhonov;
 
-  private double              gamma;
+  private double                       gamma;
 
-  protected int               last_llr;
+  protected int                        last_llr;
 
-  private double              initial_value;
+  private double                       initial_value;
 
-  private KdTree<Integer>     tree;
+  private KdTree<Integer>              tree;
 
-  private DistanceFunction    distanceFunction;
+  private DistanceFunction             distanceFunction;
 
-  private int                 tree_size;
+  private int                          tree_size;
 
-  private LinearSolverChol    solver;
+  private LinearSolver<DenseMatrix64F> solver;
 
-  private Random              random;
+  private Random                       random;
 
-  private LWRWeightFunction   weightFunction;
+  private LWRWeightFunction            weightFunction;
 
-  private int                 valuesToRebuildTree;
+  private int                          valuesToRebuildTree;
 
   public LWR(int size, int input_dimensions, int output_dimensions, int k)
   {
@@ -119,7 +120,7 @@ public class LWR implements Serializable
     tree_size = 0;
     this.valuesToRebuildTree = valuesToRebuildTree;
 
-    solver = new LinearSolverChol(new CholeskyDecompositionInner_D64());
+    solver = LinearSolverFactory.symmPosDef(input_dimension + 1);
 
     weightFunction = new br.ufrj.ppgi.rl.fa.DistanceFunction();
   }
@@ -168,7 +169,7 @@ public class LWR implements Serializable
     if (last_llr < size)
     {
       return true;
-      
+
     }
     return tree_size % valuesToRebuildTree == 0;
   }
@@ -252,9 +253,12 @@ public class LWR implements Serializable
       SimpleMatrix x = SimpleMatrix.random(output_dimension, input_dimension + 1, 0, 1, random).plus(initial_value);
       result = result.plus(initial_value);
 
+      SimpleMatrix variance = new SimpleMatrix(1, output_dimension);
+      variance.zero();
+
       ArrayList<Integer> neighbors = new ArrayList<Integer>();
 
-      return new LWRQueryVO(result, x, neighbors);
+      return new LWRQueryVO(result, x, neighbors, variance);
     }
 
     ArrayList<Integer> neighbors = getNeighbors(query);
@@ -263,8 +267,8 @@ public class LWR implements Serializable
 
   private LWRQueryVO queryForNeighbors(SimpleMatrix query, ArrayList<Integer> neighbors)
   {
-    SimpleMatrix A = new SimpleMatrix(input_dimension + 1, neighbors.size());
-    SimpleMatrix B = new SimpleMatrix(neighbors.size(), output_dimension);
+    DenseMatrix64F A = new DenseMatrix64F(neighbors.size(), input_dimension + 1);
+    DenseMatrix64F B = new DenseMatrix64F(neighbors.size(), output_dimension);
     DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, output_dimension);
 
     for (int n = 0; n < neighbors.size(); n++)
@@ -273,9 +277,9 @@ public class LWR implements Serializable
 
       for (int i = 0; i < input_dimension; i++)
       {
-        A.set(i, n, dataInput.get(pos, i));
+        A.set(n, i, dataInput.get(pos, i));
       }
-      A.set(input_dimension, n, BIAS);
+      A.set(n, input_dimension, BIAS);
 
       for (int i = 0; i < output_dimension; i++)
       {
@@ -286,31 +290,83 @@ public class LWR implements Serializable
     SimpleMatrix queryBias = getQueryBias(query);
 
     double[] weights = weightFunction.calculateWeight(A, queryBias);
-    for (int i = 0; i < A.numRows(); i++)
+    for (int i = 0; i < A.numRows; i++)
     {
-      for (int j = 0; j < A.numCols(); j++)
+      for (int j = 0; j < A.numCols; j++)
       {
-        A.set(i, j, A.get(i, j) * weights[j]);
+        A.set(i, j, A.get(i, j) * weights[i]);
       }
     }
 
-    for (int i = 0; i < B.numRows(); i++)
+    for (int i = 0; i < B.numRows; i++)
     {
-      for (int j = 0; j < B.numCols(); j++)
+      for (int j = 0; j < B.numCols; j++)
       {
         B.set(i, j, B.get(i, j) * weights[i]);
       }
     }
 
-    SimpleMatrix AAT = SimpleMatrix.identity(input_dimension + 1);
-    CommonOps.scale(tikhonov, AAT.getMatrix());
+    DenseMatrix64F ATA = new DenseMatrix64F(input_dimension + 1, input_dimension + 1);
+    CommonOps.multTransA(A, A, ATA);
+    for (int i = 0; i < ATA.numRows; i++)
+    {
+      ATA.set(i, i, ATA.get(i, i) + tikhonov);
+    }
 
-    CommonOps.multAddTransB(A.getMatrix(), A.getMatrix(), AAT.getMatrix());
+    DenseMatrix64F ATAinv = new DenseMatrix64F(input_dimension + 1, input_dimension + 1);
+    solver.setA(ATA);
+    solver.invert(ATAinv);
 
-    solver.setA(AAT.getMatrix());
-    solver.solve(A.mult(B).getMatrix(), X);
+    DenseMatrix64F ATB = new DenseMatrix64F(input_dimension + 1, output_dimension);
+    CommonOps.multTransA(A, B, ATB);
 
-    return new LWRQueryVO(queryBias.mult(SimpleMatrix.wrap(X)), SimpleMatrix.wrap(X).transpose(), neighbors);
+    // Solve for X
+    CommonOps.mult(ATAinv, ATB, X);
+
+    SimpleMatrix variance = calculateVariance(A, B, X, weights, ATAinv);
+
+    SimpleMatrix Xsm = SimpleMatrix.wrap(X);
+    return new LWRQueryVO(queryBias.mult(Xsm), Xsm.transpose(), neighbors, variance);
+  }
+
+  private SimpleMatrix calculateVariance(DenseMatrix64F A, DenseMatrix64F B, DenseMatrix64F X, double[] weights,
+                                         DenseMatrix64F ATAinv)
+  {
+    DenseMatrix64F residual = new DenseMatrix64F(B.numRows, B.numCols);
+    CommonOps.mult(A, X, residual);
+    CommonOps.subtractEquals(residual, B);
+
+    double nLWR = 0;
+    for (int i = 0; i < weights.length; i++)
+    {
+      nLWR += Math.pow(weights[i], 2);
+    }
+
+    double pLWR = 0;
+    SimpleMatrix Asm = SimpleMatrix.wrap(A);
+    for (int i = 0; i < weights.length; i++)
+    {
+
+      pLWR += Math.pow(weights[i], 2)
+              * VectorVectorMult.innerProdA(Asm.extractVector(true, i).getMatrix(), ATAinv, Asm.extractVector(true, i)
+                                                                                               .getMatrix());
+    }
+
+    double denominator = nLWR - pLWR;
+
+    SimpleMatrix variance = new SimpleMatrix(1, output_dimension);
+    for (int j = 0; j < output_dimension; j++)
+    {
+      double v = 0;
+      for (int i = 0; i < residual.numRows; i++)
+      {
+        v += Math.pow(residual.get(i, j), 2);
+      }
+      v = v / denominator;
+      variance.set(j, v);
+    }
+
+    return variance;
   }
 
   private SimpleMatrix getQueryBias(SimpleMatrix query)
