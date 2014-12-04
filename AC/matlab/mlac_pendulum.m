@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, episodes] = mlac_pendulum(varargin)
+function [critic, actor, cr, rmse, model, episodes] = mlac_pendulum(varargin)
 %MLAC_PENDULUM Runs the MLAC algorithim on the pendulum swing-up.
 %   MLAC_PENDULUM(E) learns during E episodes
 %
@@ -75,4 +75,5 @@ function [critic, actor, cr, rmse, episodes] = mlac_pendulum(varargin)
     agent.init(javaSpec);
     
     [critic, actor, cr, rmse, episodes] = learn('mops_sim', norm_factor, agent, args);
+    model = agent.getProcessModel();
 end

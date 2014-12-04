@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, episodes] = dyna_pendulum(varargin)
+function [critic, actor, cr, rmse, model, episodes] = dyna_pendulum(varargin)
 %DYNA_PENDULUM Runs the dyna algorithim on the pendulum swing-up.
 %   DYNA_PENDULUM(E, S) learns during E episodes,
 %   doing S model steps per real step.
@@ -83,5 +83,6 @@ function [critic, actor, cr, rmse, episodes] = dyna_pendulum(varargin)
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse, episodes] = learn('mops_sim', norm_factor, agent, args); 
+    [critic, actor, cr, rmse, episodes] = learn('mops_sim', norm_factor, agent, args);
+    model = agent.getProcessModel();
 end

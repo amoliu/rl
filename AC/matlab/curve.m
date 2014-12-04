@@ -29,7 +29,7 @@ disp('MLAC');
 tic;
 parfor_progress(trials);
 parfor i=1:trials
-    [~, ~, ~, ~, mlac_episodes(i)] = mlac_pendulum('mode', 'performance', 'performance', performance, 'trialsInARow', times_in_row);
+    [~, ~, ~, ~, ~, mlac_episodes(i)] = mlac_pendulum('mode', 'performance', 'performance', performance, 'trialsInARow', times_in_row);
     parfor_progress;
 end
 parfor_progress(0);
@@ -44,7 +44,7 @@ for power=0:power_of_two
     dyna_episodes_step = zeros(1,trials);
     
     parfor i=1:trials
-        [~, ~, ~, ~, dyna_episodes_step(i)] = dyna_pendulum('mode', 'performance', 'steps', step, 'performance', performance, 'trialsInARow', times_in_row);
+        [~, ~, ~, ~, ~, dyna_episodes_step(i)] = dyna_pendulum('mode', 'performance', 'steps', step, 'performance', performance, 'trialsInARow', times_in_row);
         parfor_progress;
     end
     

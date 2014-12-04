@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, episodes] = dyna_mlac_pendulum(varargin)
+function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargin)
 %DYNA_MLAC_PENDULUM Runs the dyna-mlac algorithim on the pendulum swing-up.
 %   DYNA_MLAC_PENDULUM(E, S) learns during E episodes,
 %   doing S model steps per real step.
@@ -84,4 +84,5 @@ function [critic, actor, cr, rmse, episodes] = dyna_mlac_pendulum(varargin)
     agent.init(javaSpec);
     
     [critic, actor, cr, rmse, episodes] = learn('mops_sim', norm_factor, agent, args); 
+    model = agent.getProcessModel();
 end
