@@ -30,7 +30,7 @@ public class DistanceFunction implements LWRWeightFunction
 
     for (int i = 0; i < distance.length; i++)
     {
-      distance[i] = Math.exp(-Math.pow(distance[i] / h, 2));
+      distance[i] = Math.sqrt(Math.exp(-Math.pow(distance[i] / h, 2)));
     }
 
     return distance;
