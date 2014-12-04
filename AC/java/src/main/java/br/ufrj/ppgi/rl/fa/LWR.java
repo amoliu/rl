@@ -254,7 +254,7 @@ public class LWR implements Serializable
       result = result.plus(initial_value);
 
       SimpleMatrix variance = new SimpleMatrix(1, output_dimension);
-      variance.zero();
+      variance.set(Double.MAX_VALUE);
 
       ArrayList<Integer> neighbors = new ArrayList<Integer>();
 
