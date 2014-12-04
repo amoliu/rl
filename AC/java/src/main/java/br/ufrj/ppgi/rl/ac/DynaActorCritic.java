@@ -6,6 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 import br.ufrj.ppgi.rl.ProcessModelLWR;
 import br.ufrj.ppgi.rl.ProcessModelQueryVO;
 import br.ufrj.ppgi.rl.Specification;
+import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class DynaActorCritic extends StandardActorCritic
 {
@@ -53,10 +54,11 @@ public class DynaActorCritic extends StandardActorCritic
     SimpleMatrix matrixObservation = new SimpleMatrix(observation);
     super.update(reward, matrixObservation);
 
-    SimpleMatrix model = processModel.query(lastObservation, lastAction).getLWRQueryVO().getResult();
+    LWRQueryVO modelVO = processModel.query(lastObservation, lastAction).getLWRQueryVO();
+    SimpleMatrix model = modelVO.getResult();
     double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
 
-    processModel.add(lastObservation, lastAction, matrixObservation, reward, 0);
+    processModel.add(lastObservation, lastAction, matrixObservation, reward);
     updateUsingModel();
 
     lastObservation = matrixObservation;

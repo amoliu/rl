@@ -6,19 +6,16 @@ import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class ProcessModelQueryVO implements Serializable
 {
-  private static final long serialVersionUID = -711054600461999634L;
+  private static final long serialVersionUID = 3209831204654697749L;
 
   private LWRQueryVO        lwrQueryVO;
 
   private double            reward;
 
-  private int               terminal;
-
-  public ProcessModelQueryVO(LWRQueryVO lwrQueryVO, double reward, int terminal)
+  public ProcessModelQueryVO(LWRQueryVO lwrQueryVO, double reward)
   {
     this.lwrQueryVO = lwrQueryVO;
     this.reward = reward;
-    this.terminal = terminal;
   }
 
   public LWRQueryVO getLWRQueryVO()
@@ -39,15 +36,5 @@ public class ProcessModelQueryVO implements Serializable
   public void setReward(double reward)
   {
     this.reward = reward;
-  }
-
-  public int getTerminal()
-  {
-    return terminal;
-  }
-
-  public void setTerminal(int terminal)
-  {
-    this.terminal = terminal;
   }
 }

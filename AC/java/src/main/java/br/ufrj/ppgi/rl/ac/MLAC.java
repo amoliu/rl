@@ -9,7 +9,7 @@ import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.ActionVO;
 import br.ufrj.ppgi.rl.ActorLLR;
 import br.ufrj.ppgi.rl.CriticLLR;
-import br.ufrj.ppgi.rl.ProcessModelLLR;
+import br.ufrj.ppgi.rl.ProcessModelLWR;
 import br.ufrj.ppgi.rl.ProcessModelQueryVO;
 import br.ufrj.ppgi.rl.Specification;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
@@ -22,7 +22,7 @@ public class MLAC implements Agent
 
   protected CriticLLR       critic;
 
-  protected ProcessModelLLR processModel;
+  protected ProcessModelLWR processModel;
 
   private Specification     specification;
 
@@ -36,7 +36,7 @@ public class MLAC implements Agent
   {
     actor = new ActorLLR();
     critic = new CriticLLR();
-    processModel = new ProcessModelLLR();
+    processModel = new ProcessModelLWR();
 
     specification = null;
 
@@ -95,24 +95,12 @@ public class MLAC implements Agent
   private double update(double reward, SimpleMatrix observation)
   {
     ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastAction.getPolicyAction());
-    processModel.add(lastObservation, lastAction.getAction(), observation, reward, 0);
+    processModel.add(lastObservation, lastAction.getAction(), observation, reward);
 
     LWRQueryVO criticResult = critic.query(modelQuery.getLWRQueryVO().getResult());
 
     SimpleMatrix criticXs = getXs(criticResult.getX());
     SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
-
-    // check if withinBounds
-    /*
-    for (int i = 0; i < lastAction.getPolicyAction().getNumElements(); i++)
-    {
-      if (lastAction.getPolicyAction().get(i) < specification.getActorMin().get(i) * 0.92
-          || lastAction.getPolicyAction().get(i) > specification.getActorMax().get(i) * 0.92)
-      {
-        modelXa.zero();
-      }
-    }
-    */
 
     double actorUpdate = criticXs.mult(modelXa).get(0);
     actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction.getAction());
@@ -153,7 +141,7 @@ public class MLAC implements Agent
 
   private SimpleMatrix getXa(SimpleMatrix x)
   {
-    return x.extractMatrix(0, END, specification.getObservationDimensions(), specification.getObservationDimensions()
-                                                                             + specification.getActionDimensions());
+    return x.extractMatrix(0, specification.getObservationDimensions(), specification.getObservationDimensions(),
+                           specification.getObservationDimensions() + specification.getActionDimensions());
   }
 }
