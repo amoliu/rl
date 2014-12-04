@@ -24,7 +24,7 @@ public class MLAC implements Agent
 
   protected ProcessModelLWR processModel;
 
-  protected Specification     specification;
+  protected Specification   specification;
 
   protected SimpleMatrix    lastObservation;
 
@@ -143,5 +143,10 @@ public class MLAC implements Agent
   {
     return x.extractMatrix(0, specification.getObservationDimensions(), specification.getObservationDimensions(),
                            specification.getObservationDimensions() + specification.getActionDimensions());
+  }
+
+  public ProcessModelLWR getProcessModel()
+  {
+    return processModel;
   }
 }

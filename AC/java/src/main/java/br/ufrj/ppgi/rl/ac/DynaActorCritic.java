@@ -122,4 +122,9 @@ public class DynaActorCritic extends StandardActorCritic
 
     return true;
   }
+
+  public ProcessModelLWR getProcessModel()
+  {
+    return processModel;
+  }
 }

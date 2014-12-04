@@ -24,6 +24,11 @@ public class ProcessModelLWR implements Serializable
 
   }
 
+  public ProcessModelQueryVO query(double[][] observation, double[][] action)
+  {
+    return query(new SimpleMatrix(observation), new SimpleMatrix(action));
+  }
+  
   public ProcessModelQueryVO query(SimpleMatrix observation, SimpleMatrix action)
   {
     LWRQueryVO query = lwr.query(createProcessoModelInput(observation, action));
