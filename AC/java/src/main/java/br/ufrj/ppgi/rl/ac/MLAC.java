@@ -24,7 +24,7 @@ public class MLAC implements Agent
 
   protected ProcessModelLWR processModel;
 
-  private Specification     specification;
+  protected Specification     specification;
 
   protected SimpleMatrix    lastObservation;
 
@@ -92,7 +92,7 @@ public class MLAC implements Agent
     this.specification = null;
   }
 
-  private double update(double reward, SimpleMatrix observation)
+  protected double update(double reward, SimpleMatrix observation)
   {
     ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastAction.getPolicyAction());
     processModel.add(lastObservation, lastAction.getAction(), observation, reward);
@@ -110,7 +110,7 @@ public class MLAC implements Agent
     return Math.pow(NormOps.normP2(observation.minus(modelQuery.getLWRQueryVO().getResult()).getMatrix()), 2);
   }
 
-  private double[][] chooseAction(SimpleMatrix observation)
+  protected double[][] chooseAction(SimpleMatrix observation)
   {
     lastAction = actor.action(observation);
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction.getAction());
@@ -134,12 +134,12 @@ public class MLAC implements Agent
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(actor.actionWithoutRandomness(new SimpleMatrix(observation)));
   }
 
-  private SimpleMatrix getXs(SimpleMatrix x)
+  protected SimpleMatrix getXs(SimpleMatrix x)
   {
     return x.extractMatrix(0, END, 0, specification.getObservationDimensions());
   }
 
-  private SimpleMatrix getXa(SimpleMatrix x)
+  protected SimpleMatrix getXa(SimpleMatrix x)
   {
     return x.extractMatrix(0, specification.getObservationDimensions(), specification.getObservationDimensions(),
                            specification.getObservationDimensions() + specification.getActionDimensions());
