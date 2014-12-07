@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, model, episodes] = dyna_pendulum(varargin)
+function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(varargin)
 %DYNA_PENDULUM Runs the dyna algorithim on the pendulum swing-up.
 %   DYNA_PENDULUM(E, S) learns during E episodes,
 %   doing S model steps per real step.
@@ -65,7 +65,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_pendulum(varargin)
     javaSpec.setSd(2.0);
     
     javaSpec.setProcessModelMemory(1000);
-    javaSpec.setProcessModelNeighbors(10);
+    javaSpec.setProcessModelNeighbors(12);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
@@ -75,14 +75,15 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_pendulum(varargin)
     javaSpec.setProcessModelThreshold(0.5);
     
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
-    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/200);
-    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/200);
+    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1000);
+    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1000);
     javaSpec.setProcessModelGamma(0.97);
-    javaSpec.setProcessModelIterationsWithoutLearning(10);
+    javaSpec.setProcessModelIterationsWithoutLearning(0);
+    javaSpec.setRewardRange((spec.reward_max - spec.reward_min));
        
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse, episodes] = learn('mops_sim', norm_factor, agent, args);
+    [critic, actor, cr, rmse, episodes, skiped] = learn('mops_sim', norm_factor, agent, args);
     model = agent.getProcessModel();
 end
