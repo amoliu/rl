@@ -59,12 +59,12 @@ public class DynaActorCritic extends StandardActorCritic
     double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
 
     processModel.add(lastObservation, lastAction, matrixObservation, reward);
-    updateUsingModel();
+    int modelSkiped = updateUsingModel();
 
     lastObservation = matrixObservation;
     environmentStep++;
 
-    return new StepVO(error, chooseAction(matrixObservation));
+    return new StepVO(error, chooseAction(matrixObservation), modelSkiped);
   }
 
   private void restartModel()
@@ -73,11 +73,12 @@ public class DynaActorCritic extends StandardActorCritic
     lastModelObservation = firstObservation;
   }
 
-  private void updateUsingModel()
+  private int updateUsingModel()
   {
     if (environmentStep <= specification.getProcessModelIterationsWithoutLearning() * 100)
-      return;
+      return specification.getProcessModelStepsPerEpisode();
 
+    int skiped = 0;
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
       SimpleMatrix action = actor.actionWithoutRandomness(lastModelObservation);
@@ -87,6 +88,7 @@ public class DynaActorCritic extends StandardActorCritic
       // model
       if (!isModelGood(modelQuery))
       {
+        skiped++;
         restartModel();
         continue;
       }
@@ -108,16 +110,23 @@ public class DynaActorCritic extends StandardActorCritic
         restartModel();
       }
     }
+
+    return skiped;
   }
 
   private boolean isModelGood(ProcessModelQueryVO modelQuery)
   {
     for (int k = 0; k < specification.getObservationDimensions(); k++)
     {
-      if (modelQuery.getLWRQueryVO().getVariance().get(k) > Math.abs(specification.getObservationRange().get(k)))
+      if (modelQuery.getLWRQueryVO().getVariance().get(k) > specification.getObservationRange().get(k))
       {
         return false;
       }
+    }
+
+    if (modelQuery.getLWRQueryVO().getVariance().get(specification.getObservationDimensions()) > specification.getRewardRange())
+    {
+      return false;
     }
 
     return true;

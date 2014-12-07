@@ -114,7 +114,7 @@ public class ActorLLRUnitTest
     Assert.assertEquals(2, actor.llr.getDataInput().get(1), DELTA);
     Assert.assertEquals(2.55, actor.llr.getDataOutput().get(1), DELTA);
     Assert.assertEquals(3, actor.llr.getDataInput().get(2), DELTA);
-    Assert.assertEquals(3, actor.llr.getDataOutput().get(2), DELTA);
+    Assert.assertEquals(2.05, actor.llr.getDataOutput().get(2), DELTA);
   }
   
   private Specification getSpecification_1Input2Output()

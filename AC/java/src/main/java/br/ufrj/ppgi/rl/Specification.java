@@ -70,6 +70,8 @@ public class Specification implements Serializable
 
   private SimpleMatrix      observationRange;
 
+  private double            rewardRange;
+
   private int               explorationRate;
 
   public int getActorMemory()
@@ -411,9 +413,19 @@ public class Specification implements Serializable
   {
     if (observationRange == null)
     {
-      observationRange = observationMaxValue.minus(observationMinValue);
+      observationRange = observationMaxValue.minus(observationMinValue).divide(100);
     }
 
     return observationRange;
+  }
+
+  public double getRewardRange()
+  {
+    return rewardRange;
+  }
+
+  public void setRewardRange(double rewardRange)
+  {
+    this.rewardRange = rewardRange;
   }
 }

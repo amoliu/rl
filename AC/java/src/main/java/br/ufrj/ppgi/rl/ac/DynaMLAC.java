@@ -54,12 +54,12 @@ public class DynaMLAC extends MLAC
     double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
 
     processModel.add(lastObservation, lastAction.getAction(), matrixObservation, reward);
-    updateUsingModel();
+    int skiped = updateUsingModel();
 
     lastObservation = matrixObservation;
     environmentStep++;
 
-    return new StepVO(error, chooseAction(matrixObservation));
+    return new StepVO(error, chooseAction(matrixObservation), skiped);
   }
 
   private void restartModel()
@@ -68,11 +68,12 @@ public class DynaMLAC extends MLAC
     lastModelObservation = firstObservation;
   }
 
-  private void updateUsingModel()
+  private int updateUsingModel()
   {
     if (environmentStep <= specification.getProcessModelIterationsWithoutLearning() * 100)
-      return;
+      return specification.getProcessModelStepsPerEpisode();
 
+    int skiped = 0;
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
       SimpleMatrix action = actor.actionWithoutRandomness(lastModelObservation);
@@ -82,6 +83,7 @@ public class DynaMLAC extends MLAC
       // model
       if (!isModelGood(modelQuery))
       {
+        skiped++;
         restartModel();
         continue;
       }
@@ -109,16 +111,23 @@ public class DynaMLAC extends MLAC
         restartModel();
       }
     }
+
+    return skiped;
   }
 
   private boolean isModelGood(ProcessModelQueryVO modelQuery)
   {
     for (int k = 0; k < specification.getObservationDimensions(); k++)
     {
-      if (modelQuery.getLWRQueryVO().getVariance().get(k) > Math.abs(specification.getObservationRange().get(k)))
+      if (modelQuery.getLWRQueryVO().getVariance().get(k) > specification.getObservationRange().get(k))
       {
         return false;
       }
+    }
+
+    if (modelQuery.getLWRQueryVO().getVariance().get(specification.getObservationDimensions()) > specification.getRewardRange())
+    {
+      return false;
     }
 
     return true;

@@ -17,7 +17,7 @@ public class StandardActorCriticUnitTest
     Specification spec = getSpecification();
 
     actorCritic.init(spec);
-    
+
     double[][] action = actorCritic.start(new double[][] { { 3 } }).getAction();
     Assert.assertEquals(actorCritic.lastObservation.get(0), 3, DELTA);
     Assert.assertEquals(actorCritic.lastAction.get(0), action[0][0], DELTA);
@@ -26,7 +26,7 @@ public class StandardActorCriticUnitTest
     Assert.assertEquals(actorCritic.lastObservation.get(0), 2, DELTA);
     Assert.assertEquals(actorCritic.lastAction.get(0), action[0][0], DELTA);
   }
-  
+
   @Test
   public void testStart_ShouldResetCriticET()
   {
@@ -34,19 +34,24 @@ public class StandardActorCriticUnitTest
     Specification spec = getSpecification();
 
     actorCritic.init(spec);
-    
+
     actorCritic.start(new double[][] { { 3 } });
     actorCritic.step(5, new double[][] { { 2 } });
     actorCritic.step(4, new double[][] { { 3 } });
     actorCritic.step(5.5, new double[][] { { 4 } });
-    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[0][0], 1, DELTA);
-    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[1][0], 1, DELTA);
-    
+    actorCritic.step(6, new double[][] { { 5 } });
+    actorCritic.step(6.5, new double[][] { { 5.5 } });
+    actorCritic.step(7, new double[][] { { 6 } });
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[3][0], 1, DELTA);
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[4][0], 1, DELTA);
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[5][0], 1, DELTA);
+
     actorCritic.start(new double[][] { { 5 } });
-    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[0][0], 0, DELTA);
-    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[1][0], 0, DELTA);
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[3][0], 0, DELTA);
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[4][0], 0, DELTA);
+    Assert.assertEquals(actorCritic.getCritic().getEligibilityTrace()[5][0], 0, DELTA);
   }
-  
+
   private Specification getSpecification()
   {
     Specification specification = new Specification();
@@ -70,11 +75,11 @@ public class StandardActorCriticUnitTest
     specification.setActionDimensions(1);
     specification.setActorMax(actorMax);
     specification.setActorMin(actorMin);
-    
+
     specification.setSd(1f);
     specification.setObservationDimensions(1);
     specification.setActionDimensions(1);
-    
+
     specification.setExplorationRate(1);
     return specification;
   }

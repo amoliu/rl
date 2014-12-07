@@ -23,7 +23,7 @@ public class LWR implements Serializable
 {
   private static final long            serialVersionUID      = 1741267570461500906L;
 
-  private static final double          DEFAUL_TIKHONOV       = 0.000001d;
+  private static final double          DEFAUL_RIDGE          = 0.000001d;
 
   private static final double          DEFAUL_GAMMA          = 0.9d;
 
@@ -45,7 +45,7 @@ public class LWR implements Serializable
 
   private int                          k;
 
-  private double                       tikhonov;
+  private double                       ridge;
 
   private double                       gamma;
 
@@ -69,22 +69,21 @@ public class LWR implements Serializable
 
   public LWR(int size, int input_dimensions, int output_dimensions, int k)
   {
-    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_TIKHONOV, DEFAUL_GAMMA, k);
+    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_RIDGE, DEFAUL_GAMMA, k);
   }
 
   public LWR(int size, int input_dimensions, int output_dimensions, int k, int valuesToRebuildTree)
   {
-    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_TIKHONOV, DEFAUL_GAMMA,
+    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_RIDGE, DEFAUL_GAMMA,
          valuesToRebuildTree);
   }
 
   public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, int valuesToRebuildTree)
   {
-    this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_TIKHONOV, DEFAUL_GAMMA,
-         valuesToRebuildTree);
+    this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_RIDGE, DEFAUL_GAMMA, valuesToRebuildTree);
   }
 
-  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, double tikhonov,
+  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, double ridge,
              double gamma, int valuesToRebuildTree)
   {
     if (k <= 1)
@@ -101,7 +100,7 @@ public class LWR implements Serializable
     this.output_dimension = output_dimensions;
     this.initial_value = initial_value;
     this.k = k;
-    this.tikhonov = tikhonov;
+    this.ridge = ridge;
     this.gamma = gamma;
 
     this.dataInput = new SimpleMatrix(size, input_dimensions);
@@ -310,7 +309,7 @@ public class LWR implements Serializable
     CommonOps.multTransA(A, A, ATA);
     for (int i = 0; i < ATA.numRows; i++)
     {
-      ATA.set(i, i, ATA.get(i, i) + tikhonov);
+      ATA.set(i, i, ATA.get(i, i) + ridge);
     }
 
     DenseMatrix64F ATAinv = new DenseMatrix64F(input_dimension + 1, input_dimension + 1);
@@ -346,7 +345,6 @@ public class LWR implements Serializable
     SimpleMatrix Asm = SimpleMatrix.wrap(A);
     for (int i = 0; i < weights.length; i++)
     {
-
       pLWR += Math.pow(weights[i], 2)
               * VectorVectorMult.innerProdA(Asm.extractVector(true, i).getMatrix(), ATAinv, Asm.extractVector(true, i)
                                                                                                .getMatrix());
@@ -409,9 +407,9 @@ public class LWR implements Serializable
     return Math.pow(NormOps.normP2(output.minus(predict_value).getMatrix()), 2);
   }
 
-  private boolean hasEnoughNeighbors()
+  protected boolean hasEnoughNeighbors()
   {
-    return last_llr > 1;
+    return last_llr > 4 * input_dimension;
   }
 
   private ArrayList<Integer> getNeighbors(SimpleMatrix query)
