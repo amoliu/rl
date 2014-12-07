@@ -65,7 +65,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setSd(2.0);
     
     javaSpec.setProcessModelMemory(1000);
-    javaSpec.setProcessModelNeighbors(10);
+    javaSpec.setProcessModelNeighbors(12);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
@@ -75,10 +75,11 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelThreshold(0.5);
     
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
-    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/200);
-    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/200);
+    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1000);
+    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1000);
     javaSpec.setProcessModelGamma(0.97);
-    javaSpec.setProcessModelIterationsWithoutLearning(4);
+    javaSpec.setProcessModelIterationsWithoutLearning(0);
+    javaSpec.setRewardRange((spec.reward_max - spec.reward_min));
        
     agent = br.ufrj.ppgi.rl.ac.DynaMLAC;
     agent.init(javaSpec);
