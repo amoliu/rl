@@ -17,7 +17,17 @@ for power=0:power_of_two
     rmse = zeros(trials,episodes);
 
     parfor i=1:trials
-        [~, ~, cr(i,:), rmse(i,:)] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', step);
+        [~, ~, temp_cr, temp_rmse] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', step);
+        
+        filename = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-', num2str(i));
+        parsave(strcat(path, filename), temp_cr);
+    
+        filename = strcat('dyna-rmse', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-', num2str(i));
+        parsave(strcat(path, filename), temp_rmse);
+        
+        cr(i,:) = temp_cr;
+        rmse(i,:) = temp_rmse;
+        
         parfor_progress;
     end
 
