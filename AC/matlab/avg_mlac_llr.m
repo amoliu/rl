@@ -3,7 +3,7 @@ close all;
 
 path = make_save_folder('mlac');
 
-episodes = 200;
+episodes = 300;
 trials = 25;
 
 cr = zeros(trials,episodes);
