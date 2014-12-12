@@ -28,9 +28,13 @@ public class MLAC implements Agent
 
   protected SimpleMatrix    lastObservation;
 
-  protected ActionVO        lastAction;
+  protected SimpleMatrix    lastAction;
+
+  protected ActionVO        lastActionVO;
 
   protected double          lastValueFunction;
+
+  private int               step;
 
   public MLAC()
   {
@@ -41,8 +45,11 @@ public class MLAC implements Agent
     specification = null;
 
     lastObservation = null;
+    lastActionVO = null;
     lastAction = null;
     lastValueFunction = 0;
+
+    step = 0;
   }
 
   @Override
@@ -74,6 +81,7 @@ public class MLAC implements Agent
   {
     double error = update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
+    step++;
 
     return new StepVO(error, chooseAction(new SimpleMatrix(observation)));
   }
@@ -94,8 +102,8 @@ public class MLAC implements Agent
 
   protected double update(double reward, SimpleMatrix observation)
   {
-    ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastAction.getPolicyAction());
-    processModel.add(lastObservation, lastAction.getAction(), observation, reward);
+    ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastActionVO.getPolicyAction());
+    processModel.add(lastObservation, lastAction, observation, reward);
 
     LWRQueryVO criticResult = critic.query(modelQuery.getLWRQueryVO().getResult());
 
@@ -103,17 +111,34 @@ public class MLAC implements Agent
     SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
     double actorUpdate = criticXs.mult(modelXa).get(0);
-    actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction.getAction());
+    if (step % specification.getExplorationRate() == 0)
+    {
+      actor.updateWithRandomness(actorUpdate, lastObservation, lastAction);
+    }
+    else
+    {
+      actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction);
+    }
 
-    critic.update(lastObservation, lastAction.getAction(), reward, observation);
+    critic.update(lastObservation, lastAction, reward, observation);
 
     return Math.pow(NormOps.normP2(observation.minus(modelQuery.getLWRQueryVO().getResult()).getMatrix()), 2);
   }
 
   protected double[][] chooseAction(SimpleMatrix observation)
   {
-    lastAction = actor.action(observation);
-    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction.getAction());
+    lastActionVO = actor.action(observation);
+
+    if (step % specification.getExplorationRate() == 0)
+    {
+      lastAction = lastActionVO.getAction();
+    }
+    else
+    {
+      lastAction = lastActionVO.getPolicyAction();
+    }
+
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
   }
 
   @Override

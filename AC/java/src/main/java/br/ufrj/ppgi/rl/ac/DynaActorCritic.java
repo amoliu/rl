@@ -81,7 +81,7 @@ public class DynaActorCritic extends StandardActorCritic
     int skiped = 0;
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
-      SimpleMatrix action = actor.actionWithoutRandomness(lastModelObservation);
+      SimpleMatrix action = chooseAction(lastModelObservation, i);
       ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
       // If the variance is greater exceeds the range of state params, restart
@@ -98,7 +98,14 @@ public class DynaActorCritic extends StandardActorCritic
                                                    specification.getProcessModelCriticAlpha(),
                                                    specification.getProcessModelGamma());
 
-      actor.updateWithoutRandomness(delta, lastObservation, lastAction, specification.getProcessModelActorAplha());
+      if (i % specification.getExplorationRate() == 0)
+      {
+        actor.updateWithRandomness(delta, lastModelObservation, action, specification.getProcessModelActorAplha());
+      }
+      else
+      {
+        actor.updateWithoutRandomness(delta, lastModelObservation, action, specification.getProcessModelActorAplha());
+      }
 
       lastModelObservation = modelQuery.getLWRQueryVO().getResult();
       modelStep++;
@@ -112,6 +119,18 @@ public class DynaActorCritic extends StandardActorCritic
     }
 
     return skiped;
+  }
+
+  private SimpleMatrix chooseAction(SimpleMatrix observation, int i)
+  {
+    if (i % specification.getExplorationRate() == 0)
+    {
+      return actor.action(observation).getAction();
+    }
+    else
+    {
+      return actor.action(observation).getPolicyAction();
+    }
   }
 
   private boolean isModelGood(ProcessModelQueryVO modelQuery)

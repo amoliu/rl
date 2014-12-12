@@ -49,11 +49,11 @@ public class DynaMLAC extends MLAC
     SimpleMatrix matrixObservation = new SimpleMatrix(observation);
     super.update(reward, matrixObservation);
 
-    LWRQueryVO modelVO = processModel.query(lastObservation, lastAction.getAction()).getLWRQueryVO();
+    LWRQueryVO modelVO = processModel.query(lastObservation, lastActionVO.getAction()).getLWRQueryVO();
     SimpleMatrix model = modelVO.getResult();
     double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
 
-    processModel.add(lastObservation, lastAction.getAction(), matrixObservation, reward);
+    processModel.add(lastObservation, lastActionVO.getAction(), matrixObservation, reward);
     int skiped = updateUsingModel();
 
     lastObservation = matrixObservation;
@@ -76,7 +76,7 @@ public class DynaMLAC extends MLAC
     int skiped = 0;
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
-      SimpleMatrix action = actor.actionWithoutRandomness(lastModelObservation);
+      SimpleMatrix action = chooseAction(lastModelObservation, i);
       ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
       // If the variance is greater exceeds the range of state params, restart
@@ -94,8 +94,15 @@ public class DynaMLAC extends MLAC
       SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
       double actorUpdate = criticXs.mult(modelXa).get(0);
-      actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction.getAction(),
-                                    specification.getProcessModelActorAplha());
+      if (i % specification.getExplorationRate() == 0)
+      {
+        actor.updateWithRandomness(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha());
+      }
+      else
+      {
+        actor.updateWithoutRandomness(actorUpdate, lastModelObservation, action,
+                                      specification.getProcessModelActorAplha());
+      }
 
       critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
                                                                                                     .getResult(),
@@ -113,6 +120,18 @@ public class DynaMLAC extends MLAC
     }
 
     return skiped;
+  }
+
+  private SimpleMatrix chooseAction(SimpleMatrix observation, int i)
+  {
+    if (i % specification.getExplorationRate() == 0)
+    {
+      return actor.action(observation).getAction();
+    }
+    else
+    {
+      return actor.action(observation).getPolicyAction();
+    }
   }
 
   private boolean isModelGood(ProcessModelQueryVO modelQuery)

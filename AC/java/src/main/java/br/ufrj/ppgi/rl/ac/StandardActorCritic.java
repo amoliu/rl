@@ -56,7 +56,7 @@ public class StandardActorCritic implements Agent
     lastObservation = new SimpleMatrix(observation);
     critic.resetEligibilityTrace();
 
-    return new StepVO(chooseAction(new SimpleMatrix(observation)));
+    return new StepVO(chooseAction(lastObservation));
   }
 
   @Override
@@ -64,8 +64,9 @@ public class StandardActorCritic implements Agent
   {
     update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
+    step++;
 
-    return new StepVO(chooseAction(new SimpleMatrix(observation)));
+    return new StepVO(chooseAction(lastObservation));
   }
 
   @Override
@@ -98,7 +99,15 @@ public class StandardActorCritic implements Agent
 
   protected double[][] chooseAction(SimpleMatrix observation)
   {
-    lastAction = actor.action(observation).getAction();
+    if (step % specification.getExplorationRate() == 0)
+    {
+      lastAction = actor.action(observation).getAction();
+    }
+    else
+    {
+      lastAction = actor.action(observation).getPolicyAction();
+    }
+
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
   }
 

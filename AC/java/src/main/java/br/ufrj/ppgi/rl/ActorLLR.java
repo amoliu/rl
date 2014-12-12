@@ -47,7 +47,17 @@ public class ActorLLR implements Serializable
   {
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(actionWithoutRandomness(new SimpleMatrix(observation)));
   }
-  
+
+  public double[][] actionWithRandomness(SimpleMatrix observation)
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(action(observation).getAction());
+  }
+
+  public double[][] actionWithRandomness(double[][] observation)
+  {
+    return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(action(new SimpleMatrix(observation)).getAction());
+  }
+
   public SimpleMatrix actionWithoutRandomness(SimpleMatrix observation)
   {
     if (observation.numRows() != 1)
