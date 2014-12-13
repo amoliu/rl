@@ -20,6 +20,7 @@ axis_limits = [0,episodes,-6000,0];
 t = strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
 h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'Title', t, 'Rendering', 'opaque', 'Axis', axis_limits);
 saveas(h, strcat(path, t), 'png');
+save(strcat(path, t), 'cr');
 
 h = figure;
 t = strcat('sac-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-curves');
