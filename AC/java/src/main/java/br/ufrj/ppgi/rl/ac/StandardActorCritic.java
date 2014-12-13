@@ -23,6 +23,8 @@ public class StandardActorCritic implements Agent
 
   private int               step;
 
+  private boolean           randomness;
+
   public StandardActorCritic()
   {
     actor = new ActorLLR();
@@ -46,8 +48,6 @@ public class StandardActorCritic implements Agent
 
     actor.init(specification);
     critic.init(specification);
-
-    step = 0;
   }
 
   @Override
@@ -55,6 +55,9 @@ public class StandardActorCritic implements Agent
   {
     lastObservation = new SimpleMatrix(observation);
     critic.resetEligibilityTrace();
+
+    step = 0;
+    randomness = false;
 
     return new StepVO(chooseAction(lastObservation));
   }
@@ -86,15 +89,7 @@ public class StandardActorCritic implements Agent
   protected void update(double reward, SimpleMatrix observation)
   {
     double delta = critic.update(lastObservation, lastAction, reward, observation);
-
-    if (step % specification.getExplorationRate() == 0)
-    {
-      actor.updateWithRandomness(delta, lastObservation, lastAction);
-    }
-    else
-    {
-      actor.updateWithoutRandomness(delta, lastObservation, lastAction);
-    }
+    actor.update(delta, lastObservation, lastAction, randomness);
   }
 
   protected double[][] chooseAction(SimpleMatrix observation)
@@ -102,10 +97,12 @@ public class StandardActorCritic implements Agent
     if (step % specification.getExplorationRate() == 0)
     {
       lastAction = actor.action(observation).getAction();
+      randomness = true;
     }
     else
     {
       lastAction = actor.action(observation).getPolicyAction();
+      randomness = false;
     }
 
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);

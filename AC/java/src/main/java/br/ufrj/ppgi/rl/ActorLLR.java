@@ -90,6 +90,18 @@ public class ActorLLR implements Serializable
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
 
+  public void update(double delta, SimpleMatrix observation, SimpleMatrix action, boolean randomness)
+  {
+    if (randomness)
+    {
+      updateWithRandomness(delta, observation, action);
+    }
+    else
+    {
+      updateWithoutRandomness(delta, observation, action);
+    }
+  }
+
   public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
   {
     delta = delta * lastRandom * specification.getActorAlpha();

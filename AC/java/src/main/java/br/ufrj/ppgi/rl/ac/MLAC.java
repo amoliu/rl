@@ -36,6 +36,8 @@ public class MLAC implements Agent
 
   private int               step;
 
+  private boolean           randomness;
+
   public MLAC()
   {
     actor = new ActorLLR();
@@ -48,8 +50,6 @@ public class MLAC implements Agent
     lastActionVO = null;
     lastAction = null;
     lastValueFunction = 0;
-
-    step = 0;
   }
 
   @Override
@@ -73,6 +73,9 @@ public class MLAC implements Agent
     lastObservation = new SimpleMatrix(observation);
     critic.resetEligibilityTrace();
 
+    step = 0;
+    randomness = false;
+    
     return new StepVO(chooseAction(new SimpleMatrix(observation)));
   }
 
@@ -102,7 +105,7 @@ public class MLAC implements Agent
 
   protected double update(double reward, SimpleMatrix observation)
   {
-    ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastActionVO.getPolicyAction());
+    ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastAction);
     processModel.add(lastObservation, lastAction, observation, reward);
 
     LWRQueryVO criticResult = critic.query(modelQuery.getLWRQueryVO().getResult());
@@ -111,14 +114,7 @@ public class MLAC implements Agent
     SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
     double actorUpdate = criticXs.mult(modelXa).get(0);
-    if (step % specification.getExplorationRate() == 0)
-    {
-      actor.updateWithRandomness(actorUpdate, lastObservation, lastAction);
-    }
-    else
-    {
-      actor.updateWithoutRandomness(actorUpdate, lastObservation, lastAction);
-    }
+    actor.update(actorUpdate, lastObservation, lastAction, randomness);
 
     critic.update(lastObservation, lastAction, reward, observation);
 
@@ -132,10 +128,12 @@ public class MLAC implements Agent
     if (step % specification.getExplorationRate() == 0)
     {
       lastAction = lastActionVO.getAction();
+      randomness = true;
     }
     else
     {
       lastAction = lastActionVO.getPolicyAction();
+      randomness = false;
     }
 
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
