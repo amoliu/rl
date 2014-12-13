@@ -56,7 +56,7 @@ function [critic, actor, cr, rmse, model, episodes] = mlac_pendulum(varargin)
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
 
-    javaSpec.setExplorationRate(2);
+    javaSpec.setExplorationRate(3);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
     javaSpec.setSd(2.0);
@@ -69,7 +69,7 @@ function [critic, actor, cr, rmse, model, episodes] = mlac_pendulum(varargin)
     
     javaSpec.setProcessModelCrossLimit(10);
     javaSpec.setProcessModelUpperBound([20 0]);
-    javaSpec.setProcessModelThreshold(0.5);
+    javaSpec.setProcessModelThreshold(1.0);
        
     agent = br.ufrj.ppgi.rl.ac.MLAC;
     agent.init(javaSpec);
