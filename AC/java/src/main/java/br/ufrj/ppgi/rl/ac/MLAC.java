@@ -34,7 +34,7 @@ public class MLAC implements Agent
 
   protected double          lastValueFunction;
 
-  private int               step;
+  protected int             step;
 
   private boolean           randomness;
 
@@ -75,7 +75,7 @@ public class MLAC implements Agent
 
     step = 0;
     randomness = false;
-    
+
     return new StepVO(chooseAction(new SimpleMatrix(observation)));
   }
 

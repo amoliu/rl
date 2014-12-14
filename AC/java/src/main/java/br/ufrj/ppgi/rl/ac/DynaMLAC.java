@@ -1,6 +1,5 @@
 package br.ufrj.ppgi.rl.ac;
 
-import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.rl.ProcessModelQueryVO;
@@ -17,7 +16,7 @@ public class DynaMLAC extends MLAC
 
   private SimpleMatrix      lastModelObservation;
 
-  private int               environmentStep;
+  private boolean           modelRandomness;
 
   public DynaMLAC()
   {
@@ -28,8 +27,6 @@ public class DynaMLAC extends MLAC
   public void init(Specification specification)
   {
     super.init(specification);
-
-    environmentStep = 0;
   }
 
   @Override
@@ -46,31 +43,25 @@ public class DynaMLAC extends MLAC
   @Override
   public StepVO step(double reward, double[][] observation)
   {
-    SimpleMatrix matrixObservation = new SimpleMatrix(observation);
-    super.update(reward, matrixObservation);
+    StepVO step = super.step(reward, observation);
 
-    LWRQueryVO modelVO = processModel.query(lastObservation, lastActionVO.getAction()).getLWRQueryVO();
-    SimpleMatrix model = modelVO.getResult();
-    double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
-
-    processModel.add(lastObservation, lastActionVO.getAction(), matrixObservation, reward);
     int skiped = updateUsingModel();
+    step.setModelSkiped(skiped);
 
-    lastObservation = matrixObservation;
-    environmentStep++;
-
-    return new StepVO(error, chooseAction(matrixObservation), skiped);
+    return step;
   }
 
   private void restartModel()
   {
     modelStep = 0;
     lastModelObservation = firstObservation;
+
+    modelRandomness = false;
   }
 
   private int updateUsingModel()
   {
-    if (environmentStep <= specification.getProcessModelIterationsWithoutLearning() * 100)
+    if (super.step <= specification.getProcessModelIterationsWithoutLearning() * 100)
       return specification.getProcessModelStepsPerEpisode();
 
     int skiped = 0;
@@ -94,15 +85,8 @@ public class DynaMLAC extends MLAC
       SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
       double actorUpdate = criticXs.mult(modelXa).get(0);
-      if (i % specification.getExplorationRate() == 0)
-      {
-        actor.updateWithRandomness(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha());
-      }
-      else
-      {
-        actor.updateWithoutRandomness(actorUpdate, lastModelObservation, action,
-                                      specification.getProcessModelActorAplha());
-      }
+      actor.update(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha(),
+                   modelRandomness);
 
       critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
                                                                                                     .getResult(),
@@ -111,8 +95,7 @@ public class DynaMLAC extends MLAC
       lastModelObservation = modelQuery.getLWRQueryVO().getResult();
       modelStep++;
 
-      // Restart model transition if hit a terminal state or
-      // if we had model.steps iterations
+      // Restart model transition if we had model.steps iterations
       if (modelStep >= 100)
       {
         restartModel();
@@ -124,12 +107,14 @@ public class DynaMLAC extends MLAC
 
   private SimpleMatrix chooseAction(SimpleMatrix observation, int i)
   {
-    if (i % specification.getExplorationRate() == 0)
+    if (i % specification.getProcessModelExplorationRate() == 0)
     {
+      modelRandomness = true;
       return actor.action(observation).getAction();
     }
     else
     {
+      modelRandomness = false;
       return actor.action(observation).getPolicyAction();
     }
   }

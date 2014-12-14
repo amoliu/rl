@@ -64,6 +64,8 @@ public class Specification implements Serializable
 
   private int               processModelIterationsWithoutLearning;
 
+  private int               processModelExplorationRate;
+
   private SimpleMatrix      observationMinValue;
 
   private SimpleMatrix      observationMaxValue;
@@ -427,5 +429,15 @@ public class Specification implements Serializable
   public void setRewardRange(double rewardRange)
   {
     this.rewardRange = rewardRange;
+  }
+
+  public int getProcessModelExplorationRate()
+  {
+    return processModelExplorationRate;
+  }
+
+  public void setProcessModelExplorationRate(int processModelExplorationRate)
+  {
+    this.processModelExplorationRate = processModelExplorationRate;
   }
 }

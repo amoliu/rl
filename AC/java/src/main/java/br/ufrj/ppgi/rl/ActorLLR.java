@@ -74,6 +74,18 @@ public class ActorLLR implements Serializable
     return EJMLMatlabUtils.wrap(queryResult.getResult(), specification.getActorMax(), specification.getActorMin());
   }
 
+  public void update(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha, boolean randomness)
+  {
+    if (randomness)
+    {
+      updateWithRandomness(delta, observation, action, alpha);
+    }
+    else
+    {
+      updateWithoutRandomness(delta, observation, action, alpha);
+    }
+  }
+
   public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha)
   {
     delta = delta * lastRandom * alpha;
