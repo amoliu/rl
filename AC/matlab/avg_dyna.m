@@ -17,17 +17,7 @@ for power=0:power_of_two
     rmse = zeros(trials,episodes);
 
     parfor i=1:trials
-        [~, ~, temp_cr, temp_rmse] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', step);
-        
-        filename = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-', num2str(i));
-        parsave(strcat(path, filename), temp_cr);
-    
-        filename = strcat('dyna-rmse', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-', num2str(i));
-        parsave(strcat(path, filename), temp_rmse);
-        
-        cr(i,:) = temp_cr;
-        rmse(i,:) = temp_rmse;
-        
+        [~, ~, cr(i,:), rmse(i,:)] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', step);
         parfor_progress;
     end
 
@@ -35,11 +25,13 @@ for power=0:power_of_two
     t = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
     h = errorbaralpha(mean(cr), 1.96.*std(cr)./sqrt(trials), 'Title', t, 'Rendering', 'opaque', 'Axis', axis_limits);
     saveas(h, strcat(path, t), 'png');
+    save(strcat(path,t), 'cr');
     
     figure;
     t = strcat('dyna-rmse-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes');
     h = errorbaralpha(mean(rmse), 1.96.*std(rmse)./sqrt(trials), 'Title', t, 'Rendering', 'opaque');
     saveas(h, strcat(path, t), 'png');
+    save(strcat(path,t), 'rmse');
     
     h = figure;
     t = strcat('dyna-', num2str(step), '-', num2str(trials), '-iterations-', num2str(episodes), '-episodes-curves');
