@@ -145,8 +145,8 @@ public class LWR implements Serializable
     else
     {
       pos = positionLessRelevant();
-      if (rel <= relevance[pos])
-        return -1;
+      //if (rel <= relevance[pos])
+      //  return -1;
     }
 
     relevance[pos] = rel;
