@@ -76,7 +76,7 @@ public class MLAC implements Agent
     step = 0;
     randomness = false;
 
-    return new StepVO(chooseAction(new SimpleMatrix(observation)));
+    return new StepVO(chooseAction(lastObservation));
   }
 
   @Override
@@ -86,7 +86,7 @@ public class MLAC implements Agent
     lastObservation = new SimpleMatrix(observation);
     step++;
 
-    return new StepVO(error, chooseAction(new SimpleMatrix(observation)));
+    return new StepVO(error, chooseAction(lastObservation));
   }
 
   @Override
