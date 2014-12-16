@@ -2,70 +2,55 @@ close all;
 clear all;
 clc;
 
-trials = 20;
-performance = -1000;
+desired_performance = -950;
 times_in_row = 5;
+power_of_two=11;
 
-power_of_two = 7;
-x = linspace(0,2^power_of_two,2^power_of_two);
-
-sac_episodes = zeros(1,trials);
-mlac_episodes = zeros(1,trials);
-dyna_episodes = zeros(1, power_of_two+1);
+x = linspace(0, power_of_two, power_of_two+1);
 
 % sac dashed line
-disp('SAC');
-tic;
-parfor_progress(trials);
-parfor i=1:trials
-    [~, ~, ~, sac_episodes(i)] = sac_pendulum('mode', 'performance', 'performance', performance, 'trialsInARow', times_in_row);
-    parfor_progress;
-end
-parfor_progress(0);
-toc;
+load('../results/sac/sac-25-iterations-400-episodes.mat');
+[m_sac, c_sac] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 
-% sac dashed line
-disp('MLAC');
-tic;
-parfor_progress(trials);
-parfor i=1:trials
-    [~, ~, ~, ~, ~, mlac_episodes(i)] = mlac_pendulum('mode', 'performance', 'performance', performance, 'trialsInARow', times_in_row);
-    parfor_progress;
-end
-parfor_progress(0);
-toc;
+% mlac dashed line
+load('../results/mlac/mlac-25-iterations-300-episodes.mat');
+[m_mlac, c_mlac] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 
-disp('DYNA');
-tic;
-parfor_progress(trials*(power_of_two+1));
-for power=0:power_of_two
-    step = 2^power;
-    
-    dyna_episodes_step = zeros(1,trials);
-    
-    parfor i=1:trials
-        [~, ~, ~, ~, ~, dyna_episodes_step(i)] = dyna_pendulum('mode', 'performance', 'steps', step, 'performance', performance, 'trialsInARow', times_in_row);
-        parfor_progress;
-    end
-    
-    dyna_episodes(power+1) = mean_without_outlier(dyna_episodes_step);
-end
-toc;
+% dyna dashed line
+folder = '../results/dyna/';
+m_dyna = zeros(1, power_of_two+1);
+c_dyna = zeros(1, power_of_two+1);
 
-dyna_y = zeros(1, 2^power_of_two);
-for i=power_of_two+1:-1:1
-    dyna_y(:,1:2^(i-1)) = repmat(dyna_episodes(i), 1, 2^(i-1));
+m_dyna(1) = m_sac;
+c_dyna(1) = c_sac;
+for i=1:power_of_two
+    load(strcat(folder, 'dyna-', num2str(2^(i-1)), '-25-iterations-200-episodes.mat'));
+    [m_dyna(i+1), c_dyna(i+1)] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 end
 
-path = make_save_folder('curve');
+% dyna-mlac dashed line
+folder = '../results/dyna-mlac/';
+m_dyna_mlac = zeros(1, power_of_two+1);
+c_dyna_mlac = zeros(1, power_of_two+1);
+
+m_dyna_mlac(1) = m_mlac;
+c_dyna_mlac(1) = c_mlac;
+for i=1:8
+    load(strcat(folder, 'dyna-mlac-', num2str(2^(i-1)), '-25-iterations-200-episodes.mat'));
+    [m_dyna_mlac(i+1), c_dyna_mlac(i+1)] = find_iteration_by_performance(cr, desired_performance, times_in_row);
+end
+
+%path = make_save_folder('curve');
 h = figure;
 hold on;
-plot(x, repmat(mean_without_outlier(sac_episodes), 1, 2^power_of_two), '--r');
-plot(x, repmat(mean_without_outlier(mlac_episodes), 1, 2^power_of_two), '--b');
-plot(x, dyna_y, '--g');
-legend('SAC','MLAC', 'DYNA');
+axis_limits = [0,power_of_two,0,500];
+errorbaralpha(repmat(m_sac, 1, power_of_two+1), repmat(c_sac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'r');
+errorbaralpha(repmat(m_mlac, 1, power_of_two+1), repmat(c_mlac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'b');
+errorbaralpha(m_dyna, c_dyna, 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'g');
+errorbaralpha(m_dyna_mlac, c_dyna_mlac, 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'm');
+legend('95% SAC', 'SAC','95% MLAC', 'MLAC', '95% DYNA', 'DYNA', '95% DYNA-MLAC', 'DYNA-MLAC');
 xlabel('Computation time');
 ylabel('Rise Time');
 title('Performance of Dyna against SAC and MLAC');
-filename = strcat('trials-', num2str(trials), '-performance-', num2str(performance), '-times_in_row-', num2str(times_in_row), '-power_of_two-', num2str(power_of_two));
-saveas(h, strcat(path, filename), 'png');
+%filename = strcat('trials-', num2str(trials), '-performance-', num2str(performance), '-times_in_row-', num2str(times_in_row), '-power_of_two-', num2str(power_of_two));
+%saveas(h, strcat(path, filename), 'png');
