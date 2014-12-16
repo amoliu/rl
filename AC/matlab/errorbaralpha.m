@@ -68,7 +68,7 @@ if isempty(r.e)
     if ~ismonotonic(r.x)
         r.e = r.y;
         r.y = r.x;
-        r.x = 1:len;
+        r.x = 0:len-1;
     end
 end
 
