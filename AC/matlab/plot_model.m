@@ -1,4 +1,6 @@
 function plot_model(model)
+    figure;
+    
     %%%%%%%%%%
     % Memory %
     input = model.getLWR.getMatlabDataInput;
@@ -9,7 +11,8 @@ function plot_model(model)
         d(i,:) = d(i,:) ./ norm(d(i,:));
     end
 
-    figure;
+    
+    subplot(2,3,1);
     quiver(input(:,1),input(:,2),d(:,1),d(:,2));
     xlabel('Angle');
     ylabel('Angular speed');
@@ -27,7 +30,7 @@ function plot_model(model)
         d(i,:) = d(i,:) ./ norm(d(i,:));
     end
     
-    figure;
+    subplot(2,3,2);
     quiver(input(:,1),input(:,2),d(:,1),d(:,2));
     xlabel('Angle');
     ylabel('Angular speed');
@@ -45,7 +48,7 @@ function plot_model(model)
         d(i,:) = d(i,:) ./ norm(d(i,:));
     end
     
-    figure;
+    subplot(2,3,3);
     quiver(input(:,1),input(:,2),d(:,1),d(:,2));
     xlabel('Angle');
     ylabel('Angular speed');
@@ -63,7 +66,7 @@ function plot_model(model)
         d(i,:) = d(i,:) ./ norm(d(i,:));
     end
     
-    figure;
+    subplot(2,3,4);
     quiver(input(:,1),input(:,2),d(:,1),d(:,2));
     xlabel('Angle');
     ylabel('Angular speed');
@@ -81,7 +84,7 @@ function plot_model(model)
         d(i,:) = d(i,:) ./ norm(d(i,:));
     end
     
-    figure;
+    subplot(2,3,5);
     quiver(input(:,1),input(:,2),d(:,1),d(:,2));
     xlabel('Angle');
     ylabel('Angular speed');
@@ -103,7 +106,7 @@ function plot_model(model)
         d(i,:) = d(i,:) ./ norm(d(i,:));
     end
     
-    figure;
+    subplot(2,3,6);
     quiver(input(:,1),input(:,2),d(:,1),d(:,2));
     xlabel('Angle');
     ylabel('Angular speed');
