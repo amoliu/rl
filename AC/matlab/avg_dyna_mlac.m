@@ -3,9 +3,9 @@ close all;
 
 path = make_save_folder('dyna-mlac');
 
-episodes = 200;
+episodes = 600;
 trials = 25;
-power_of_two = 12;
+power_of_two = 11;
 
 axis_limits = [0,episodes,-6000,0];
 
