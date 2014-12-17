@@ -3,7 +3,7 @@ close all;
 
 path = make_save_folder('sac');
 
-episodes = 400;
+episodes = 600;
 trials = 25;
 
 cr = zeros(trials,episodes);
