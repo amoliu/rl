@@ -9,11 +9,11 @@ power_of_two=11;
 x = linspace(0, power_of_two, power_of_two+1);
 
 % sac dashed line
-load('../results/sac/sac-25-iterations-400-episodes.mat');
+load('../results/sac/sac-25-iterations-600-episodes.mat');
 [m_sac, c_sac] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 
 % mlac dashed line
-load('../results/mlac/mlac-25-iterations-300-episodes.mat');
+load('../results/mlac/mlac-25-iterations-600-episodes.mat');
 [m_mlac, c_mlac] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 
 % dyna dashed line
@@ -35,7 +35,7 @@ c_dyna_mlac = zeros(1, power_of_two+1);
 
 m_dyna_mlac(1) = m_mlac;
 c_dyna_mlac(1) = c_mlac;
-for i=1:8
+for i=1:power_of_two
     load(strcat(folder, 'dyna-mlac-', num2str(2^(i-1)), '-25-iterations-200-episodes.mat'));
     [m_dyna_mlac(i+1), c_dyna_mlac(i+1)] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 end
