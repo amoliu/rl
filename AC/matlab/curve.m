@@ -2,8 +2,8 @@ close all;
 clear all;
 clc;
 
-desired_performance = -950;
-times_in_row = 5;
+desired_performance = -1000;
+times_in_row = 3;
 power_of_two=11;
 
 x = linspace(0, power_of_two, power_of_two+1);
@@ -35,8 +35,8 @@ c_dyna_mlac = zeros(1, power_of_two+1);
 
 m_dyna_mlac(1) = m_mlac;
 c_dyna_mlac(1) = c_mlac;
-for i=1:power_of_two
-    load(strcat(folder, 'dyna-mlac-', num2str(2^(i-1)), '-25-iterations-200-episodes.mat'));
+for i=1:9
+    load(strcat(folder, 'dyna-mlac-', num2str(2^(i-1)), '-25-iterations-600-episodes.mat'));
     [m_dyna_mlac(i+1), c_dyna_mlac(i+1)] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 end
 
@@ -44,11 +44,11 @@ end
 h = figure;
 hold on;
 axis_limits = [0,power_of_two,0,500];
-errorbaralpha(repmat(m_sac, 1, power_of_two+1), repmat(c_sac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'r');
-errorbaralpha(repmat(m_mlac, 1, power_of_two+1), repmat(c_mlac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'b');
-errorbaralpha(m_dyna, c_dyna, 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'g');
-errorbaralpha(m_dyna_mlac, c_dyna_mlac, 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'm');
-legend('95% SAC', 'SAC','95% MLAC', 'MLAC', '95% DYNA', 'DYNA', '95% DYNA-MLAC', 'DYNA-MLAC');
+h_sac = errorbaralpha(repmat(m_sac, 1, power_of_two+1), repmat(c_sac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'r');
+h_mlac = errorbaralpha(repmat(m_mlac, 1, power_of_two+1), repmat(c_mlac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'b');
+h_dyna = errorbaralpha(m_dyna, c_dyna, 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'g');
+h_dyna_mlac = errorbaralpha(m_dyna_mlac, c_dyna_mlac, 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'm');
+legend([h_sac, h_mlac, h_dyna, h_dyna_mlac], {'SAC', 'MLAC', 'DYNA', 'DYNA-MLAC' });
 xlabel('Computation time');
 ylabel('Rise Time');
 title('Performance of Dyna against SAC and MLAC');
