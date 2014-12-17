@@ -36,8 +36,6 @@ public class MLAC implements Agent
 
   protected int             step;
 
-  private boolean           randomness;
-
   public MLAC()
   {
     actor = new ActorLLR();
@@ -74,7 +72,6 @@ public class MLAC implements Agent
     critic.resetEligibilityTrace();
 
     step = 0;
-    randomness = false;
 
     return new StepVO(chooseAction(lastObservation));
   }
@@ -114,7 +111,7 @@ public class MLAC implements Agent
     SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
     double actorUpdate = criticXs.mult(modelXa).get(0);
-    actor.update(actorUpdate, lastObservation, lastAction, randomness);
+    actor.update(actorUpdate, lastObservation, lastAction, false);
 
     critic.update(lastObservation, lastAction, reward, observation);
 
@@ -128,12 +125,10 @@ public class MLAC implements Agent
     if (step % specification.getExplorationRate() == 0)
     {
       lastAction = lastActionVO.getAction();
-      randomness = true;
     }
     else
     {
       lastAction = lastActionVO.getPolicyAction();
-      randomness = false;
     }
 
     return EJMLMatlabUtils.getMatlabMatrixFromSimpleMatrix(lastAction);
