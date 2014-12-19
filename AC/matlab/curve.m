@@ -35,7 +35,7 @@ c_dyna_mlac = zeros(1, power_of_two+1);
 
 m_dyna_mlac(1) = m_mlac;
 c_dyna_mlac(1) = c_mlac;
-for i=1:9
+for i=1:power_of_two
     load(strcat(folder, 'dyna-mlac-', num2str(2^(i-1)), '-25-iterations-600-episodes.mat'));
     [m_dyna_mlac(i+1), c_dyna_mlac(i+1)] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 end
