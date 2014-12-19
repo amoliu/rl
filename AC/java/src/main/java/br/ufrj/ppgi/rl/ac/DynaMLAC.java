@@ -16,8 +16,6 @@ public class DynaMLAC extends MLAC
 
   private SimpleMatrix      lastModelObservation;
 
-  private boolean           modelRandomness;
-
   public DynaMLAC()
   {
     super();
@@ -55,8 +53,6 @@ public class DynaMLAC extends MLAC
   {
     modelStep = 0;
     lastModelObservation = firstObservation;
-
-    modelRandomness = false;
   }
 
   private int updateUsingModel()
@@ -85,8 +81,7 @@ public class DynaMLAC extends MLAC
       SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
 
       double actorUpdate = criticXs.mult(modelXa).get(0);
-      actor.update(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha(),
-                   modelRandomness);
+      actor.update(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha(), false);
 
       critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
                                                                                                     .getResult(),
@@ -109,12 +104,10 @@ public class DynaMLAC extends MLAC
   {
     if (i % specification.getProcessModelExplorationRate() == 0)
     {
-      modelRandomness = true;
       return actor.action(observation).getAction();
     }
     else
     {
-      modelRandomness = false;
       return actor.action(observation).getPolicyAction();
     }
   }
