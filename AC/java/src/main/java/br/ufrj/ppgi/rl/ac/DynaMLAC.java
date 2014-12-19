@@ -104,11 +104,11 @@ public class DynaMLAC extends MLAC
   {
     if (i % specification.getProcessModelExplorationRate() == 0)
     {
-      return actor.action(observation).getAction();
+      return actor.action(observation, specification.getProcessModelSd()).getAction();
     }
     else
     {
-      return actor.action(observation).getPolicyAction();
+      return actor.action(observation, specification.getProcessModelSd()).getPolicyAction();
     }
   }
 

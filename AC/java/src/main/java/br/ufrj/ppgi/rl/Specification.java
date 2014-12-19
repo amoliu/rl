@@ -66,6 +66,8 @@ public class Specification implements Serializable
 
   private int               processModelExplorationRate;
 
+  private float             processModelSd;
+
   private SimpleMatrix      observationMinValue;
 
   private SimpleMatrix      observationMaxValue;
@@ -439,5 +441,15 @@ public class Specification implements Serializable
   public void setProcessModelExplorationRate(int processModelExplorationRate)
   {
     this.processModelExplorationRate = processModelExplorationRate;
+  }
+
+  public float getProcessModelSd()
+  {
+    return processModelSd;
+  }
+
+  public void setProcessModelSd(float processModelSd)
+  {
+    this.processModelSd = processModelSd;
   }
 }

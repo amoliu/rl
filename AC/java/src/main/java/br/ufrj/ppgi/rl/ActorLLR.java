@@ -32,6 +32,16 @@ public class ActorLLR implements Serializable
 
     random = new XORShiftRNG();
   }
+  
+  public ActionVO action(SimpleMatrix observation, float sd)
+  {
+    SimpleMatrix action = actionWithoutRandomness(observation);
+    nextRandom(sd);
+
+    return new ActionVO(EJMLMatlabUtils.wrap(action.plus(lastRandom), specification.getActorMax(),
+                                             specification.getActorMin()),
+                        EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
+  }
 
   public ActionVO action(SimpleMatrix observation)
   {
@@ -142,10 +152,15 @@ public class ActorLLR implements Serializable
   {
     return llr.add(observation, EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
   }
+  
+  private void nextRandom(float sd)
+  {
+    lastRandom = random.nextGaussian() * sd;
+  }
 
   private void nextRandom()
   {
-    lastRandom = random.nextGaussian() * specification.getSd();
+    nextRandom(specification.getSd());
   }
 
   public LLR getLLR()
