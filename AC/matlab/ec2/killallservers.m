@@ -7,6 +7,8 @@ function s= killallservers(s)
     for k=1:length(instances)
         system(sprintf('ssh -oStrictHostKeyChecking=no -i %s ubuntu@%s sudo killall server',...
                        s.keylocation,instances{k}));
+        system(sprintf('ssh -oStrictHostKeyChecking=no -i %s ubuntu@%s sudo rm /tmp/tmp.*',...
+                       s.keylocation,instances{k}));
     end
     
     s.servers = []; 
