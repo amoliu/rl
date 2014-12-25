@@ -74,6 +74,30 @@ function server(port,debug)
                 [episodes, steps] = deal(received.arguments{:});
                 [~, ~, cr] = dyna_mlac_pendulum('mode', 'episode', 'episodes', episodes, 'steps', steps, 'verbose', true);
                 mssend(sock,cr);
+              case {codes.all}
+                if debug
+                    fprintf('Received all command\n');
+                end
+                [episodes, start_power, end_power, whoami] = deal(received.arguments{:});
+                mssend(sock,'1');
+                msclose(sock);
+                
+                path = '/mnt/s3/';
+                for power=start_power:end_power
+                    steps = 2^power;
+                    fprintf(strcat('Dyna-mlac ', num2str(steps), ' \n'));
+                    [~, ~, cr] = dyna_mlac_pendulum('mode', 'episode', 'episodes', episodes, 'steps', steps, 'verbose', true);
+                    t = strcat('dyna-mlac', num2str(steps), '-', num2str(episodes), '-episodes-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                end
+                
+                for power=start_power:end_power
+                    steps = 2^power;
+                    fprintf(strcat('Dyna ', num2str(steps), ' \n'));
+                    [~, ~, cr] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', steps, 'verbose', true);
+                    t = strcat('dyna-', num2str(steps), '-', num2str(episodes), '-episodes-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                end
               case {codes.closesocket}
                 msclose(sock);
                 if debug

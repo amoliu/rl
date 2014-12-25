@@ -9,7 +9,7 @@ s = socket_client('/home/bruno/Documentos/aws/home.pem');
 [s,servers] = updateserverlist(s);
 
 trials = 40;
-episodes = 600;
+episodes = 400;
 power_of_two = 20;
 
 for k=1:trials
@@ -45,7 +45,7 @@ for step=1:power_of_two
 end
 
 %Dyna-mlac
-for step=1:power_of_two
+for step=11:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna_mlac;
        joblist(k).arguments = {episodes, 2^step};
@@ -61,3 +61,10 @@ for step=1:power_of_two
     filename = strcat('dyna-mlac', num2str(step), '.mat');
     save(filename, 'dyna_mlac');
 end
+
+% All standalone
+for k=1:size(servers, 2)
+   joblist(k).command = codes.all;
+   joblist(k).arguments = {episodes, 10, 20, k};
+end
+runjobs(s,joblist,1);

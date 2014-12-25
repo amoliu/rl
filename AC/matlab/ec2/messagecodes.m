@@ -9,3 +9,5 @@ function codes = messagecodes
     codes.mlac = 11;
     codes.dyna = 12;
     codes.dyna_mlac = 13;
+    
+    codes.all = 14;
