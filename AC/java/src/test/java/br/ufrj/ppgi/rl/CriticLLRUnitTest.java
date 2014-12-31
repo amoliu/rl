@@ -6,6 +6,8 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Assert;
 import org.junit.Test;
 
+import br.ufrj.ppgi.rl.fa.LLRMemoryManagement;
+
 public class CriticLLRUnitTest
 {
   private static final int CRITIC_INITIAL_VALUE = -1000;
@@ -109,6 +111,7 @@ public class CriticLLRUnitTest
     specification.setCriticNeighbors(2);
     specification.setCriticInitialValue(CRITIC_INITIAL_VALUE);
     specification.setCriticValuesToRebuildTree(2);
+    specification.setCriticMemoryManagement(LLRMemoryManagement.LLR_MEMORY_PREDICTION);
     specification.setSd(1f);
     
     specification.setObservationDimensions(1);

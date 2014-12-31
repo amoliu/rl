@@ -5,14 +5,14 @@ import java.io.Serializable;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
-import br.ufrj.ppgi.rl.fa.LLR;
+import br.ufrj.ppgi.rl.fa.LWR;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class CriticLLR implements Serializable
 {
   private static final long serialVersionUID = -8821872302477032620L;
 
-  protected LLR             llr;
+  protected LWR             llr;
 
   private Specification     specification;
 
@@ -24,10 +24,19 @@ public class CriticLLR implements Serializable
   {
     this.specification = specification;
 
-    llr = new LLR(specification.getCriticMemory(), specification.getObservationDimensions(), 1,
-                  specification.getCriticNeighbors(), this.specification.getCriticInitialValue(),
-                  specification.getCriticValuesToRebuildTree());
+    llr = LWR.createLLR()
+             .setSize(specification.getCriticMemory())
+             .setInputDimension(specification.getObservationDimensions())
+             .setOutputDimension(1)
+             .setK(specification.getCriticNeighbors())
+             .setInitialValue(this.specification.getCriticInitialValue())
+             .setValuesToRebuildTheTree(specification.getCriticValuesToRebuildTree());
 
+    if (specification.getCriticMemoryManagement() != null)
+    {
+      llr.setMemoryManagement(specification.getCriticMemoryManagement());
+    }
+    
     resetEligibilityTrace();
   }
 
@@ -47,6 +56,8 @@ public class CriticLLR implements Serializable
     double tdError = reward + specification.getGamma() * valueFunction.getResult().get(0)
                      - oldValueFunction.getResult().get(0);
 
+    // TODO Set ET to zero for the removed point?
+
     // Add to LLR
     int insertIndex = llr.add(lastObservation, oldValueFunction.getResult());
 
@@ -62,8 +73,8 @@ public class CriticLLR implements Serializable
       eligibilityTrace.set(neighbor, 1);
       update.set(neighbor, specification.getCriticAlpha() * tdError);
     }
-    
-    //set ET of inserted sample to 1
+
+    // set ET of inserted sample to 1
     if (insertIndex != -1)
     {
       eligibilityTrace.set(insertIndex, 1);
@@ -75,8 +86,8 @@ public class CriticLLR implements Serializable
     return tdError;
   }
 
-  public double updateWithoutAddSample(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation,
-                       double alpha, double gamma)
+  public double updateWithoutAddSample(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward,
+                                       SimpleMatrix observation, double alpha, double gamma)
   {
     LWRQueryVO valueFunction = llr.query(observation);
     LWRQueryVO oldValueFunction = llr.query(lastObservation);
@@ -93,7 +104,7 @@ public class CriticLLR implements Serializable
     return llr.query(query);
   }
 
-  public LLR getLLR()
+  public LWR getLLR()
   {
     return llr;
   }

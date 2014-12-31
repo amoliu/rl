@@ -7,14 +7,14 @@ import org.ejml.simple.SimpleMatrix;
 import org.uncommons.maths.random.XORShiftRNG;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
-import br.ufrj.ppgi.rl.fa.LLR;
+import br.ufrj.ppgi.rl.fa.LWR;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
 public class ActorLLR implements Serializable
 {
   private static final long serialVersionUID = -9178817118835693301L;
 
-  protected LLR             llr;
+  protected LWR             llr;
 
   private Specification     specification;
 
@@ -26,13 +26,21 @@ public class ActorLLR implements Serializable
   {
     this.specification = specification;
 
-    llr = new LLR(specification.getActorMemory(), specification.getObservationDimensions(),
-                  specification.getActionDimensions(), specification.getActorNeighbors(),
-                  specification.getActorValuesToRebuildTree());
+    llr = LWR.createLLR()
+             .setSize(specification.getActorMemory())
+             .setInputDimension(specification.getObservationDimensions())
+             .setOutputDimension(specification.getActionDimensions())
+             .setK(specification.getActorNeighbors())
+             .setValuesToRebuildTheTree(specification.getActorValuesToRebuildTree());
+    
+    if (specification.getActorMemoryManagement() != null)
+    {
+      llr.setMemoryManagement(specification.getActorMemoryManagement());
+    }
 
     random = new XORShiftRNG();
   }
-  
+
   public ActionVO action(SimpleMatrix observation, float sd)
   {
     SimpleMatrix action = actionWithoutRandomness(observation);
@@ -152,7 +160,7 @@ public class ActorLLR implements Serializable
   {
     return llr.add(observation, EJMLMatlabUtils.wrap(action, specification.getActorMax(), specification.getActorMin()));
   }
-  
+
   private void nextRandom(float sd)
   {
     lastRandom = random.nextGaussian() * sd;
@@ -163,7 +171,7 @@ public class ActorLLR implements Serializable
     nextRandom(specification.getSd());
   }
 
-  public LLR getLLR()
+  public LWR getLLR()
   {
     return llr;
   }

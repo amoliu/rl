@@ -19,9 +19,17 @@ public class ProcessModelLWR implements Serializable
   {
     this.specification = specification;
 
-    lwr = new LWR(specification.getProcessModelMemory(), getInputDimension(), getOutputDimension(),
-                  specification.getProcessModelNeighbors(), specification.getProcessModelValuesToRebuildTree());
-
+    lwr = LWR.createLWR()
+             .setSize(specification.getProcessModelMemory())
+             .setInputDimension(getInputDimension())
+             .setOutputDimension(getOutputDimension())
+             .setK(specification.getProcessModelNeighbors())
+             .setValuesToRebuildTheTree(specification.getProcessModelValuesToRebuildTree());
+    
+    if (specification.getProcessModelMemoryManagement() != null)
+    {
+      lwr.setMemoryManagement(specification.getProcessModelMemoryManagement());
+    }
   }
 
   public ProcessModelQueryVO query(double[][] observation, double[][] action)
