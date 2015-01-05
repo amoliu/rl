@@ -63,8 +63,13 @@ for step=11:power_of_two
 end
 
 % All standalone
+episodes = 600;
+dyna_episodes = 200;
+start_power = 0;
+end_power = 14;
 for k=1:size(servers, 2)
+   whoami = k;
    joblist(k).command = codes.all;
-   joblist(k).arguments = {episodes, 10, 20, k};
+   joblist(k).arguments = {episodes, dyna_episodes, start_power, end_power, whoami};
 end
 runjobs(s,joblist,1);
