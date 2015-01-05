@@ -26,7 +26,7 @@ function pendulum_viz(actor, critic, cr, rmse)
     figure;
     criticInput = critic.getLLR.getMatlabDataInput;
     criticOutput = critic.getLLR.getMatlabDataOutput;
-    scatter(criticInput(:,1), criticInput(:,2), [], criticOutput, 'x')
+    scatter(criticInput(:,1), criticInput(:,2), 25, criticOutput, 'filled')
     title('Critic');
     xlabel('angle[rad]');
     ylabel('angular velocity[rad/s]');
@@ -35,7 +35,7 @@ function pendulum_viz(actor, critic, cr, rmse)
     figure;
     actorInput = actor.getLLR.getMatlabDataInput;
     actorOutput = actor.getLLR.getMatlabDataOutput;
-    scatter(actorInput(:,1), actorInput(:,2), [], actorOutput, 'x')
+    scatter(actorInput(:,1), actorInput(:,2), 25, actorOutput, 'filled')
     title('Actor');
     xlabel('angle[rad]');
     ylabel('angular velocity[rad/s]');

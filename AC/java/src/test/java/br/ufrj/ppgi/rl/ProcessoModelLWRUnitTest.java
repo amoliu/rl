@@ -4,6 +4,8 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Assert;
 import org.junit.Test;
 
+import br.ufrj.ppgi.rl.fa.LLRMemoryManagement;
+
 public class ProcessoModelLWRUnitTest
 {
 
@@ -215,6 +217,7 @@ public class ProcessoModelLWRUnitTest
     specification.setProcessModelCrossLimit(10);
     specification.setProcessModelThreshold(0.5);
     specification.setProcessModelUpperBound(new double[][] { { 20, 0 } });
+    specification.setProcessModelMemoryManagement(LLRMemoryManagement.LLR_MEMORY_PREDICTION);
 
     return specification;
   }

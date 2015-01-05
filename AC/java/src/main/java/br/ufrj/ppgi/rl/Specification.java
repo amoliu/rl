@@ -4,79 +4,87 @@ import java.io.Serializable;
 
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.rl.fa.LLRMemoryManagement;
+
 public class Specification implements Serializable
 {
-  private static final long serialVersionUID = 3994811158443931724L;
+  private static final long   serialVersionUID = -4101879734249891756L;
 
-  private int               actorMemory;
+  private int                 actorMemory;
 
-  private double            actorAlpha;
+  private double              actorAlpha;
 
-  private int               actorNeighbors;
+  private int                 actorNeighbors;
 
-  private SimpleMatrix      actorMin;
+  private SimpleMatrix        actorMin;
 
-  private SimpleMatrix      actorMax;
+  private SimpleMatrix        actorMax;
 
-  private SimpleMatrix      actorRange;
+  private SimpleMatrix        actorRange;
 
-  private int               actorValuesToRebuildTree;
+  private int                 actorValuesToRebuildTree;
 
-  private double            criticInitialValue;
+  private LLRMemoryManagement actorMemoryManagement;
 
-  private int               criticMemory;
+  private double              criticInitialValue;
 
-  private double            criticAlpha;
+  private int                 criticMemory;
 
-  private int               criticNeighbors;
+  private double              criticAlpha;
 
-  private int               criticValuesToRebuildTree;
+  private int                 criticNeighbors;
 
-  private int               observationDimensions;
+  private int                 criticValuesToRebuildTree;
 
-  private int               actionDimensions;
+  private LLRMemoryManagement criticMemoryManagement;
 
-  private float             lamda;
+  private int                 observationDimensions;
 
-  private float             gamma;
+  private int                 actionDimensions;
 
-  private float             sd;
+  private float               lamda;
 
-  private int               processModelMemory;
+  private float               gamma;
 
-  private int               processModelNeighbors;
+  private float               sd;
 
-  private double            processModelCrossLimit;
+  private int                 processModelMemory;
 
-  private SimpleMatrix      processModelUpperBound;
+  private int                 processModelNeighbors;
 
-  private double            processModelThreshold;
+  private double              processModelCrossLimit;
 
-  private int               processModelStepsPerEpisode;
+  private SimpleMatrix        processModelUpperBound;
 
-  private double            processModelCriticAlpha;
+  private double              processModelThreshold;
 
-  private double            processModelActorAplha;
+  private int                 processModelStepsPerEpisode;
 
-  private double            processModelGamma;
+  private double              processModelCriticAlpha;
 
-  private int               processModelValuesToRebuildTree;
+  private double              processModelActorAplha;
 
-  private int               processModelIterationsWithoutLearning;
+  private double              processModelGamma;
 
-  private int               processModelExplorationRate;
+  private int                 processModelValuesToRebuildTree;
 
-  private float             processModelSd;
+  private int                 processModelIterationsWithoutLearning;
 
-  private SimpleMatrix      observationMinValue;
+  private int                 processModelExplorationRate;
 
-  private SimpleMatrix      observationMaxValue;
+  private float               processModelSd;
 
-  private SimpleMatrix      observationRange;
+  private LLRMemoryManagement processModelMemoryManagement;
 
-  private double            rewardRange;
+  private SimpleMatrix        observationMinValue;
 
-  private int               explorationRate;
+  private SimpleMatrix        observationMaxValue;
+
+  private SimpleMatrix        observationRange;
+
+  private double              rewardRange;
+
+  private int                 explorationRate;
 
   public int getActorMemory()
   {
@@ -451,5 +459,35 @@ public class Specification implements Serializable
   public void setProcessModelSd(float processModelSd)
   {
     this.processModelSd = processModelSd;
+  }
+
+  public LLRMemoryManagement getActorMemoryManagement()
+  {
+    return actorMemoryManagement;
+  }
+
+  public void setActorMemoryManagement(LLRMemoryManagement actorMemoryManagement)
+  {
+    this.actorMemoryManagement = actorMemoryManagement;
+  }
+
+  public LLRMemoryManagement getCriticMemoryManagement()
+  {
+    return criticMemoryManagement;
+  }
+
+  public void setCriticMemoryManagement(LLRMemoryManagement criticMemoryManagement)
+  {
+    this.criticMemoryManagement = criticMemoryManagement;
+  }
+
+  public LLRMemoryManagement getProcessModelMemoryManagement()
+  {
+    return processModelMemoryManagement;
+  }
+
+  public void setProcessModelMemoryManagement(LLRMemoryManagement processModelMemoryManagement)
+  {
+    this.processModelMemoryManagement = processModelMemoryManagement;
   }
 }

@@ -5,7 +5,7 @@ import java.util.Random;
 import org.apache.commons.lang3.time.StopWatch;
 import org.ejml.simple.SimpleMatrix;
 
-import br.ufrj.ppgi.rl.fa.LLR;
+import br.ufrj.ppgi.rl.fa.LWR;
 
 public class LLRPerformanceTest
 {
@@ -25,7 +25,13 @@ public class LLRPerformanceTest
     long queryTime = 0;
 
     Random rand = new Random();
-    LLR llr = new LLR(size, inputDimension, outputDimension, neighbors, initialValue, neighbors);
+    LWR llr = LWR.createLLR()
+                 .setSize(size)
+                 .setInputDimension(inputDimension)
+                 .setOutputDimension(outputDimension)
+                 .setK(neighbors)
+                 .setInitialValue(initialValue)
+                 .setValuesToRebuildTheTree(neighbors);
 
     StopWatch watch = new StopWatch();
 

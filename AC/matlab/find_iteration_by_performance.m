@@ -1,7 +1,7 @@
-function [m, c] = find_iteration_by_performance(experiments, desired_performance, trials_in_a_row)
+function [m, c, p] = find_iteration_by_performance(experiments, desired_performance, trials_in_a_row)
     [trials, episodes] = size(experiments);
     
-    performance = zeros(trials, 1);
+    performance = [];
     
     for i=1:trials
         above = 0;
@@ -16,9 +16,13 @@ function [m, c] = find_iteration_by_performance(experiments, desired_performance
                 break;
             end
         end
-        performance(i) = j;
+        
+        if j ~= episodes
+            performance = [performance; j];
+        end
     end
     
+    p = numel(performance) / trials;
     m = mean(performance);
-    c = 1.96.*std(performance)./sqrt(trials);
+    c = 1.96.*std(performance)./sqrt(numel(performance));
 end

@@ -1,5 +1,7 @@
 package br.ufrj.ppgi.rl.fa;
 
+import static br.ufrj.ppgi.rl.fa.LLRMemoryManagement.LLR_MEMORY_EVENLY;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,107 +23,172 @@ import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 
 public class LWR implements Serializable
 {
-  private static final long            serialVersionUID      = 1741267570461500906L;
+  private static final long                serialVersionUID          = 1243362004074465105L;
 
-  private static final double          DEFAUL_RIDGE          = 0.000001d;
+  private static final double              DEFAUL_RIDGE              = 0.000001d;
 
-  private static final double          DEFAUL_GAMMA          = 0.9d;
+  private static final double              DEFAUL_GAMMA              = 0.9d;
 
-  private static final double          DEFAULT_INITIAL_VALUE = 0;
+  private static final double              DEFAULT_INITIAL_VALUE     = 0;
 
-  private static final double          BIAS                  = 1d;
+  private static final LLRMemoryManagement DEFAULT_MEMORY_MANAGEMENT = LLR_MEMORY_EVENLY;
 
-  protected SimpleMatrix               dataInput;
+  private static final double              BIAS                      = 1d;
 
-  protected SimpleMatrix               dataOutput;
+  protected SimpleMatrix                   dataInput;
 
-  protected double[]                   relevance;
+  protected SimpleMatrix                   dataOutput;
 
-  protected int                        size;
+  protected double[]                       relevance;
 
-  private int                          input_dimension;
+  protected int                            size;
 
-  private int                          output_dimension;
+  private int                              input_dimension;
 
-  private int                          k;
+  private int                              output_dimension;
 
-  private double                       ridge;
+  private int                              k;
 
-  private double                       gamma;
+  private double                           ridge;
 
-  protected int                        last_llr;
+  private double                           gamma;
 
-  private double                       initial_value;
+  protected int                            last_llr;
 
-  private KdTree<Integer>              tree;
+  private double                           initial_value;
 
-  private DistanceFunction             distanceFunction;
+  private KdTree<Integer>                  tree;
 
-  private int                          tree_size;
+  private DistanceFunction                 distanceFunction;
 
-  private LinearSolver<DenseMatrix64F> solver;
+  private int                              tree_size;
 
-  private Random                       random;
+  private LinearSolver<DenseMatrix64F>     solver;
 
-  private LWRWeightFunction            weightFunction;
+  private Random                           random;
 
-  private int                          valuesToRebuildTree;
+  private LWRWeightFunction                weightFunction;
 
-  public LWR(int size, int input_dimensions, int output_dimensions, int k)
+  private int                              valuesToRebuildTree;
+
+  private LLRMemoryManagement              memoryManagement;
+
+  protected LWR()
   {
-    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_RIDGE, DEFAUL_GAMMA, k);
+  };
+
+  private static LWR create()
+  {
+    LWR lwr = new LWR();
+
+    lwr.initial_value = DEFAULT_INITIAL_VALUE;
+    lwr.ridge = DEFAUL_RIDGE;
+    lwr.gamma = DEFAUL_GAMMA;
+
+    lwr.last_llr = 0;
+    lwr.random = new Random();
+
+    lwr.distanceFunction = new SquareEuclideanDistanceFunction();
+    lwr.tree_size = 0;
+    lwr.memoryManagement = DEFAULT_MEMORY_MANAGEMENT;
+
+    return lwr;
   }
 
-  public LWR(int size, int input_dimensions, int output_dimensions, int k, int valuesToRebuildTree)
+  public static LWR createLWR()
   {
-    this(size, input_dimensions, output_dimensions, k, DEFAULT_INITIAL_VALUE, DEFAUL_RIDGE, DEFAUL_GAMMA,
-         valuesToRebuildTree);
+    return LWR.create().setWeightFunction(new br.ufrj.ppgi.rl.fa.DistanceFunction());
   }
 
-  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, int valuesToRebuildTree)
+  public static LWR createLLR()
   {
-    this(size, input_dimensions, output_dimensions, k, initial_value, DEFAUL_RIDGE, DEFAUL_GAMMA, valuesToRebuildTree);
+    return LWR.create().setWeightFunction(new br.ufrj.ppgi.rl.fa.ConstantFunction());
   }
 
-  public LWR(int size, int input_dimensions, int output_dimensions, int k, double initial_value, double ridge,
-             double gamma, int valuesToRebuildTree)
+  public LWR setK(int k)
   {
     if (k <= 1)
       throw new IllegalArgumentException("K must be greater than one");
 
-    if (input_dimensions <= 0)
+    this.k = k;
+    return this;
+  }
+
+  public LWR setInputDimension(int input_dimension)
+  {
+    if (input_dimension <= 0)
       throw new IllegalArgumentException("Input must be greater than zero");
 
-    if (output_dimensions <= 0)
-      throw new IllegalArgumentException("Output must be greater than zero");
-
-    this.size = size;
-    this.input_dimension = input_dimensions;
-    this.output_dimension = output_dimensions;
-    this.initial_value = initial_value;
-    this.k = k;
-    this.ridge = ridge;
-    this.gamma = gamma;
-
-    this.dataInput = new SimpleMatrix(size, input_dimensions);
+    this.input_dimension = input_dimension;
+    this.dataInput = new SimpleMatrix(size, input_dimension);
     this.dataInput.zero();
 
-    this.dataOutput = new SimpleMatrix(size, output_dimensions);
-    this.dataOutput.zero();
-
-    this.relevance = new double[size];
-
-    this.last_llr = 0;
-    this.random = new Random();
-
     buildKDTree();
-    distanceFunction = new SquareEuclideanDistanceFunction();
-    tree_size = 0;
-    this.valuesToRebuildTree = valuesToRebuildTree;
-
     solver = LinearSolverFactory.symmPosDef(input_dimension + 1);
 
-    weightFunction = new br.ufrj.ppgi.rl.fa.DistanceFunction();
+    return this;
+  }
+
+  public LWR setOutputDimension(int output_dimension)
+  {
+    if (output_dimension <= 0)
+      throw new IllegalArgumentException("Output must be greater than zero");
+
+    this.output_dimension = output_dimension;
+    this.dataOutput = new SimpleMatrix(size, output_dimension);
+    this.dataOutput.zero();
+
+    return this;
+  }
+
+  public LWR setSize(int size)
+  {
+    this.size = size;
+    this.relevance = new double[size];
+
+    return this;
+  }
+
+  public LWR setInitialValue(double initial_value)
+  {
+    this.initial_value = initial_value;
+
+    return this;
+  }
+
+  public LWR setRidge(double ridge)
+  {
+    this.ridge = ridge;
+
+    return this;
+  }
+
+  public LWR setGamma(double gamma)
+  {
+    this.gamma = gamma;
+
+    return this;
+  }
+
+  public LWR setMemoryManagement(LLRMemoryManagement memoryManagement)
+  {
+    this.memoryManagement = memoryManagement;
+
+    return this;
+  }
+
+  public LWR setWeightFunction(LWRWeightFunction weightFunction)
+  {
+    this.weightFunction = weightFunction;
+
+    return this;
+  }
+
+  public LWR setValuesToRebuildTheTree(int valuesToRebuildTree)
+  {
+    this.valuesToRebuildTree = valuesToRebuildTree;
+
+    return this;
   }
 
   /**
@@ -135,7 +202,12 @@ public class LWR implements Serializable
   public int add(SimpleMatrix input, SimpleMatrix output)
   {
     int pos = 0;
-    double rel = updateRelevanceForPoint(input, output);
+    double rel = 0;
+
+    if (!memoryManagement.equals(LLRMemoryManagement.LLR_MEMORY_RANDOM))
+    {
+      rel = updateRelevanceForPoint(input, output);
+    }
 
     if (last_llr < size)
     {
@@ -144,9 +216,17 @@ public class LWR implements Serializable
     }
     else
     {
-      pos = positionLessRelevant();
-      //if (rel <= relevance[pos])
-      //  return -1;
+      if (memoryManagement.equals(LLRMemoryManagement.LLR_MEMORY_RANDOM))
+      {
+        pos = random.nextInt(size);
+      }
+      else
+      {
+        pos = positionLessRelevant();
+      }
+
+      // if (rel <= relevance[pos])
+      // return -1;
     }
 
     relevance[pos] = rel;
@@ -387,24 +467,69 @@ public class LWR implements Serializable
 
     ArrayList<Integer> neighbors = getNeighbors(input);
 
+    switch (memoryManagement)
+    {
+      case LLR_MEMORY_EVENLY:
+        updateRelevanceEvenly(neighbors);
+        return calculateRelevanceEvenly(neighbors, input);
+
+      case LLR_MEMORY_PREDICTION:
+        updateRelevancePrediction(neighbors);
+        SimpleMatrix predict_value = queryForNeighbors(input, neighbors).getResult();
+        
+        return calculateRelevancePrediction(output, predict_value);
+
+      default:
+        return 0;
+    }
+  }
+
+  private void updateRelevancePrediction(ArrayList<Integer> neighbors)
+  {
     for (int n = 0; n < neighbors.size(); n++)
     {
       Integer pos = neighbors.get(n);
-
       SimpleMatrix query = dataInput.extractVector(true, pos);
+      
       SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
-
       SimpleMatrix real_value = dataOutput.extractVector(true, pos);
-
-      double rel = Math.pow(NormOps.normP2(real_value.minus(predict_value).getMatrix()), 2);
-
+  
       dataOutput.setRow(pos, 0, predict_value.getMatrix().data);
-
+      
+      double rel = calculateRelevancePrediction(real_value, predict_value);
+  
       relevance[pos] = gamma * relevance[pos] + (1 - gamma) * rel;
     }
+  }
+  
+  private double calculateRelevancePrediction(SimpleMatrix input, SimpleMatrix output)
+  {
+    return Math.pow(NormOps.normP2(input.minus(output).getMatrix()), 2);
+  }
 
-    SimpleMatrix predict_value = queryForNeighbors(input, neighbors).getResult();
-    return Math.pow(NormOps.normP2(output.minus(predict_value).getMatrix()), 2);
+  private void updateRelevanceEvenly(ArrayList<Integer> neighbors)
+  {
+    for (int n = 0; n < neighbors.size(); n++)
+    {
+      Integer pos = neighbors.get(n);
+      SimpleMatrix query = dataInput.extractVector(true, pos);
+  
+      double averageDistance = calculateRelevanceEvenly(neighbors, query);
+  
+      relevance[pos] = averageDistance;
+    }
+  }
+
+  private double calculateRelevanceEvenly(ArrayList<Integer> neighbors, SimpleMatrix query)
+  {
+    double averageDistance = 0;
+    for (Integer n : neighbors)
+    {
+      SimpleMatrix neighbor = dataInput.extractVector(true, n);
+      averageDistance += NormOps.normP2(query.minus(neighbor).getMatrix());
+    }
+    averageDistance /= neighbors.size();
+    return averageDistance;
   }
 
   protected boolean hasEnoughNeighbors()
@@ -446,7 +571,7 @@ public class LWR implements Serializable
       tree.addPoint(dataInput.extractVector(true, i).getMatrix().data, i);
     }
   }
-
+  
   public void setRandom(Random random)
   {
     this.random = random;
@@ -480,10 +605,5 @@ public class LWR implements Serializable
   public LWRWeightFunction getWeightFunction()
   {
     return weightFunction;
-  }
-
-  public void setWeightFunction(LWRWeightFunction weightFunction)
-  {
-    this.weightFunction = weightFunction;
   }
 }

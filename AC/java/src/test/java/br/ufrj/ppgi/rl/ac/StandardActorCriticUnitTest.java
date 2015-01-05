@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import br.ufrj.ppgi.rl.Specification;
+import br.ufrj.ppgi.rl.fa.LLRMemoryManagement;
 
 public class StandardActorCriticUnitTest
 {
@@ -60,11 +61,13 @@ public class StandardActorCriticUnitTest
     specification.setCriticNeighbors(2);
     specification.setCriticInitialValue(0);
     specification.setCriticValuesToRebuildTree(2);
+    specification.setCriticMemoryManagement(LLRMemoryManagement.LLR_MEMORY_PREDICTION);
 
     specification.setActorAlpha(0.1);
     specification.setActorMemory(10);
     specification.setActorNeighbors(2);
     specification.setActorValuesToRebuildTree(2);
+    specification.setActorMemoryManagement(LLRMemoryManagement.LLR_MEMORY_PREDICTION);
     SimpleMatrix actorMin = new SimpleMatrix(1, 1);
     actorMin.set(0, -3);
 

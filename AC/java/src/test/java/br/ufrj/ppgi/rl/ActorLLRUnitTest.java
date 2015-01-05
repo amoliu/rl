@@ -4,6 +4,8 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Assert;
 import org.junit.Test;
 
+import br.ufrj.ppgi.rl.fa.LLRMemoryManagement;
+
 public class ActorLLRUnitTest
 {
   private static final double DELTA = 0.1d;
@@ -159,6 +161,7 @@ public class ActorLLRUnitTest
     specification.setActorMemory(10);
     specification.setActorNeighbors(2);
     specification.setActorValuesToRebuildTree(2);
+    specification.setActorMemoryManagement(LLRMemoryManagement.LLR_MEMORY_PREDICTION);
     specification.setSd(1f);
     return specification;
   }
