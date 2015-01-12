@@ -328,9 +328,11 @@ public class LWR implements Serializable
   {
     if (!hasEnoughNeighbors())
     {
-      SimpleMatrix result = SimpleMatrix.random(1, output_dimension, 0, 1, random);
-      SimpleMatrix x = SimpleMatrix.random(output_dimension, input_dimension + 1, 0, 1, random).plus(initial_value);
-      result = result.plus(initial_value);
+      SimpleMatrix result = new SimpleMatrix(1, output_dimension);
+      result.zero();
+      
+      SimpleMatrix x = new SimpleMatrix(output_dimension, input_dimension + 1);
+      x.zero();
 
       SimpleMatrix variance = new SimpleMatrix(1, output_dimension);
       variance.set(Double.MAX_VALUE);
