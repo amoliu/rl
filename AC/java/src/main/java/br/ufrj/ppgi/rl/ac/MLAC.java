@@ -63,6 +63,8 @@ public class MLAC implements Agent
     actor.init(specification);
     critic.init(specification);
     processModel.init(specification);
+    
+    step = 0;
   }
 
   @Override
@@ -70,8 +72,6 @@ public class MLAC implements Agent
   {
     lastObservation = new SimpleMatrix(observation);
     critic.resetEligibilityTrace();
-
-    step = 0;
 
     return new StepVO(chooseAction(lastObservation));
   }
