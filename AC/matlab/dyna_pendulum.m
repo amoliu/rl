@@ -63,11 +63,11 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     javaSpec.setProcessModelExplorationRate(2);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
-    javaSpec.setSd(2.0);
+    javaSpec.setSd(3.0);
     javaSpec.setProcessModelSd(1.0);
     
-    javaSpec.setProcessModelMemory(100);
-    javaSpec.setProcessModelNeighbors(9);
+    javaSpec.setProcessModelMemory(500);
+    javaSpec.setProcessModelNeighbors(10);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
@@ -77,8 +77,8 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     javaSpec.setProcessModelThreshold(0.5);
     
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
-    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1000);
-    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1000);
+    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/100);
+    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/100);
     javaSpec.setProcessModelGamma(0.97);
     javaSpec.setProcessModelIterationsWithoutLearning(0);
     javaSpec.setRewardRange((spec.reward_max - spec.reward_min));

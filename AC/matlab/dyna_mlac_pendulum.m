@@ -43,31 +43,31 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.005);
+    javaSpec.setActorAlpha(0.05);
     javaSpec.setActorMemory(2000);
-    javaSpec.setActorNeighbors(9);
+    javaSpec.setActorNeighbors(25);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(1);
     
     javaSpec.setCriticInitialValue(0);
-    javaSpec.setCriticAlpha(0.1);
+    javaSpec.setCriticAlpha(0.3);
     javaSpec.setCriticMemory(2000);
-    javaSpec.setCriticNeighbors(20);
+    javaSpec.setCriticNeighbors(15);
     javaSpec.setCriticValuesToRebuildTree(1);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
 
     javaSpec.setExplorationRate(1);
-    javaSpec.setProcessModelExplorationRate(2);
+    javaSpec.setProcessModelExplorationRate(3);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
-    javaSpec.setSd(2.0);
+    javaSpec.setSd(1.0);
     javaSpec.setProcessModelSd(1.0);
     
-    javaSpec.setProcessModelMemory(100);
-    javaSpec.setProcessModelNeighbors(9);
+    javaSpec.setProcessModelMemory(500);
+    javaSpec.setProcessModelNeighbors(10);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
@@ -77,10 +77,10 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelThreshold(0.5);
         
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
-    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1000);
-    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1000);
+    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/100);
+    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/100);
     javaSpec.setProcessModelGamma(0.97);
-    javaSpec.setProcessModelIterationsWithoutLearning(0);
+    javaSpec.setProcessModelIterationsWithoutLearning(2);
     javaSpec.setRewardRange((spec.reward_max - spec.reward_min));
        
     agent = br.ufrj.ppgi.rl.ac.DynaMLAC;
