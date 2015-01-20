@@ -4,7 +4,7 @@ close all;
 path = make_save_folder('mlac');
 
 episodes = 600;
-trials = 25;
+trials = 40;
 
 cr = zeros(trials,episodes);
 rmse = zeros(trials,episodes);
