@@ -33,8 +33,8 @@ function [critic, actor, cr] = sac_cartpole(varargin)
     javaSpec.setActorValuesToRebuildTree(1);
     
     javaSpec.setCriticInitialValue(0);
-    javaSpec.setCriticAlpha(0.15);
-    javaSpec.setCriticMemory(8000);
+    javaSpec.setCriticAlpha(0.2);
+    javaSpec.setCriticMemory(8500);
     javaSpec.setCriticNeighbors(20);
     javaSpec.setCriticValuesToRebuildTree(1);
 
@@ -42,9 +42,9 @@ function [critic, actor, cr] = sac_cartpole(varargin)
     javaSpec.setActionDimensions(spec.action_dims);
 
     javaSpec.setExplorationRate(1);
-    javaSpec.setLamda(0.67);
-    javaSpec.setGamma(0.97);
-    javaSpec.setSd(1.0);
+    javaSpec.setLamda(0.62);
+    javaSpec.setGamma(0.87);
+    javaSpec.setSd(2.0);
     
     agent = br.ufrj.ppgi.rl.ac.StandardActorCritic;
     agent.init(javaSpec);
