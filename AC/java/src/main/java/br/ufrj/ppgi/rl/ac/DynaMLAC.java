@@ -2,7 +2,6 @@ package br.ufrj.ppgi.rl.ac;
 
 import org.ejml.simple.SimpleMatrix;
 
-import br.ufrj.ppgi.rl.ProcessModelQueryVO;
 import br.ufrj.ppgi.rl.Specification;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
@@ -64,7 +63,7 @@ public class DynaMLAC extends MLAC
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
       SimpleMatrix action = chooseAction(lastModelObservation, i);
-      ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
+      LWRQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
       // If the variance is greater exceeds the range of state params, restart
       // model
@@ -75,19 +74,19 @@ public class DynaMLAC extends MLAC
         continue;
       }
 
-      LWRQueryVO criticResult = critic.query(modelQuery.getLWRQueryVO().getResult());
+      LWRQueryVO criticResult = critic.query(modelQuery.getResult());
 
       SimpleMatrix criticXs = getXs(criticResult.getX());
-      SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
+      SimpleMatrix modelXa = getXa(modelQuery.getX());
 
       double actorUpdate = criticXs.mult(modelXa).get(0);
       actor.update(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha(), false);
 
-      critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(), modelQuery.getLWRQueryVO()
-                                                                                                    .getResult(),
+      double reward = specification.getRewardCalculator().calculate(lastModelObservation, action);
+      critic.updateWithoutAddSample(lastModelObservation, action, reward, modelQuery.getResult(),
                                     specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
 
-      lastModelObservation = modelQuery.getLWRQueryVO().getResult();
+      lastModelObservation = modelQuery.getResult();
       modelStep++;
 
       // Restart model transition if we had model.steps iterations
@@ -112,19 +111,14 @@ public class DynaMLAC extends MLAC
     }
   }
 
-  private boolean isModelGood(ProcessModelQueryVO modelQuery)
+  private boolean isModelGood(LWRQueryVO modelQuery)
   {
     for (int k = 0; k < specification.getObservationDimensions(); k++)
     {
-      if (modelQuery.getLWRQueryVO().getVariance().get(k) > specification.getObservationRange().get(k))
+      if (modelQuery.getVariance().get(k) > specification.getObservationRange().get(k))
       {
         return false;
       }
-    }
-
-    if (modelQuery.getLWRQueryVO().getVariance().get(specification.getObservationDimensions()) > specification.getRewardRange())
-    {
-      return false;
     }
 
     return true;

@@ -4,7 +4,6 @@ import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.rl.ProcessModelLWR;
-import br.ufrj.ppgi.rl.ProcessModelQueryVO;
 import br.ufrj.ppgi.rl.Specification;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
@@ -54,11 +53,11 @@ public class DynaActorCritic extends StandardActorCritic
     SimpleMatrix matrixObservation = new SimpleMatrix(observation);
     super.update(reward, matrixObservation);
 
-    LWRQueryVO modelVO = processModel.query(lastObservation, lastAction).getLWRQueryVO();
+    LWRQueryVO modelVO = processModel.query(lastObservation, lastAction);
     SimpleMatrix model = modelVO.getResult();
     double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
 
-    processModel.add(lastObservation, lastAction, matrixObservation, reward);
+    processModel.add(lastObservation, lastAction, matrixObservation);
     int modelSkiped = updateUsingModel();
 
     lastObservation = matrixObservation;
@@ -82,7 +81,7 @@ public class DynaActorCritic extends StandardActorCritic
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
       SimpleMatrix action = chooseAction(lastModelObservation, i);
-      ProcessModelQueryVO modelQuery = processModel.query(lastModelObservation, action);
+      LWRQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
       // If the variance is greater exceeds the range of state params, restart
       // model
@@ -93,8 +92,8 @@ public class DynaActorCritic extends StandardActorCritic
         continue;
       }
 
-      double delta = critic.updateWithoutAddSample(lastModelObservation, action, modelQuery.getReward(),
-                                                   modelQuery.getLWRQueryVO().getResult(),
+      double reward = specification.getRewardCalculator().calculate(lastModelObservation, action);
+      double delta = critic.updateWithoutAddSample(lastModelObservation, action, reward, modelQuery.getResult(),
                                                    specification.getProcessModelCriticAlpha(),
                                                    specification.getProcessModelGamma());
 
@@ -107,7 +106,7 @@ public class DynaActorCritic extends StandardActorCritic
         actor.updateWithoutRandomness(delta, lastModelObservation, action, specification.getProcessModelActorAplha());
       }
 
-      lastModelObservation = modelQuery.getLWRQueryVO().getResult();
+      lastModelObservation = modelQuery.getResult();
       modelStep++;
 
       // Restart model transition if hit a terminal state or
@@ -133,19 +132,14 @@ public class DynaActorCritic extends StandardActorCritic
     }
   }
 
-  private boolean isModelGood(ProcessModelQueryVO modelQuery)
+  private boolean isModelGood(LWRQueryVO modelQuery)
   {
     for (int k = 0; k < specification.getObservationDimensions(); k++)
     {
-      if (modelQuery.getLWRQueryVO().getVariance().get(k) > specification.getObservationRange().get(k))
+      if (modelQuery.getVariance().get(k) > specification.getObservationRange().get(k))
       {
         return false;
       }
-    }
-
-    if (modelQuery.getLWRQueryVO().getVariance().get(specification.getObservationDimensions()) > specification.getRewardRange())
-    {
-      return false;
     }
 
     return true;

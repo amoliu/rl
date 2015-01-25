@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.rl.fa.LLRMemoryManagement;
+import br.ufrj.ppgi.rl.reward.RewardCalculator;
 
 public class Specification implements Serializable
 {
@@ -85,6 +86,8 @@ public class Specification implements Serializable
   private double              rewardRange;
 
   private int                 explorationRate;
+
+  private RewardCalculator    rewardCalculator;
 
   public int getActorMemory()
   {
@@ -489,5 +492,15 @@ public class Specification implements Serializable
   public void setProcessModelMemoryManagement(LLRMemoryManagement processModelMemoryManagement)
   {
     this.processModelMemoryManagement = processModelMemoryManagement;
+  }
+
+  public RewardCalculator getRewardCalculator()
+  {
+    return rewardCalculator;
+  }
+
+  public void setRewardCalculator(RewardCalculator rewardCalculator)
+  {
+    this.rewardCalculator = rewardCalculator;
   }
 }

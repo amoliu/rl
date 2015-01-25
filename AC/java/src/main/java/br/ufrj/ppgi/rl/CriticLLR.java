@@ -56,8 +56,6 @@ public class CriticLLR implements Serializable
     double tdError = reward + specification.getGamma() * valueFunction.getResult().get(0)
                      - oldValueFunction.getResult().get(0);
 
-    // TODO Set ET to zero for the removed point?
-
     // Add to LLR
     int insertIndex = llr.add(lastObservation, oldValueFunction.getResult());
 

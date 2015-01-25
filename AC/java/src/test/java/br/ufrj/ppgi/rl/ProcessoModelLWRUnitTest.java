@@ -25,7 +25,7 @@ public class ProcessoModelLWRUnitTest
 
     SimpleMatrix new_observation = new SimpleMatrix(new double[][] { { 1, 2 } });
 
-    processModelLLR.add(observation, action, new_observation, 0);
+    processModelLLR.add(observation, action, new_observation);
 
     SimpleMatrix inputLLR = processModelLLR.lwr.getDataInput().extractVector(true, 0);
     Assert.assertEquals(19.5, inputLLR.get(0), DELTA);
@@ -60,7 +60,7 @@ public class ProcessoModelLWRUnitTest
 
     SimpleMatrix new_observation = new SimpleMatrix(new double[][] { { 19.5, 2 } });
 
-    processModelLLR.add(observation, action, new_observation, 0);
+    processModelLLR.add(observation, action, new_observation);
 
     SimpleMatrix inputLLR = processModelLLR.lwr.getDataInput().extractVector(true, 0);
     Assert.assertEquals(21, inputLLR.get(0), DELTA);
@@ -95,7 +95,7 @@ public class ProcessoModelLWRUnitTest
 
     SimpleMatrix new_observation = new SimpleMatrix(new double[][] { { 0.2, 2 } });
 
-    processModelLLR.add(observation, action, new_observation, 0);
+    processModelLLR.add(observation, action, new_observation);
 
     SimpleMatrix inputLLR = processModelLLR.lwr.getDataInput().extractVector(true, 0);
     Assert.assertEquals(0.3, inputLLR.get(0), DELTA);
@@ -130,7 +130,7 @@ public class ProcessoModelLWRUnitTest
 
     SimpleMatrix new_observation = new SimpleMatrix(new double[][] { { 19.9, 2 } });
 
-    processModelLLR.add(observation, action, new_observation, 0);
+    processModelLLR.add(observation, action, new_observation);
 
     SimpleMatrix inputLLR = processModelLLR.lwr.getDataInput().extractVector(true, 0);
     Assert.assertEquals(19.7, inputLLR.get(0), DELTA);
@@ -165,12 +165,12 @@ public class ProcessoModelLWRUnitTest
     SimpleMatrix observation = new SimpleMatrix(new double[][] { { 1 } });
     SimpleMatrix action = new SimpleMatrix(new double[][] { { 2 } });
 
-    SimpleMatrix query = processModelLLR.query(observation, action).getLWRQueryVO().getResult();
+    SimpleMatrix query = processModelLLR.query(observation, action).getResult();
     Assert.assertEquals(1, query.get(0), DELTA);
 
     processModelLLR.lwr.setRandom(new RandomMock(-1));
 
-    query = processModelLLR.query(observation, action).getLWRQueryVO().getResult();
+    query = processModelLLR.query(observation, action).getResult();
     Assert.assertEquals(19, query.get(0), DELTA);
   }
 
@@ -188,7 +188,7 @@ public class ProcessoModelLWRUnitTest
 
     SimpleMatrix new_observation = new SimpleMatrix(new double[][] { { 3, 4 } });
 
-    processModelLWR.add(observation, action, new_observation, -50);
+    processModelLWR.add(observation, action, new_observation);
 
     Assert.assertEquals(processModelLWR.lwr.getDataInput().numCols(), 3);
     Assert.assertEquals(processModelLWR.lwr.getDataOutput().numCols(), 3);

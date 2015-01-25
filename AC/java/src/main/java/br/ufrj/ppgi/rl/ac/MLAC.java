@@ -10,7 +10,6 @@ import br.ufrj.ppgi.rl.ActionVO;
 import br.ufrj.ppgi.rl.ActorLLR;
 import br.ufrj.ppgi.rl.CriticLLR;
 import br.ufrj.ppgi.rl.ProcessModelLWR;
-import br.ufrj.ppgi.rl.ProcessModelQueryVO;
 import br.ufrj.ppgi.rl.Specification;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
@@ -63,7 +62,7 @@ public class MLAC implements Agent
     actor.init(specification);
     critic.init(specification);
     processModel.init(specification);
-    
+
     step = 0;
   }
 
@@ -102,20 +101,20 @@ public class MLAC implements Agent
 
   protected double update(double reward, SimpleMatrix observation)
   {
-    ProcessModelQueryVO modelQuery = processModel.query(lastObservation, lastAction);
-    processModel.add(lastObservation, lastAction, observation, reward);
+    LWRQueryVO modelQuery = processModel.query(lastObservation, lastAction);
+    processModel.add(lastObservation, lastAction, observation);
 
-    LWRQueryVO criticResult = critic.query(modelQuery.getLWRQueryVO().getResult());
+    LWRQueryVO criticResult = critic.query(modelQuery.getResult());
 
     SimpleMatrix criticXs = getXs(criticResult.getX());
-    SimpleMatrix modelXa = getXa(modelQuery.getLWRQueryVO().getX());
+    SimpleMatrix modelXa = getXa(modelQuery.getX());
 
     double actorUpdate = criticXs.mult(modelXa).get(0);
     actor.update(actorUpdate, lastObservation, lastAction, false);
 
     critic.update(lastObservation, lastAction, reward, observation);
 
-    return Math.pow(NormOps.normP2(observation.minus(modelQuery.getLWRQueryVO().getResult()).getMatrix()), 2);
+    return Math.pow(NormOps.normP2(observation.minus(modelQuery.getResult()).getMatrix()), 2);
   }
 
   protected double[][] chooseAction(SimpleMatrix observation)

@@ -225,8 +225,8 @@ public class LWR implements Serializable
         pos = positionLessRelevant();
       }
 
-      // if (rel <= relevance[pos])
-      // return -1;
+      if (rel <= relevance[pos])
+        return -1;
     }
 
     relevance[pos] = rel;
@@ -330,7 +330,7 @@ public class LWR implements Serializable
     {
       SimpleMatrix result = new SimpleMatrix(1, output_dimension);
       result.zero();
-      
+
       SimpleMatrix x = new SimpleMatrix(output_dimension, input_dimension + 1);
       x.zero();
 
@@ -469,6 +469,8 @@ public class LWR implements Serializable
 
     ArrayList<Integer> neighbors = getNeighbors(input);
 
+    updateOutputToModelOutput(neighbors);
+    
     switch (memoryManagement)
     {
       case LLR_MEMORY_EVENLY:
@@ -478,11 +480,23 @@ public class LWR implements Serializable
       case LLR_MEMORY_PREDICTION:
         updateRelevancePrediction(neighbors);
         SimpleMatrix predict_value = queryForNeighbors(input, neighbors).getResult();
-        
+
         return calculateRelevancePrediction(output, predict_value);
 
       default:
         return 0;
+    }
+  }
+
+  private void updateOutputToModelOutput(ArrayList<Integer> neighbors)
+  {
+    for (int n = 0; n < neighbors.size(); n++)
+    {
+      Integer pos = neighbors.get(n);
+      SimpleMatrix query = dataInput.extractVector(true, pos);
+
+      SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
+      dataOutput.setRow(pos, 0, predict_value.getMatrix().data);
     }
   }
 
@@ -492,18 +506,18 @@ public class LWR implements Serializable
     {
       Integer pos = neighbors.get(n);
       SimpleMatrix query = dataInput.extractVector(true, pos);
-      
+
       SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
       SimpleMatrix real_value = dataOutput.extractVector(true, pos);
-  
+
       dataOutput.setRow(pos, 0, predict_value.getMatrix().data);
-      
+
       double rel = calculateRelevancePrediction(real_value, predict_value);
-  
+
       relevance[pos] = gamma * relevance[pos] + (1 - gamma) * rel;
     }
   }
-  
+
   private double calculateRelevancePrediction(SimpleMatrix input, SimpleMatrix output)
   {
     return Math.pow(NormOps.normP2(input.minus(output).getMatrix()), 2);
@@ -515,9 +529,9 @@ public class LWR implements Serializable
     {
       Integer pos = neighbors.get(n);
       SimpleMatrix query = dataInput.extractVector(true, pos);
-  
+
       double averageDistance = calculateRelevanceEvenly(neighbors, query);
-  
+
       relevance[pos] = averageDistance;
     }
   }
@@ -573,7 +587,7 @@ public class LWR implements Serializable
       tree.addPoint(dataInput.extractVector(true, i).getMatrix().data, i);
     }
   }
-  
+
   public void setRandom(Random random)
   {
     this.random = random;

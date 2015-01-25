@@ -19,72 +19,66 @@ public class ProcessModelLWR implements Serializable
   {
     this.specification = specification;
 
-    lwr = LWR.createLWR()
-             .setSize(specification.getProcessModelMemory())
-             .setInputDimension(getInputDimension())
-             .setOutputDimension(getOutputDimension())
-             .setK(specification.getProcessModelNeighbors())
+    lwr = LWR.createLWR().setSize(specification.getProcessModelMemory()).setInputDimension(getInputDimension())
+             .setOutputDimension(getOutputDimension()).setK(specification.getProcessModelNeighbors())
              .setValuesToRebuildTheTree(specification.getProcessModelValuesToRebuildTree());
-    
+
     if (specification.getProcessModelMemoryManagement() != null)
     {
       lwr.setMemoryManagement(specification.getProcessModelMemoryManagement());
     }
   }
 
-  public ProcessModelQueryVO query(double[][] observation, double[][] action)
+  public LWRQueryVO query(double[][] observation, double[][] action)
   {
     return query(new SimpleMatrix(observation), new SimpleMatrix(action));
   }
 
-  public ProcessModelQueryVO query(SimpleMatrix observation, SimpleMatrix action)
+  public LWRQueryVO query(SimpleMatrix observation, SimpleMatrix action)
   {
     LWRQueryVO query = lwr.query(createProcessoModelInput(observation, action));
-    ProcessModelQueryVO result = decomposeProcessModelOutput(query);
 
-    if (result.getLWRQueryVO().getResult().get(0) < 0)
+    if (query.getResult().get(0) < 0)
     {
-      result.getLWRQueryVO().setResult(result.getLWRQueryVO().getResult()
-                                             .plus(specification.getProcessModelUpperBound()));
+      query.setResult(query.getResult().plus(specification.getProcessModelUpperBound()));
     }
-    if (result.getLWRQueryVO().getResult().get(0) > specification.getProcessModelUpperBound().get(0))
+    if (query.getResult().get(0) > specification.getProcessModelUpperBound().get(0))
     {
-      result.getLWRQueryVO().setResult(result.getLWRQueryVO().getResult()
-                                             .minus(specification.getProcessModelUpperBound()));
+      query.setResult(query.getResult().minus(specification.getProcessModelUpperBound()));
     }
 
-    return result;
+    return query;
   }
 
-  public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation, double reward)
+  public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
   {
     if (nextObservation.get(0) - observation.get(0) < -specification.getProcessModelCrossLimit())
     {
-      addToLLR(observation, action, nextObservation.plus(specification.getProcessModelUpperBound()), reward);
-      addToLLR(observation.minus(specification.getProcessModelUpperBound()), action, nextObservation, reward);
+      addToLLR(observation, action, nextObservation.plus(specification.getProcessModelUpperBound()));
+      addToLLR(observation.minus(specification.getProcessModelUpperBound()), action, nextObservation);
     }
     else
       if (nextObservation.get(0) - observation.get(0) > specification.getProcessModelCrossLimit())
       {
-        addToLLR(observation.plus(specification.getProcessModelUpperBound()), action, nextObservation, reward);
-        addToLLR(observation, action, nextObservation.minus(specification.getProcessModelUpperBound()), reward);
+        addToLLR(observation.plus(specification.getProcessModelUpperBound()), action, nextObservation);
+        addToLLR(observation, action, nextObservation.minus(specification.getProcessModelUpperBound()));
       }
       else
       {
-        addToLLR(observation, action, nextObservation, reward);
+        addToLLR(observation, action, nextObservation);
       }
   }
 
-  private void addToLLR(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation, double reward)
+  private void addToLLR(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
   {
-    lwr.add(createProcessoModelInput(observation, action), createProcessoModelOutput(nextObservation, reward));
+    lwr.add(createProcessoModelInput(observation, action), nextObservation);
 
     if (observation.get(0) - specification.getProcessModelThreshold() < 0)
     {
       SimpleMatrix newObservation = observation.plus(specification.getProcessModelUpperBound());
       SimpleMatrix newNextObservation = nextObservation.plus(specification.getProcessModelUpperBound());
 
-      lwr.add(createProcessoModelInput(newObservation, action), createProcessoModelOutput(newNextObservation, reward));
+      lwr.add(createProcessoModelInput(newObservation, action), newNextObservation);
     }
 
     if (observation.get(0) + specification.getProcessModelThreshold() > specification.getProcessModelUpperBound()
@@ -93,7 +87,7 @@ public class ProcessModelLWR implements Serializable
       SimpleMatrix newObservation = observation.minus(specification.getProcessModelUpperBound());
       SimpleMatrix newNextObservation = nextObservation.minus(specification.getProcessModelUpperBound());
 
-      lwr.add(createProcessoModelInput(newObservation, action), createProcessoModelOutput(newNextObservation, reward));
+      lwr.add(createProcessoModelInput(newObservation, action), newNextObservation);
     }
   }
 
@@ -107,28 +101,6 @@ public class ProcessModelLWR implements Serializable
     return input;
   }
 
-  private SimpleMatrix createProcessoModelOutput(SimpleMatrix observation, double reward)
-  {
-    SimpleMatrix output = new SimpleMatrix(1, getOutputDimension());
-
-    output.setRow(0, 0, observation.getMatrix().data);
-    output.setRow(0, specification.getObservationDimensions(), reward);
-
-    return output;
-  }
-
-  private ProcessModelQueryVO decomposeProcessModelOutput(LWRQueryVO lwrQueryVO)
-  {
-    SimpleMatrix result = lwrQueryVO.getResult();
-    double reward = 0;
-
-    reward = result.get(specification.getObservationDimensions());
-
-    lwrQueryVO.setResult(lwrQueryVO.getResult().extractMatrix(0, 1, 0, specification.getObservationDimensions()));
-
-    return new ProcessModelQueryVO(lwrQueryVO, reward);
-  }
-
   public LWR getLWR()
   {
     return lwr;
@@ -136,7 +108,7 @@ public class ProcessModelLWR implements Serializable
 
   protected int getOutputDimension()
   {
-    return specification.getObservationDimensions() + 1;
+    return specification.getObservationDimensions();
   }
 
   protected int getInputDimension()
