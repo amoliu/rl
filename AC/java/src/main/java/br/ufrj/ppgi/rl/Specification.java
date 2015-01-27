@@ -89,6 +89,8 @@ public class Specification implements Serializable
 
   private RewardCalculator    rewardCalculator;
 
+  private SimpleMatrix        normalization;
+
   public int getActorMemory()
   {
     return actorMemory;
@@ -502,5 +504,15 @@ public class Specification implements Serializable
   public void setRewardCalculator(RewardCalculator rewardCalculator)
   {
     this.rewardCalculator = rewardCalculator;
+  }
+
+  public SimpleMatrix getNormalization()
+  {
+    return normalization;
+  }
+
+  public void setNormalization(double[][] normalization)
+  {
+    this.normalization = new SimpleMatrix(normalization);
   }
 }

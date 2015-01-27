@@ -3,6 +3,7 @@ package br.ufrj.ppgi.rl.ac;
 import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.ProcessModelLWR;
 import br.ufrj.ppgi.rl.Specification;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
@@ -92,7 +93,9 @@ public class DynaActorCritic extends StandardActorCritic
         continue;
       }
 
-      double reward = specification.getRewardCalculator().calculate(lastModelObservation, action);
+      SimpleMatrix denormalizedObservation = EJMLMatlabUtils.denormalize(lastModelObservation, specification.getNormalization());
+      double reward = specification.getRewardCalculator().calculate(denormalizedObservation, action);
+      
       double delta = critic.updateWithoutAddSample(lastModelObservation, action, reward, modelQuery.getResult(),
                                                    specification.getProcessModelCriticAlpha(),
                                                    specification.getProcessModelGamma());

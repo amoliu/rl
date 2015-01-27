@@ -2,6 +2,7 @@ package br.ufrj.ppgi.rl.ac;
 
 import org.ejml.simple.SimpleMatrix;
 
+import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
 import br.ufrj.ppgi.rl.Specification;
 import br.ufrj.ppgi.rl.fa.LWRQueryVO;
 
@@ -82,7 +83,9 @@ public class DynaMLAC extends MLAC
       double actorUpdate = criticXs.mult(modelXa).get(0);
       actor.update(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha(), false);
 
-      double reward = specification.getRewardCalculator().calculate(lastModelObservation, action);
+      SimpleMatrix denormalizedObservation = EJMLMatlabUtils.denormalize(lastModelObservation, specification.getNormalization());
+      double reward = specification.getRewardCalculator().calculate(denormalizedObservation, action);
+      
       critic.updateWithoutAddSample(lastModelObservation, action, reward, modelQuery.getResult(),
                                     specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
 

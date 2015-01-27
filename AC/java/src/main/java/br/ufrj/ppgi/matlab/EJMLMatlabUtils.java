@@ -39,5 +39,20 @@ public class EJMLMatlabUtils implements Serializable
     }
     return value;
   }
+  
+  public static SimpleMatrix denormalize(SimpleMatrix observation, SimpleMatrix normalizationFactor)
+  {
+    SimpleMatrix denormalized = new SimpleMatrix(observation);
+    
+    for (int i = 0; i < observation.numRows(); i++)
+    {
+      for (int j = 0; j < observation.numCols(); j++)
+      {
+        denormalized.set(i, j, observation.get(i, j) * normalizationFactor.get(i, j));
+      }
+    }
+    
+    return denormalized;
+  }
 
 }
