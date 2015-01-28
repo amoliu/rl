@@ -45,7 +45,7 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
 
     javaSpec.setActorAlpha(0.005);
     javaSpec.setActorMemory(2000);
-    javaSpec.setActorNeighbors(9);
+    javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(1);
@@ -60,13 +60,13 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     javaSpec.setActionDimensions(spec.action_dims);
 
     javaSpec.setExplorationRate(1);
-    javaSpec.setProcessModelExplorationRate(3);
+    javaSpec.setProcessModelExplorationRate(1);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
-    javaSpec.setSd(3.0);
+    javaSpec.setSd(1.0);
     javaSpec.setProcessModelSd(1.0);
     
-    javaSpec.setProcessModelMemory(500);
+    javaSpec.setProcessModelMemory(100);
     javaSpec.setProcessModelNeighbors(10);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
@@ -81,7 +81,8 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1000);
     javaSpec.setProcessModelGamma(0.97);
     javaSpec.setProcessModelIterationsWithoutLearning(0);
-    javaSpec.setRewardRange((spec.reward_max - spec.reward_min));
+    javaSpec.setRewardCalculator(br.ufrj.ppgi.rl.reward.RewardCalculator.Pendulum);
+    javaSpec.setNormalization(norm_factor);
        
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
