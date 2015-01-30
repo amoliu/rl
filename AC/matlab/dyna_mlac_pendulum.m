@@ -43,17 +43,17 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.02);
+    javaSpec.setActorAlpha(0.005);
     javaSpec.setActorMemory(2000);
-    javaSpec.setActorNeighbors(25);
+    javaSpec.setActorNeighbors(9);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(1);
     
     javaSpec.setCriticInitialValue(0);
-    javaSpec.setCriticAlpha(0.2);
+    javaSpec.setCriticAlpha(0.1);
     javaSpec.setCriticMemory(2000);
-    javaSpec.setCriticNeighbors(15);
+    javaSpec.setCriticNeighbors(20);
     javaSpec.setCriticValuesToRebuildTree(1);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
@@ -63,11 +63,11 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelExplorationRate(3);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
-    javaSpec.setSd(3.0);
+    javaSpec.setSd(1.0);
     javaSpec.setProcessModelSd(1.0);
     
-    javaSpec.setProcessModelMemory(500);
-    javaSpec.setProcessModelNeighbors(10);
+    javaSpec.setProcessModelMemory(100);
+    javaSpec.setProcessModelNeighbors(9);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
@@ -80,8 +80,9 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1000);
     javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1000);
     javaSpec.setProcessModelGamma(0.97);
-    javaSpec.setProcessModelIterationsWithoutLearning(1);
-    javaSpec.setRewardRange((spec.reward_max - spec.reward_min));
+    javaSpec.setProcessModelIterationsWithoutLearning(0);
+    javaSpec.setRewardCalculator(br.ufrj.ppgi.rl.reward.RewardCalculator.Pendulum);
+    javaSpec.setNormalization(norm_factor);
        
     agent = br.ufrj.ppgi.rl.ac.DynaMLAC;
     agent.init(javaSpec);
