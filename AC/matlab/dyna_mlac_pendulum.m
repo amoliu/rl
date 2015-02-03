@@ -26,6 +26,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
              
     p.addParameter('steps', 2, @isnumeric);
     p.addOptional('episodes', 100, @isnumeric);
+    p.addOptional('alpha', 1000, @isnumeric);
     
     p.addOptional('performance', -900, @isnumeric);
     p.addOptional('trialsInARow', 3, @isnumeric);
@@ -77,8 +78,8 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelThreshold(0.5);
         
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
-    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/1000);
-    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/1000);
+    javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/args.alpha);
+    javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/args.alpha);
     javaSpec.setProcessModelGamma(0.97);
     javaSpec.setProcessModelIterationsWithoutLearning(0);
     javaSpec.setRewardCalculator(br.ufrj.ppgi.rl.reward.RewardCalculator.Pendulum);
