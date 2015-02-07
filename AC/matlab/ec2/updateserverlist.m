@@ -11,7 +11,7 @@ function [s,servers] = updateserverlist(s)
     
     
     for k=1:length(instances)
-        for port=9001:9010
+        for port=9001:9020
             sock = msconnect(instances{k},port);
             if sock ~= -1
                 % Try to make a connection
