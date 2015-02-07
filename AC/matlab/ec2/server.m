@@ -64,15 +64,15 @@ function server(port,debug)
                 if debug
                     fprintf('Received dyna command\n');
                 end
-                [episodes, steps] = deal(received.arguments{:});
-                [~, ~, cr] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', steps, 'verbose', true);
+                [episodes, steps, alpha, explorationRate] = deal(received.arguments{:});
+                [~, ~, cr] = dyna_pendulum('mode', 'episode', 'episodes', episodes, 'steps', steps, 'alpha', alpha, 'explorationRate', explorationRate, 'verbose', true);
                 mssend(sock,cr);
               case {codes.dyna_mlac}
                 if debug
                     fprintf('Received dyna-mlac command\n');
                 end
-                [episodes, steps] = deal(received.arguments{:});
-                [~, ~, cr] = dyna_mlac_pendulum('mode', 'episode', 'episodes', episodes, 'steps', steps, 'verbose', true);
+                [episodes, steps, alpha, explorationRate] = deal(received.arguments{:});
+                [~, ~, cr] = dyna_mlac_pendulum('mode', 'episode', 'episodes', episodes, 'steps', steps, 'alpha', alpha, 'explorationRate', explorationRate, 'verbose', true);
                 mssend(sock,cr);
               case {codes.all}
                 if debug
