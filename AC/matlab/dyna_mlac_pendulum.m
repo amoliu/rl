@@ -26,7 +26,9 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
              
     p.addParameter('steps', 2, @isnumeric);
     p.addOptional('episodes', 100, @isnumeric);
+
     p.addOptional('alpha', 1000, @isnumeric);
+    p.addOptional('explorationRate', 1, @isnumeric);
     
     p.addOptional('performance', -900, @isnumeric);
     p.addOptional('trialsInARow', 3, @isnumeric);
@@ -61,7 +63,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setActionDimensions(spec.action_dims);
 
     javaSpec.setExplorationRate(1);
-    javaSpec.setProcessModelExplorationRate(3);
+    javaSpec.setProcessModelExplorationRate(args.explorationRate);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
     javaSpec.setSd(1.0);
