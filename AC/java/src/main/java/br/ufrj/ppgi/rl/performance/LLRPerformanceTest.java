@@ -19,7 +19,6 @@ public class LLRPerformanceTest
     int inputDimension = 2;
     int outputDimension = 1;
     int neighbors = 15;
-    double initialValue = -1000;
 
     long addTime = 0;
     long queryTime = 0;
@@ -30,7 +29,6 @@ public class LLRPerformanceTest
                  .setInputDimension(inputDimension)
                  .setOutputDimension(outputDimension)
                  .setK(neighbors)
-                 .setInitialValue(initialValue)
                  .setValuesToRebuildTheTree(neighbors);
 
     StopWatch watch = new StopWatch();

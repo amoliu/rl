@@ -5,12 +5,12 @@ clear all;
 close all;
 
 llr = br.ufrj.ppgi.rl.fa.LWR.createLLR;
-llr.setSize(50) ...
+llr.setSize(20) ...
    .setInputDimension(1) ...
    .setOutputDimension(1) ...
    .setK(3) ...
    .setValuesToRebuildTheTree(3) ...
-   .setMemoryManagement(br.ufrj.ppgi.rl.fa.LLRMemoryManagement.LLR_MEMORY_EVENLY);
+   .setMemoryManagement(br.ufrj.ppgi.rl.fa.LLRMemoryManagement.LLR_MEMORY_PREDICTION_NOISE);
 
 figure;       
     
@@ -36,3 +36,4 @@ hold on;
 plot(x, sin(x), 'r');
 plot(x_hat, y_hat, 'b');
 scatter(llr.getMatlabDataInput, llr.getMatlabDataOutput);
+hold off;

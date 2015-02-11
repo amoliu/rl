@@ -59,7 +59,6 @@ public class StandardActorCriticUnitTest
     specification.setCriticAlpha(0.1);
     specification.setCriticMemory(10);
     specification.setCriticNeighbors(2);
-    specification.setCriticInitialValue(0);
     specification.setCriticValuesToRebuildTree(2);
     specification.setCriticMemoryManagement(LLRMemoryManagement.LLR_MEMORY_PREDICTION);
 
