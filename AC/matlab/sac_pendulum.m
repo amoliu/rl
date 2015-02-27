@@ -30,7 +30,7 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
     p.addOptional('figure', false, @islogical);
     p.parse(varargin{:});
     args = p.Results;
-        
+    
     % Initialize environment
     spec = env_mops_sim('init');
     
@@ -46,7 +46,6 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(1);
     
-    javaSpec.setCriticInitialValue(0);
     javaSpec.setCriticAlpha(0.1);
     javaSpec.setCriticMemory(2000);
     javaSpec.setCriticNeighbors(20);
@@ -54,7 +53,7 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
-    
+
     javaSpec.setExplorationRate(1);
     javaSpec.setLamda(0.65);
     javaSpec.setGamma(0.97);
