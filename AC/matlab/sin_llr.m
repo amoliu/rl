@@ -10,7 +10,7 @@ llr.setSize(50) ...
    .setOutputDimension(1) ...
    .setK(3) ...
    .setValuesToRebuildTheTree(3) ...
-   .setMemoryManagement(br.ufrj.ppgi.rl.fa.LLRMemoryManagement.LLR_MEMORY_EVENLY);
+   .setMemoryManagement(br.ufrj.ppgi.rl.fa.LLRMemoryManagement.LLR_MEMORY_PREDICTION);
 
 figure;       
     
@@ -19,11 +19,13 @@ for i=1:numel(x)
     llr.add(x(i), sin(x(i)));
 end
 
-for i=1:numel(x)
-    llr.add(x(i), sin(x(i)));
-    scatter(llr.getMatlabDataInput, llr.getMatlabDataOutput, 30, llr.getRelevance, 'fill');
-    axis([0,8,-1.3,1.3]);
-    M(i)=getframe;
+for j=0:2
+    for i=1:numel(x)
+        llr.add(x(i), sin(x(i)));
+        scatter(llr.getMatlabDataInput, llr.getMatlabDataOutput, 30, llr.getRelevance, 'fill');
+        axis([0,8,-1.3,1.3]);
+        M(j*numel(x) + i)=getframe;
+    end
 end
 
 x_hat = linspace(0,2*pi, 1000);
@@ -36,3 +38,4 @@ hold on;
 plot(x, sin(x), 'r');
 plot(x_hat, y_hat, 'b');
 scatter(llr.getMatlabDataInput, llr.getMatlabDataOutput);
+title('Sin function approximated by LLR using 50 points');
