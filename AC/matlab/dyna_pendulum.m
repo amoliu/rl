@@ -27,7 +27,7 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     p.addParameter('steps', 2, @isnumeric);
     p.addOptional('episodes', 100, @isnumeric);
     
-    p.addOptional('alpha', 1000, @isnumeric);
+    p.addOptional('alpha', 100, @isnumeric);
     p.addOptional('explorationRate', 1, @isnumeric);
     
     p.addOptional('performance', -900, @isnumeric);
@@ -53,7 +53,6 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(1);
     
-    javaSpec.setCriticInitialValue(0);
     javaSpec.setCriticAlpha(0.1);
     javaSpec.setCriticMemory(2000);
     javaSpec.setCriticNeighbors(20);
