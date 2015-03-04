@@ -9,8 +9,8 @@ s = socket_client('/home/bruno/Documentos/aws/home.pem');
 [s,servers] = updateserverlist(s);
 
 trials = 40;
-episodes = 400;
-power_of_two = 20;
+episodes = 300;
+power_of_two = 10;
 
 for k=1:trials
    joblist(k).command = codes.sac;
@@ -27,10 +27,10 @@ end
 save sac.mat sac;
 
 %Dyna
-for step=1:power_of_two
+for step=0:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna;
-       joblist(k).arguments = {episodes, 2^step};
+       joblist(k).arguments = {episodes, 2^step, 100, 1};
     end
 
     [results,finishtimes]  = runjobs(s,joblist,1);
@@ -45,10 +45,10 @@ for step=1:power_of_two
 end
 
 %Dyna-mlac
-for step=11:power_of_two
+for step=0:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna_mlac;
-       joblist(k).arguments = {episodes, 2^step};
+       joblist(k).arguments = {episodes, 2^step, 100, 1};
     end
 
     [results,finishtimes]  = runjobs(s,joblist,1);
