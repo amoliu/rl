@@ -4,17 +4,17 @@ clc;
 
 desired_performance = -1000;
 times_in_row = 3;
-power_of_two=14;
+power_of_two=8;
 
 x = linspace(0, power_of_two, power_of_two+1);
 
 % sac dashed line
-load('../results/sac/sac--40-iterations-600-episodes.mat');
+load('../results/sac/sac-40-iterations-600-episodes.mat');
 [m_sac, c_sac, p_sac] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 disp(strcat('SAC: ', num2str(p_sac * 100), '%'));
 
 % mlac dashed line
-load('../results/mlac/mlac--40-iterations-600-episodes.mat');
+load('../results/mlac/mlac-40-iterations-600-episodes.mat');
 [m_mlac, c_mlac, p_mlac] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 disp(strcat('MLAC: ', num2str(p_mlac * 100), '%'));
 
@@ -28,7 +28,7 @@ m_dyna(1) = m_sac;
 c_dyna(1) = c_sac;
 p_dyna(1) = p_sac;
 for i=1:power_of_two
-    load(strcat(folder, 'dyna-', num2str(2^(i-1)), '-40-iterations-250-episodes.mat'));
+    load(strcat(folder, 'dyna-', num2str(2^(i-1)), '-40-iterations-300-episodes.mat'));
     [m_dyna(i+1), c_dyna(i+1), p_dyna(i+1)] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 end
 
@@ -42,7 +42,7 @@ m_dyna_mlac(1) = m_mlac;
 c_dyna_mlac(1) = c_mlac;
 p_dyna_mlac(1) = p_mlac;
 for i=1:power_of_two
-    load(strcat(folder, 'dyna-mlac-', num2str(2^(i-1)), '-40-iterations-250-episodes.mat'));
+    load(strcat(folder, 'dyna-mlac-', num2str(2^(i-1)), '-40-iterations-300-episodes.mat'));
     [m_dyna_mlac(i+1), c_dyna_mlac(i+1), p_dyna_mlac(i+1)] = find_iteration_by_performance(cr, desired_performance, times_in_row);
 end
 
