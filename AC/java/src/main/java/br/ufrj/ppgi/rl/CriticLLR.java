@@ -72,7 +72,7 @@ public class CriticLLR implements Serializable
     if (insertIndex != -1)
     {
       eligibilityTrace.set(insertIndex, 1);
-      update.set(insertIndex, specification.getCriticAlpha() * tdError);
+      update.set(insertIndex, 0);
     }
 
     llr.update(update);
