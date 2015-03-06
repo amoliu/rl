@@ -94,55 +94,32 @@ public class ActorLLR implements Serializable
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha, boolean randomness)
   {
+    delta = delta * alpha;
+    
     if (randomness)
     {
-      updateWithRandomness(delta, observation, action, alpha);
+      delta = delta * lastRandom;
+      update(delta, observation, action);
     }
     else
     {
-      updateWithoutRandomness(delta, observation, action, alpha);
+      update(delta, observation, action);
     }
-  }
-
-  public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha)
-  {
-    delta = delta * lastRandom * alpha;
-
-    LWRQueryVO queryResult = llr.query(observation);
-    llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
-  }
-
-  public void updateWithoutRandomness(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha)
-  {
-    delta = delta * alpha;
-
-    LWRQueryVO queryResult = llr.query(observation);
-    llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action, boolean randomness)
   {
+    delta = delta * specification.getActorAlpha();
+    
     if (randomness)
     {
-      updateWithRandomness(delta, observation, action);
+      delta = delta * lastRandom;
+      update(delta, observation, action);
     }
     else
     {
-      updateWithoutRandomness(delta, observation, action);
+      update(delta, observation, action);
     }
-  }
-
-  public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
-  {
-    delta = delta * lastRandom * specification.getActorAlpha();
-    update(delta, observation, action);
-  }
-
-  public void updateWithoutRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
-  {
-    delta = delta * specification.getActorAlpha();
-
-    update(delta, observation, action);
   }
 
   private void update(double delta, SimpleMatrix observation, SimpleMatrix action)
@@ -150,7 +127,7 @@ public class ActorLLR implements Serializable
     LWRQueryVO queryResult = llr.query(observation);
     int insertIndex = add(observation, action);
 
-    if (insertIndex != -1)
+    if (insertIndex != -1 && !queryResult.getNeighbors().contains(insertIndex))
       queryResult.getNeighbors().add(insertIndex);
 
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());

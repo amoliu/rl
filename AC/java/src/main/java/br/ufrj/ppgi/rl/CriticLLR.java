@@ -1,6 +1,7 @@
 package br.ufrj.ppgi.rl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -22,19 +23,16 @@ public class CriticLLR implements Serializable
   {
     this.specification = specification;
 
-    llr = LWR.createLLR()
-             .setSize(specification.getCriticMemory())
-             .setInputDimension(specification.getObservationDimensions())
-             .setOutputDimension(1)
-             .setK(specification.getCriticNeighbors())
-             .setInitialValue(this.specification.getCriticInitialValue())
+    llr = LWR.createLLR().setSize(specification.getCriticMemory())
+             .setInputDimension(specification.getObservationDimensions()).setOutputDimension(1)
+             .setK(specification.getCriticNeighbors()).setInitialValue(this.specification.getCriticInitialValue())
              .setValuesToRebuildTheTree(specification.getCriticValuesToRebuildTree());
 
     if (specification.getCriticMemoryManagement() != null)
     {
       llr.setMemoryManagement(specification.getCriticMemoryManagement());
     }
-    
+
     resetEligibilityTrace();
   }
 
@@ -82,15 +80,31 @@ public class CriticLLR implements Serializable
     return tdError;
   }
 
-  public double updateWithoutAddSample(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward,
-                                       SimpleMatrix observation, double alpha, double gamma)
+  public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation,
+                       double alpha, double gamma)
   {
     LWRQueryVO valueFunction = llr.query(observation);
     LWRQueryVO oldValueFunction = llr.query(lastObservation);
 
     double tdError = reward + gamma * valueFunction.getResult().get(0) - oldValueFunction.getResult().get(0);
 
-    llr.update(oldValueFunction.getNeighbors(), alpha * tdError);
+    // Add to LLR
+    int insertIndex = llr.add(lastObservation, oldValueFunction.getResult().plus(tdError));
+
+    ArrayList<Integer> updatedPoints = oldValueFunction.getNeighbors();
+    // also update the insertedIndex
+    if (insertIndex != -1 && !updatedPoints.contains(insertIndex))
+    {
+      updatedPoints.add(insertIndex);
+    }
+
+    SimpleMatrix upperLimit = new SimpleMatrix(1, 1);
+    upperLimit.set(0);
+    
+    SimpleMatrix lowerLimit = new SimpleMatrix(1, 1);
+    lowerLimit.set(Double.NEGATIVE_INFINITY);
+    
+    llr.update(updatedPoints, alpha * tdError, upperLimit, lowerLimit);
 
     return tdError;
   }

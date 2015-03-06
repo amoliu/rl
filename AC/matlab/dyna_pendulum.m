@@ -55,7 +55,7 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     
     javaSpec.setCriticAlpha(0.1);
     javaSpec.setCriticMemory(2000);
-    javaSpec.setCriticNeighbors(20);
+    javaSpec.setCriticNeighbors(10);
     javaSpec.setCriticValuesToRebuildTree(1);
 
     javaSpec.setObservationDimensions(spec.observation_dims);

@@ -83,11 +83,12 @@ public class DynaMLAC extends MLAC
       double actorUpdate = criticXs.mult(modelXa).get(0);
       actor.update(actorUpdate, lastModelObservation, action, specification.getProcessModelActorAplha(), false);
 
-      SimpleMatrix denormalizedObservation = EJMLMatlabUtils.denormalize(lastModelObservation, specification.getNormalization());
+      SimpleMatrix denormalizedObservation = EJMLMatlabUtils.denormalize(lastModelObservation,
+                                                                         specification.getNormalization());
       double reward = specification.getRewardCalculator().calculate(denormalizedObservation, action);
-      
-      critic.updateWithoutAddSample(lastModelObservation, action, reward, modelQuery.getResult(),
-                                    specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
+
+      critic.update(lastModelObservation, action, reward, modelQuery.getResult(),
+                    specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
 
       lastModelObservation = modelQuery.getResult();
       modelStep++;

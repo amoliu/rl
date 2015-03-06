@@ -43,10 +43,10 @@ function [critic, actor, cr, rmse, episodes, skiped] = learn(env_name, norm_fact
     end
     
     if args.figure
-        figure;
-        first_obs = env('start');
-        h = viz(first_obs);
-        title('Training');
+        h = figure;
+        %first_obs = env('start');
+        %h = viz(first_obs);
+        %title('Training');
     end
     
     while while_cond()
@@ -64,8 +64,16 @@ function [critic, actor, cr, rmse, episodes, skiped] = learn(env_name, norm_fact
             norm_obs = obs ./ norm_factor;
 
             if args.figure
-                viz(obs, h);
-                pause(0.005);
+                criticInput = agent.getCritic.getLLR.getMatlabDataInput;
+                criticOutput = agent.getCritic.getLLR.getMatlabDataOutput;
+                scatter(criticInput(:,1), criticInput(:,2), 25, criticOutput, 'filled')
+                title('Critic');
+                xlabel('angle[rad]');
+                ylabel('angular velocity[rad/s]');
+                axis([0, 20, -15, 15]);
+                colorbar;
+                %viz(obs, h);
+                pause(0.05);
             end
             
             if terminal

@@ -93,21 +93,15 @@ public class DynaActorCritic extends StandardActorCritic
         continue;
       }
 
-      SimpleMatrix denormalizedObservation = EJMLMatlabUtils.denormalize(lastModelObservation, specification.getNormalization());
+      SimpleMatrix denormalizedObservation = EJMLMatlabUtils.denormalize(lastModelObservation,
+                                                                         specification.getNormalization());
       double reward = specification.getRewardCalculator().calculate(denormalizedObservation, action);
-      
-      double delta = critic.updateWithoutAddSample(lastModelObservation, action, reward, modelQuery.getResult(),
-                                                   specification.getProcessModelCriticAlpha(),
-                                                   specification.getProcessModelGamma());
 
-      if (i % specification.getExplorationRate() == 0)
-      {
-        actor.updateWithRandomness(delta, lastModelObservation, action, specification.getProcessModelActorAplha());
-      }
-      else
-      {
-        actor.updateWithoutRandomness(delta, lastModelObservation, action, specification.getProcessModelActorAplha());
-      }
+      double delta = critic.update(lastModelObservation, action, reward, modelQuery.getResult(),
+                                   specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
+
+      boolean randomness = i % specification.getExplorationRate() == 0;
+      actor.update(delta, lastModelObservation, action, specification.getProcessModelActorAplha(), randomness);
 
       lastModelObservation = modelQuery.getResult();
       modelStep++;
