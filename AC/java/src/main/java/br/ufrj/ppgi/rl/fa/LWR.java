@@ -29,8 +29,6 @@ public class LWR implements Serializable
 
   private static final double              DEFAUL_GAMMA              = 0.9d;
 
-  private static final double              DEFAULT_INITIAL_VALUE     = 0;
-
   private static final LLRMemoryManagement DEFAULT_MEMORY_MANAGEMENT = LLR_MEMORY_EVENLY;
 
   private static final double              BIAS                      = 1d;
@@ -54,8 +52,6 @@ public class LWR implements Serializable
   private double                           gamma;
 
   protected int                            last_llr;
-
-  private double                           initial_value;
 
   private KdTree<Integer>                  tree;
 
@@ -81,7 +77,6 @@ public class LWR implements Serializable
   {
     LWR lwr = new LWR();
 
-    lwr.initial_value = DEFAULT_INITIAL_VALUE;
     lwr.ridge = DEFAUL_RIDGE;
     lwr.gamma = DEFAUL_GAMMA;
 
@@ -145,13 +140,6 @@ public class LWR implements Serializable
   {
     this.size = size;
     this.relevance = new double[size];
-
-    return this;
-  }
-
-  public LWR setInitialValue(double initial_value)
-  {
-    this.initial_value = initial_value;
 
     return this;
   }

@@ -25,7 +25,7 @@ public class CriticLLR implements Serializable
 
     llr = LWR.createLLR().setSize(specification.getCriticMemory())
              .setInputDimension(specification.getObservationDimensions()).setOutputDimension(1)
-             .setK(specification.getCriticNeighbors()).setInitialValue(this.specification.getCriticInitialValue())
+             .setK(specification.getCriticNeighbors())
              .setValuesToRebuildTheTree(specification.getCriticValuesToRebuildTree());
 
     if (specification.getCriticMemoryManagement() != null)

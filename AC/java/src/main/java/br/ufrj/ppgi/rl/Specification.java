@@ -27,8 +27,6 @@ public class Specification implements Serializable
 
   private LLRMemoryManagement actorMemoryManagement;
 
-  private double              criticInitialValue;
-
   private int                 criticMemory;
 
   private double              criticAlpha;
@@ -149,16 +147,6 @@ public class Specification implements Serializable
   public void setActorMax(SimpleMatrix actorMax)
   {
     this.actorMax = actorMax;
-  }
-
-  public double getCriticInitialValue()
-  {
-    return criticInitialValue;
-  }
-
-  public void setCriticInitialValue(double criticInitialValue)
-  {
-    this.criticInitialValue = criticInitialValue;
   }
 
   public int getCriticMemory()
