@@ -117,7 +117,7 @@ public class ActorLLR implements Serializable
     LWRQueryVO queryResult = llr.query(observation);
     int insertIndex = add(observation, action);
 
-    if (insertIndex != -1 && !queryResult.getNeighbors().contains(insertIndex))
+    if (insertIndex != -1)
       queryResult.getNeighbors().add(insertIndex);
 
     llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());

@@ -1,7 +1,7 @@
 package br.ufrj.ppgi.rl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Set;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -91,9 +91,9 @@ public class CriticLLR implements Serializable
     // Add to LLR
     int insertIndex = llr.add(lastObservation, oldValueFunction.getResult().plus(tdError));
 
-    ArrayList<Integer> updatedPoints = oldValueFunction.getNeighbors();
+    Set<Integer> updatedPoints = oldValueFunction.getNeighbors();
     // also update the insertedIndex
-    if (insertIndex != -1 && !updatedPoints.contains(insertIndex))
+    if (insertIndex != -1)
     {
       updatedPoints.add(insertIndex);
     }
