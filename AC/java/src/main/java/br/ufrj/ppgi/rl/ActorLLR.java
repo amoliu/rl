@@ -109,17 +109,7 @@ public class ActorLLR implements Serializable
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action, boolean randomness)
   {
-    delta = delta * specification.getActorAlpha();
-    
-    if (randomness)
-    {
-      delta = delta * lastRandom;
-      update(delta, observation, action);
-    }
-    else
-    {
-      update(delta, observation, action);
-    }
+	update(delta, observation, action, specification.getActorAlpha(), randomness);
   }
 
   private void update(double delta, SimpleMatrix observation, SimpleMatrix action)

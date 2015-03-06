@@ -51,7 +51,7 @@ public class CriticLLR implements Serializable
                      - oldValueFunction.getResult().get(0);
 
     // Add to LLR
-    int insertIndex = llr.add(lastObservation, oldValueFunction.getResult());
+    int insertIndex = llr.add(lastObservation, oldValueFunction.getResult().plus(tdError));
 
     SimpleMatrix update = new SimpleMatrix(specification.getCriticMemory(), 1);
 
@@ -98,6 +98,7 @@ public class CriticLLR implements Serializable
       updatedPoints.add(insertIndex);
     }
 
+    /*
     SimpleMatrix upperLimit = new SimpleMatrix(1, 1);
     upperLimit.set(0);
     
@@ -105,6 +106,8 @@ public class CriticLLR implements Serializable
     lowerLimit.set(Double.NEGATIVE_INFINITY);
     
     llr.update(updatedPoints, alpha * tdError, upperLimit, lowerLimit);
+    */
+    llr.update(updatedPoints, alpha * tdError);
 
     return tdError;
   }
