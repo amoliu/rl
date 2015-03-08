@@ -11,12 +11,15 @@ public class StepVO implements Serializable
   private double[][]        action;
 
   private int               modelSkiped;
+  
+  private double            meanDistance;
 
   public StepVO(double[][] action)
   {
     this.action = action;
     this.error = 0;
     this.modelSkiped = 0;
+    this.meanDistance = 0;
   }
 
   public StepVO(double error, double[][] action)
@@ -24,13 +27,15 @@ public class StepVO implements Serializable
     this.error = error;
     this.action = action;
     this.modelSkiped = 0;
+    this.meanDistance = 0;
   }
 
-  public StepVO(double error, double[][] action, int modelSkiped)
+  public StepVO(double error, double[][] action, int modelSkiped, double meanDistance)
   {
     this.error = error;
     this.action = action;
     this.modelSkiped = modelSkiped;
+    this.meanDistance = meanDistance;
   }
 
   public double getError()
@@ -61,5 +66,15 @@ public class StepVO implements Serializable
   public void setModelSkiped(int modelSkiped)
   {
     this.modelSkiped = modelSkiped;
+  }
+
+  public double getMeanDistance()
+  {
+    return meanDistance;
+  }
+
+  public void setMeanDistance(double meanDistance)
+  {
+    this.meanDistance = meanDistance;
   }
 }

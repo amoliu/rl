@@ -98,16 +98,14 @@ public class CriticLLR implements Serializable
       updatedPoints.add(insertIndex);
     }
 
-    /*
     SimpleMatrix upperLimit = new SimpleMatrix(1, 1);
     upperLimit.set(0);
     
     SimpleMatrix lowerLimit = new SimpleMatrix(1, 1);
-    lowerLimit.set(Double.NEGATIVE_INFINITY);
+    lowerLimit.set(-2000.0);
     
     llr.update(updatedPoints, alpha * tdError, upperLimit, lowerLimit);
-    */
-    llr.update(updatedPoints, alpha * tdError);
+    //llr.update(updatedPoints, alpha * tdError);
 
     return tdError;
   }

@@ -327,7 +327,7 @@ public class LWR implements Serializable
 
       Set<Integer> neighbors = new HashSet<Integer>();
 
-      return new LWRQueryVO(result, x, neighbors, variance);
+      return new LWRQueryVO(result, x, neighbors, variance, Double.MAX_VALUE);
     }
 
     Set<Integer> neighbors = getNeighbors(query);
@@ -339,7 +339,8 @@ public class LWR implements Serializable
     DenseMatrix64F A = new DenseMatrix64F(neighbors.size(), input_dimension + 1);
     DenseMatrix64F B = new DenseMatrix64F(neighbors.size(), output_dimension);
     DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, output_dimension);
-
+    double meanDistance = 0;
+    
     int n = 0;
     for (Integer pos : neighbors) {
       for (int i = 0; i < input_dimension; i++)
@@ -352,9 +353,11 @@ public class LWR implements Serializable
       {
     	B.set(n, i, dataOutput.get(pos, i));
       }
+      meanDistance = NormOps.normP2(dataInput.extractVector(true, pos).minus(query).getMatrix());
       n++;
 	}
-
+    meanDistance /= neighbors.size();
+    
     SimpleMatrix queryBias = getQueryBias(query);
 
     double[] weights = weightFunction.calculateWeight(A, queryBias);
@@ -384,7 +387,7 @@ public class LWR implements Serializable
     DenseMatrix64F ATAinv = new DenseMatrix64F(input_dimension + 1, input_dimension + 1);
     solver.setA(ATA);
     solver.invert(ATAinv);
-
+    
     DenseMatrix64F ATB = new DenseMatrix64F(input_dimension + 1, output_dimension);
     CommonOps.multTransA(A, B, ATB);
 
@@ -394,7 +397,7 @@ public class LWR implements Serializable
     SimpleMatrix variance = calculateVariance(A, B, X, weights, ATAinv);
 
     SimpleMatrix Xsm = SimpleMatrix.wrap(X);
-    return new LWRQueryVO(queryBias.mult(Xsm), Xsm.transpose(), neighbors, variance);
+    return new LWRQueryVO(queryBias.mult(Xsm), Xsm.transpose(), neighbors, variance, meanDistance);
   }
 
   private SimpleMatrix calculateVariance(DenseMatrix64F A, DenseMatrix64F B, DenseMatrix64F X, double[] weights,

@@ -59,12 +59,12 @@ public class DynaActorCritic extends StandardActorCritic
     double error = Math.pow(NormOps.normP2(matrixObservation.minus(model).getMatrix()), 2);
 
     processModel.add(lastObservation, lastAction, matrixObservation);
-    int modelSkiped = updateUsingModel();
+    double meanDistance = updateUsingModel();
 
     lastObservation = matrixObservation;
     environmentStep++;
 
-    return new StepVO(error, chooseAction(matrixObservation), modelSkiped);
+    return new StepVO(error, chooseAction(matrixObservation), 0, meanDistance);
   }
 
   private void restartModel()
@@ -73,17 +73,19 @@ public class DynaActorCritic extends StandardActorCritic
     lastModelObservation = firstObservation;
   }
 
-  private int updateUsingModel()
+  private double updateUsingModel()
   {
     if (environmentStep <= specification.getProcessModelIterationsWithoutLearning() * 100)
       return specification.getProcessModelStepsPerEpisode();
 
     int skiped = 0;
+    double meanDistance = 0;
     for (int i = 0; i < specification.getProcessModelStepsPerEpisode(); i++)
     {
       SimpleMatrix action = chooseAction(lastModelObservation, i);
       LWRQueryVO modelQuery = processModel.query(lastModelObservation, action);
 
+      meanDistance += modelQuery.getMeanDistance();
       // If the variance is greater exceeds the range of state params, restart
       // model
       if (!isModelGood(modelQuery))
@@ -114,7 +116,7 @@ public class DynaActorCritic extends StandardActorCritic
       }
     }
 
-    return skiped;
+    return meanDistance;
   }
 
   private SimpleMatrix chooseAction(SimpleMatrix observation, int i)
@@ -131,6 +133,9 @@ public class DynaActorCritic extends StandardActorCritic
 
   private boolean isModelGood(LWRQueryVO modelQuery)
   {
+    if (modelQuery.getMeanDistance() > 0.4)
+      return false;
+    
     for (int k = 0; k < specification.getObservationDimensions(); k++)
     {
       if (modelQuery.getVariance().get(k) > specification.getObservationRange().get(k))

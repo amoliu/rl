@@ -117,6 +117,9 @@ public class DynaMLAC extends MLAC
 
   private boolean isModelGood(LWRQueryVO modelQuery)
   {
+    if (modelQuery.getMeanDistance() > 0.4)
+      return false;
+    
     for (int k = 0; k < specification.getObservationDimensions(); k++)
     {
       if (modelQuery.getVariance().get(k) > specification.getObservationRange().get(k))

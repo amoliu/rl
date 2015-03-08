@@ -18,13 +18,16 @@ public class LWRQueryVO implements Serializable
   private Set<Integer> 		 neighbors;
 
   private SimpleMatrix       variance;
-
-  public LWRQueryVO(SimpleMatrix result, SimpleMatrix x, Set<Integer> neighbors, SimpleMatrix variance)
+  
+  private double             meanDistance;
+  
+  public LWRQueryVO(SimpleMatrix result, SimpleMatrix x, Set<Integer> neighbors, SimpleMatrix variance, double meanDistance)
   {
     this.result = result;
     this.neighbors = neighbors;
     this.x = x;
     this.variance = variance;
+    this.meanDistance = meanDistance;
   }
 
   public SimpleMatrix getResult()
@@ -71,10 +74,20 @@ public class LWRQueryVO implements Serializable
   {
     this.variance = variance;
   }
-
+  
   @Override
   public String toString()
   {
     return "LWRQueryVO [result=" + result + ", x=" + x + ", neighbors=" + neighbors + ", variance=" + variance + "]";
+  }
+
+  public double getMeanDistance()
+  {
+    return meanDistance;
+  }
+
+  public void setMeanDistance(double meanDistance)
+  {
+    this.meanDistance = meanDistance;
   }
 }
