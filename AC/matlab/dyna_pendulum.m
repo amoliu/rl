@@ -46,7 +46,7 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.005);
+    javaSpec.setActorAlpha(0.02);
     javaSpec.setActorMemory(2000);
     javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
@@ -87,6 +87,7 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     javaSpec.setProcessModelIterationsWithoutLearning(0);
     javaSpec.setRewardCalculator(br.ufrj.ppgi.rl.reward.RewardCalculator.Pendulum);
     javaSpec.setNormalization(norm_factor);
+    javaSpec.setProcessModelMeanDistanceLimit(0.65);
        
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);

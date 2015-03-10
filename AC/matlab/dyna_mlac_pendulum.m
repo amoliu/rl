@@ -87,6 +87,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelIterationsWithoutLearning(0);
     javaSpec.setRewardCalculator(br.ufrj.ppgi.rl.reward.RewardCalculator.Pendulum);
     javaSpec.setNormalization(norm_factor);
+    javaSpec.setProcessModelMeanDistanceLimit(0.65);
        
     agent = br.ufrj.ppgi.rl.ac.DynaMLAC;
     agent.init(javaSpec);

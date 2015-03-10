@@ -78,6 +78,8 @@ public class Specification implements Serializable
   private float               processModelSd;
 
   private LLRMemoryManagement processModelMemoryManagement;
+  
+  private double              processModelMeanDistanceLimit;
 
   private SimpleMatrix        observationMinValue;
 
@@ -536,5 +538,15 @@ public class Specification implements Serializable
   public void setCriticMax(SimpleMatrix criticMax)
   {
     this.criticMax = criticMax;
+  }
+
+  public double getProcessModelMeanDistanceLimit()
+  {
+    return processModelMeanDistanceLimit;
+  }
+
+  public void setProcessModelMeanDistanceLimit(double processModelMeanDistanceLimit)
+  {
+    this.processModelMeanDistanceLimit = processModelMeanDistanceLimit;
   }
 }
