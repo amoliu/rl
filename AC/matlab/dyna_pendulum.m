@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(varargin)
+function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pendulum(varargin)
 %DYNA_PENDULUM Runs the dyna algorithim on the pendulum swing-up.
 %   DYNA_PENDULUM(E, S) learns during E episodes,
 %   doing S model steps per real step.
@@ -27,7 +27,7 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     p.addParameter('steps', 2, @isnumeric);
     p.addOptional('episodes', 100, @isnumeric);
     
-    p.addOptional('alpha', 100, @isnumeric);
+    p.addOptional('alpha', 2, @isnumeric);
     p.addOptional('explorationRate', 1, @isnumeric);
     
     p.addOptional('performance', -900, @isnumeric);
@@ -51,12 +51,14 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
-    javaSpec.setActorValuesToRebuildTree(1);
+    javaSpec.setActorValuesToRebuildTree(5);
     
     javaSpec.setCriticAlpha(0.1);
     javaSpec.setCriticMemory(2000);
     javaSpec.setCriticNeighbors(20);
-    javaSpec.setCriticValuesToRebuildTree(1);
+    javaSpec.setCriticMin(-3000);
+    javaSpec.setCriticMax(0);
+    javaSpec.setCriticValuesToRebuildTree(5);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
@@ -69,7 +71,7 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     javaSpec.setProcessModelSd(1.0);
     
     javaSpec.setProcessModelMemory(100);
-    javaSpec.setProcessModelNeighbors(10);
+    javaSpec.setProcessModelNeighbors(9);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
@@ -89,6 +91,6 @@ function [critic, actor, cr, rmse, model, skiped, episodes] = dyna_pendulum(vara
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse, episodes, skiped] = learn('mops_sim', norm_factor, agent, args);
+    [critic, actor, cr, rmse, episodes, skiped, distance] = learn('mops_sim', norm_factor, agent, args);
     model = agent.getProcessModel();
 end

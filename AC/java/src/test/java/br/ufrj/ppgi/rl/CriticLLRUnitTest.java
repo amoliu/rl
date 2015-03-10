@@ -10,9 +10,8 @@ import br.ufrj.ppgi.rl.fa.LLRMemoryManagement;
 
 public class CriticLLRUnitTest
 {
-  private static final int CRITIC_INITIAL_VALUE = -1000;
   private static final double DELTA = 0.1d;
-
+  
   @Test
   public void testResetEligibilityTrace()
   {
@@ -80,19 +79,19 @@ public class CriticLLRUnitTest
     SimpleMatrix action = new SimpleMatrix(1, 1);
     action.set(2);
     
-    critic.update(observation, action, 0, observation);
+    critic.update(observation, action, 100, observation);
     Assert.assertEquals(1, critic.llr.getDataInput().get(0), DELTA);
-    Assert.assertEquals(CRITIC_INITIAL_VALUE + 100, critic.llr.getDataOutput().get(0), DELTA);
+    Assert.assertEquals(100, critic.llr.getDataOutput().get(0), DELTA);
     
     observation.set(2);
     action.set(2);
-    critic.update(observation, action, 0, observation);
+    critic.update(observation, action, 50, observation);
     Assert.assertEquals(2, critic.llr.getDataInput().get(1), DELTA);
-    Assert.assertEquals(CRITIC_INITIAL_VALUE + 100, critic.llr.getDataOutput().get(1), DELTA);
+    Assert.assertEquals(50, critic.llr.getDataOutput().get(1), DELTA);
     
     observation.set(3);
     action.set(2);
-    critic.update(observation, action, CRITIC_INITIAL_VALUE + 10, observation);
+    critic.update(observation, action, 10, observation);
     Assert.assertEquals(1, critic.llr.getDataInput().get(0), DELTA);
     Assert.assertEquals(-900, critic.llr.getDataOutput().get(0), DELTA);
     
@@ -107,9 +106,8 @@ public class CriticLLRUnitTest
   {
     Specification specification = new Specification();
     specification.setCriticAlpha(0.1);
-    specification.setCriticMemory(10);
-    specification.setCriticNeighbors(2);
-    specification.setCriticInitialValue(CRITIC_INITIAL_VALUE);
+    specification.setCriticMemory(20);
+    specification.setCriticNeighbors(5);
     specification.setCriticValuesToRebuildTree(2);
     specification.setCriticMemoryManagement(LLRMemoryManagement.LLR_MEMORY_PREDICTION);
     specification.setSd(1f);

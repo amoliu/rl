@@ -3,9 +3,9 @@ package br.ufrj.ppgi.rl.fa;
 import static br.ufrj.ppgi.rl.fa.LLRMemoryManagement.LLR_MEMORY_EVENLY;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import org.ejml.alg.dense.mult.VectorVectorMult;
 import org.ejml.data.DenseMatrix64F;
@@ -28,8 +28,6 @@ public class LWR implements Serializable
   private static final double              DEFAUL_RIDGE              = 0.000001d;
 
   private static final double              DEFAUL_GAMMA              = 0.9d;
-
-  private static final double              DEFAULT_INITIAL_VALUE     = 0;
 
   private static final LLRMemoryManagement DEFAULT_MEMORY_MANAGEMENT = LLR_MEMORY_EVENLY;
 
@@ -55,8 +53,6 @@ public class LWR implements Serializable
 
   protected int                            last_llr;
 
-  private double                           initial_value;
-
   private KdTree<Integer>                  tree;
 
   private DistanceFunction                 distanceFunction;
@@ -81,7 +77,6 @@ public class LWR implements Serializable
   {
     LWR lwr = new LWR();
 
-    lwr.initial_value = DEFAULT_INITIAL_VALUE;
     lwr.ridge = DEFAUL_RIDGE;
     lwr.gamma = DEFAUL_GAMMA;
 
@@ -145,13 +140,6 @@ public class LWR implements Serializable
   {
     this.size = size;
     this.relevance = new double[size];
-
-    return this;
-  }
-
-  public LWR setInitialValue(double initial_value)
-  {
-    this.initial_value = initial_value;
 
     return this;
   }
@@ -286,7 +274,7 @@ public class LWR implements Serializable
     update(new SimpleMatrix(delta));
   }
 
-  public void update(List<Integer> points, double delta)
+  public void update(Set<Integer> points, double delta)
   {
     for (Integer pos : points)
     {
@@ -297,7 +285,7 @@ public class LWR implements Serializable
     }
   }
 
-  public void update(List<Integer> points, double delta, SimpleMatrix maxValue, SimpleMatrix minValue)
+  public void update(Set<Integer> points, double delta, SimpleMatrix maxValue, SimpleMatrix minValue)
   {
     for (Integer pos : points)
     {
@@ -306,6 +294,16 @@ public class LWR implements Serializable
       {
         dataOutput.set(pos, i, update.get(i));
       }
+    }
+  }
+
+  public void update(SimpleMatrix delta, SimpleMatrix maxValue, SimpleMatrix minValue)
+  {
+    for (int i = 0; i < dataOutput.numRows(); i++)
+    {
+      SimpleMatrix update = EJMLMatlabUtils.wrap(dataOutput.extractVector(true, i).plus(delta.extractVector(true, i)),
+                                                 maxValue, minValue);
+      dataOutput.setRow(i, 0, update.getMatrix().data);
     }
   }
 
@@ -337,25 +335,25 @@ public class LWR implements Serializable
       SimpleMatrix variance = new SimpleMatrix(1, output_dimension);
       variance.set(Double.MAX_VALUE);
 
-      ArrayList<Integer> neighbors = new ArrayList<Integer>();
+      Set<Integer> neighbors = new HashSet<Integer>();
 
-      return new LWRQueryVO(result, x, neighbors, variance);
+      return new LWRQueryVO(result, x, neighbors, variance, Double.MAX_VALUE);
     }
 
-    ArrayList<Integer> neighbors = getNeighbors(query);
+    Set<Integer> neighbors = getNeighbors(query);
     return queryForNeighbors(query, neighbors);
   }
 
-  private LWRQueryVO queryForNeighbors(SimpleMatrix query, ArrayList<Integer> neighbors)
+  private LWRQueryVO queryForNeighbors(SimpleMatrix query, Set<Integer> neighbors)
   {
     DenseMatrix64F A = new DenseMatrix64F(neighbors.size(), input_dimension + 1);
     DenseMatrix64F B = new DenseMatrix64F(neighbors.size(), output_dimension);
     DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, output_dimension);
+    double meanDistance = 0;
 
-    for (int n = 0; n < neighbors.size(); n++)
+    int n = 0;
+    for (Integer pos : neighbors)
     {
-      Integer pos = neighbors.get(n);
-
       for (int i = 0; i < input_dimension; i++)
       {
         A.set(n, i, dataInput.get(pos, i));
@@ -366,7 +364,10 @@ public class LWR implements Serializable
       {
         B.set(n, i, dataOutput.get(pos, i));
       }
+      meanDistance = NormOps.normP2(dataInput.extractVector(true, pos).minus(query).getMatrix());
+      n++;
     }
+    meanDistance /= neighbors.size();
 
     SimpleMatrix queryBias = getQueryBias(query);
 
@@ -407,7 +408,7 @@ public class LWR implements Serializable
     SimpleMatrix variance = calculateVariance(A, B, X, weights, ATAinv);
 
     SimpleMatrix Xsm = SimpleMatrix.wrap(X);
-    return new LWRQueryVO(queryBias.mult(Xsm), Xsm.transpose(), neighbors, variance);
+    return new LWRQueryVO(queryBias.mult(Xsm), Xsm.transpose(), neighbors, variance, meanDistance);
   }
 
   private SimpleMatrix calculateVariance(DenseMatrix64F A, DenseMatrix64F B, DenseMatrix64F X, double[] weights,
@@ -467,10 +468,10 @@ public class LWR implements Serializable
       return 0;
     }
 
-    ArrayList<Integer> neighbors = getNeighbors(input);
+    Set<Integer> neighbors = getNeighbors(input);
 
     updateOutputToModelOutput(neighbors);
-    
+
     switch (memoryManagement)
     {
       case LLR_MEMORY_EVENLY:
@@ -488,11 +489,10 @@ public class LWR implements Serializable
     }
   }
 
-  private void updateOutputToModelOutput(ArrayList<Integer> neighbors)
+  private void updateOutputToModelOutput(Set<Integer> neighbors)
   {
-    for (int n = 0; n < neighbors.size(); n++)
+    for (Integer pos : neighbors)
     {
-      Integer pos = neighbors.get(n);
       SimpleMatrix query = dataInput.extractVector(true, pos);
 
       SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
@@ -500,11 +500,10 @@ public class LWR implements Serializable
     }
   }
 
-  private void updateRelevancePrediction(ArrayList<Integer> neighbors)
+  private void updateRelevancePrediction(Set<Integer> neighbors)
   {
-    for (int n = 0; n < neighbors.size(); n++)
+    for (Integer pos : neighbors)
     {
-      Integer pos = neighbors.get(n);
       SimpleMatrix query = dataInput.extractVector(true, pos);
 
       SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
@@ -523,11 +522,10 @@ public class LWR implements Serializable
     return Math.pow(NormOps.normP2(input.minus(output).getMatrix()), 2);
   }
 
-  private void updateRelevanceEvenly(ArrayList<Integer> neighbors)
+  private void updateRelevanceEvenly(Set<Integer> neighbors)
   {
-    for (int n = 0; n < neighbors.size(); n++)
+    for (Integer pos : neighbors)
     {
-      Integer pos = neighbors.get(n);
       SimpleMatrix query = dataInput.extractVector(true, pos);
 
       double averageDistance = calculateRelevanceEvenly(neighbors, query);
@@ -536,7 +534,7 @@ public class LWR implements Serializable
     }
   }
 
-  private double calculateRelevanceEvenly(ArrayList<Integer> neighbors, SimpleMatrix query)
+  private double calculateRelevanceEvenly(Set<Integer> neighbors, SimpleMatrix query)
   {
     double averageDistance = 0;
     for (Integer n : neighbors)
@@ -553,7 +551,7 @@ public class LWR implements Serializable
     return last_llr > 4 * input_dimension;
   }
 
-  private ArrayList<Integer> getNeighbors(SimpleMatrix query)
+  private Set<Integer> getNeighbors(SimpleMatrix query)
   {
     int totalNeighbors = 0;
     if (last_llr <= k)
@@ -566,7 +564,7 @@ public class LWR implements Serializable
     }
 
     MaxHeap<Integer> heap = tree.findNearestNeighbors(query.getMatrix().getData(), totalNeighbors, distanceFunction);
-    ArrayList<Integer> neighbors = new ArrayList<Integer>();
+    Set<Integer> neighbors = new HashSet<Integer>();
 
     for (int i = 0; i < totalNeighbors; i++)
     {

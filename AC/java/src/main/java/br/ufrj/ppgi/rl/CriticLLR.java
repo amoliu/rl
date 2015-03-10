@@ -1,6 +1,7 @@
 package br.ufrj.ppgi.rl;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -22,19 +23,16 @@ public class CriticLLR implements Serializable
   {
     this.specification = specification;
 
-    llr = LWR.createLLR()
-             .setSize(specification.getCriticMemory())
-             .setInputDimension(specification.getObservationDimensions())
-             .setOutputDimension(1)
+    llr = LWR.createLLR().setSize(specification.getCriticMemory())
+             .setInputDimension(specification.getObservationDimensions()).setOutputDimension(1)
              .setK(specification.getCriticNeighbors())
-             .setInitialValue(this.specification.getCriticInitialValue())
              .setValuesToRebuildTheTree(specification.getCriticValuesToRebuildTree());
 
     if (specification.getCriticMemoryManagement() != null)
     {
       llr.setMemoryManagement(specification.getCriticMemoryManagement());
     }
-    
+
     resetEligibilityTrace();
   }
 
@@ -53,7 +51,7 @@ public class CriticLLR implements Serializable
                      - oldValueFunction.getResult().get(0);
 
     // Add to LLR
-    int insertIndex = llr.add(lastObservation, oldValueFunction.getResult());
+    int insertIndex = llr.add(lastObservation, oldValueFunction.getResult().plus(tdError));
 
     SimpleMatrix update = new SimpleMatrix(specification.getCriticMemory(), 1);
 
@@ -74,23 +72,33 @@ public class CriticLLR implements Serializable
     if (insertIndex != -1)
     {
       eligibilityTrace.set(insertIndex, 1);
-      update.set(insertIndex, specification.getCriticAlpha() * tdError);
+      update.set(insertIndex, 0);
     }
 
-    llr.update(update);
+    llr.update(update, specification.getCriticMax(), specification.getCriticMin());
 
     return tdError;
   }
 
-  public double updateWithoutAddSample(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward,
-                                       SimpleMatrix observation, double alpha, double gamma)
+  public double update(SimpleMatrix lastObservation, SimpleMatrix lastAction, double reward, SimpleMatrix observation,
+                       double alpha, double gamma)
   {
     LWRQueryVO valueFunction = llr.query(observation);
     LWRQueryVO oldValueFunction = llr.query(lastObservation);
 
     double tdError = reward + gamma * valueFunction.getResult().get(0) - oldValueFunction.getResult().get(0);
 
-    llr.update(oldValueFunction.getNeighbors(), alpha * tdError);
+    // Add to LLR
+    int insertIndex = llr.add(lastObservation, oldValueFunction.getResult().plus(tdError));
+
+    Set<Integer> updatedPoints = oldValueFunction.getNeighbors();
+    // also update the insertedIndex
+    if (insertIndex != -1)
+    {
+      updatedPoints.add(insertIndex);
+    }
+
+    llr.update(updatedPoints, alpha * tdError, specification.getCriticMax(), specification.getCriticMin());
 
     return tdError;
   }

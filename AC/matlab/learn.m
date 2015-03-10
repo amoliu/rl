@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, episodes, skiped] = learn(env_name, norm_factor, agent, args)
+function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name, norm_factor, agent, args)
 %LEARN Make the agent learn about the environment.
 %   LEARN(ENV, N, A) learns using N as norm factor to the observations,
 %   given the agent A in the ENV environment.
@@ -43,10 +43,12 @@ function [critic, actor, cr, rmse, episodes, skiped] = learn(env_name, norm_fact
     end
     
     if args.figure
-        figure;
-        first_obs = env('start');
-        h = viz(first_obs);
-        title('Training');
+        close all;
+        figure(1);
+        figure(2);
+        %first_obs = env('start');
+        %h = viz(first_obs);
+        %title('Training');
     end
     
     while while_cond()
@@ -57,6 +59,7 @@ function [critic, actor, cr, rmse, episodes, skiped] = learn(env_name, norm_fact
         stepVO = agent.start(norm_first_obs);
         rmse(episodes) = 0;
         skiped(episodes) = 0;
+        distance(episodes) = 0;
         
         while 1
              % Actuate
@@ -64,8 +67,28 @@ function [critic, actor, cr, rmse, episodes, skiped] = learn(env_name, norm_fact
             norm_obs = obs ./ norm_factor;
 
             if args.figure
-                viz(obs, h);
-                pause(0.005);
+                figure(1);
+                criticInput = agent.getCritic.getLLR.getMatlabDataInput;
+                criticOutput = agent.getCritic.getLLR.getMatlabDataOutput;
+                scatter(criticInput(:,1), criticInput(:,2), 25, criticOutput, 'filled')
+                title('Critic');
+                xlabel('angle[rad]');
+                ylabel('angular velocity[rad/s]');
+                axis([0, 20, -15, 15]);
+                colorbar;
+                
+                figure(2);
+                actorInput = agent.getActor.getLLR.getMatlabDataInput;
+                actorOutput = agent.getActor.getLLR.getMatlabDataOutput;
+                scatter(actorInput(:,1), actorInput(:,2), 25, actorOutput, 'filled')
+                title('Actor');
+                xlabel('angle[rad]');
+                ylabel('angular velocity[rad/s]');
+                axis([0, 20, -15, 15]);
+                colorbar;
+                
+                drawnow;
+                pause(0.001);
             end
             
             if terminal
@@ -75,6 +98,7 @@ function [critic, actor, cr, rmse, episodes, skiped] = learn(env_name, norm_fact
 
             rmse(episodes) = rmse(episodes) + stepVO.getError;
             skiped(episodes) = skiped(episodes) + stepVO.getModelSkiped;
+            distance(episodes) = distance(episodes) + stepVO.getMeanDistance;
             
             % Learn and choose next action
             stepVO = agent.step(reward, norm_obs);

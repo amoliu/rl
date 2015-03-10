@@ -160,16 +160,30 @@ public class ProcessoModelLWRUnitTest
 
     processModelLLR.init(specification);
 
-    processModelLLR.lwr.setRandom(new RandomMock(21));
-
-    SimpleMatrix observation = new SimpleMatrix(new double[][] { { 1 } });
-    SimpleMatrix action = new SimpleMatrix(new double[][] { { 2 } });
-
+    SimpleMatrix observation = new SimpleMatrix(1, 2);
+    SimpleMatrix action = new SimpleMatrix(1, 1);
+    SimpleMatrix nextObservation = new SimpleMatrix(1, 2);
+    
+    for (int i=0; i<20; i++)
+    {
+    	observation.set(0, 1+i/10.);
+        observation.set(1, 1+i/10.);
+        action.set(0, 1+i/10.);
+        nextObservation.set(0, 1+i/10.);
+        nextObservation.set(1, 1+i/10.);
+        
+    	processModelLLR.add(observation, action, nextObservation);
+    }
+    
+    observation.set(0, 21);
+    observation.set(1, 21);
+    action.set(0, 21);
     SimpleMatrix query = processModelLLR.query(observation, action).getResult();
     Assert.assertEquals(1, query.get(0), DELTA);
 
-    processModelLLR.lwr.setRandom(new RandomMock(-1));
-
+    observation.set(0, -1);
+    observation.set(1, -1);
+    action.set(0, -1);
     query = processModelLLR.query(observation, action).getResult();
     Assert.assertEquals(19, query.get(0), DELTA);
   }
@@ -191,7 +205,7 @@ public class ProcessoModelLWRUnitTest
     processModelLWR.add(observation, action, new_observation);
 
     Assert.assertEquals(processModelLWR.lwr.getDataInput().numCols(), 3);
-    Assert.assertEquals(processModelLWR.lwr.getDataOutput().numCols(), 3);
+    Assert.assertEquals(processModelLWR.lwr.getDataOutput().numCols(), 2);
 
     SimpleMatrix inputLLR = processModelLWR.lwr.getDataInput().extractVector(true, 0);
     Assert.assertEquals(1, inputLLR.get(0), DELTA);
@@ -201,7 +215,6 @@ public class ProcessoModelLWRUnitTest
     SimpleMatrix outputLLR = processModelLWR.lwr.getDataOutput().extractVector(true, 0);
     Assert.assertEquals(3, outputLLR.get(0), DELTA);
     Assert.assertEquals(4, outputLLR.get(1), DELTA);
-    Assert.assertEquals(-50, outputLLR.get(2), DELTA);
   }
 
   private Specification getSpecification()
@@ -209,8 +222,8 @@ public class ProcessoModelLWRUnitTest
     Specification specification = new Specification();
     specification.setObservationDimensions(2);
     specification.setActionDimensions(1);
-    specification.setProcessModelMemory(10);
-    specification.setProcessModelNeighbors(2);
+    specification.setProcessModelMemory(20);
+    specification.setProcessModelNeighbors(5);
     specification.setProcessModelValuesToRebuildTree(2);
     specification.setObservationMaxValue(new double[][] { { 20, 12 } });
     specification.setObservationMinValue(new double[][] { { 0, -12 } });

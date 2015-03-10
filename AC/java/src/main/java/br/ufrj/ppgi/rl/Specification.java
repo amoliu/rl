@@ -21,13 +21,15 @@ public class Specification implements Serializable
 
   private SimpleMatrix        actorMax;
 
+  private SimpleMatrix        criticMin;
+
+  private SimpleMatrix        criticMax;
+
   private SimpleMatrix        actorRange;
 
   private int                 actorValuesToRebuildTree;
 
   private LLRMemoryManagement actorMemoryManagement;
-
-  private double              criticInitialValue;
 
   private int                 criticMemory;
 
@@ -149,16 +151,6 @@ public class Specification implements Serializable
   public void setActorMax(SimpleMatrix actorMax)
   {
     this.actorMax = actorMax;
-  }
-
-  public double getCriticInitialValue()
-  {
-    return criticInitialValue;
-  }
-
-  public void setCriticInitialValue(double criticInitialValue)
-  {
-    this.criticInitialValue = criticInitialValue;
   }
 
   public int getCriticMemory()
@@ -514,5 +506,35 @@ public class Specification implements Serializable
   public void setNormalization(double[][] normalization)
   {
     this.normalization = new SimpleMatrix(normalization);
+  }
+
+  public SimpleMatrix getCriticMin()
+  {
+    return criticMin;
+  }
+
+  public void setCriticMin(double[][] value)
+  {
+    setCriticMin(new SimpleMatrix(value));
+  }
+
+  public void setCriticMin(SimpleMatrix criticMin)
+  {
+    this.criticMin = criticMin;
+  }
+
+  public SimpleMatrix getCriticMax()
+  {
+    return criticMax;
+  }
+
+  public void setCriticMax(double[][] value)
+  {
+    setCriticMax(new SimpleMatrix(value));
+  }
+
+  public void setCriticMax(SimpleMatrix criticMax)
+  {
+    this.criticMax = criticMax;
   }
 }

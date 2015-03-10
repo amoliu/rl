@@ -27,7 +27,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     p.addParameter('steps', 2, @isnumeric);
     p.addOptional('episodes', 100, @isnumeric);
 
-    p.addOptional('alpha', 100, @isnumeric);
+    p.addOptional('alpha', 2, @isnumeric);
     p.addOptional('explorationRate', 1, @isnumeric);
     
     p.addOptional('performance', -900, @isnumeric);
@@ -46,17 +46,19 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.005);
+    javaSpec.setActorAlpha(0.02);
     javaSpec.setActorMemory(2000);
     javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
-    javaSpec.setActorValuesToRebuildTree(1);
+    javaSpec.setActorValuesToRebuildTree(5);
     
     javaSpec.setCriticAlpha(0.1);
     javaSpec.setCriticMemory(2000);
     javaSpec.setCriticNeighbors(20);
-    javaSpec.setCriticValuesToRebuildTree(1);
+    javaSpec.setCriticMin(-3000);
+    javaSpec.setCriticMax(0);
+    javaSpec.setCriticValuesToRebuildTree(5);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
@@ -69,7 +71,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelSd(1.0);
     
     javaSpec.setProcessModelMemory(100);
-    javaSpec.setProcessModelNeighbors(10);
+    javaSpec.setProcessModelNeighbors(9);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);

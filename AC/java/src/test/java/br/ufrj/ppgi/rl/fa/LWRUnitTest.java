@@ -2,7 +2,8 @@ package br.ufrj.ppgi.rl.fa;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
@@ -552,7 +553,10 @@ public class LWRUnitTest
     output.set(0, 2);
     llr.add(input, output);
 
-    llr.update(Arrays.asList(1), 1);
+    Set<Integer> points = new HashSet<Integer>();
+    points.add(1);
+    
+    llr.update(points, 1);
 
     assertEquals(0, llr.dataOutput.get(0, 0), DELTA);
     assertEquals(3, llr.dataOutput.get(1, 0), DELTA);

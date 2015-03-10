@@ -94,55 +94,22 @@ public class ActorLLR implements Serializable
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha, boolean randomness)
   {
+    delta = delta * alpha;
+    
     if (randomness)
     {
-      updateWithRandomness(delta, observation, action, alpha);
+      delta = delta * lastRandom;
+      update(delta, observation, action);
     }
     else
     {
-      updateWithoutRandomness(delta, observation, action, alpha);
+      update(delta, observation, action);
     }
-  }
-
-  public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha)
-  {
-    delta = delta * lastRandom * alpha;
-
-    LWRQueryVO queryResult = llr.query(observation);
-    llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
-  }
-
-  public void updateWithoutRandomness(double delta, SimpleMatrix observation, SimpleMatrix action, double alpha)
-  {
-    delta = delta * alpha;
-
-    LWRQueryVO queryResult = llr.query(observation);
-    llr.update(queryResult.getNeighbors(), delta, specification.getActorMax(), specification.getActorMin());
   }
 
   public void update(double delta, SimpleMatrix observation, SimpleMatrix action, boolean randomness)
   {
-    if (randomness)
-    {
-      updateWithRandomness(delta, observation, action);
-    }
-    else
-    {
-      updateWithoutRandomness(delta, observation, action);
-    }
-  }
-
-  public void updateWithRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
-  {
-    delta = delta * lastRandom * specification.getActorAlpha();
-    update(delta, observation, action);
-  }
-
-  public void updateWithoutRandomness(double delta, SimpleMatrix observation, SimpleMatrix action)
-  {
-    delta = delta * specification.getActorAlpha();
-
-    update(delta, observation, action);
+	update(delta, observation, action, specification.getActorAlpha(), randomness);
   }
 
   private void update(double delta, SimpleMatrix observation, SimpleMatrix action)
