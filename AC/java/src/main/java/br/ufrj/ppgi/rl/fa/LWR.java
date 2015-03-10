@@ -297,6 +297,16 @@ public class LWR implements Serializable
     }
   }
 
+  public void update(SimpleMatrix delta, SimpleMatrix maxValue, SimpleMatrix minValue)
+  {
+    for (int i = 0; i < dataOutput.numRows(); i++)
+    {
+      SimpleMatrix update = EJMLMatlabUtils.wrap(dataOutput.extractVector(true, i).plus(delta.extractVector(true, i)),
+                                                 maxValue, minValue);
+      dataOutput.setRow(i, 0, update.getMatrix().data);
+    }
+  }
+
   public void update(SimpleMatrix delta)
   {
     dataOutput = dataOutput.plus(delta);
@@ -340,24 +350,25 @@ public class LWR implements Serializable
     DenseMatrix64F B = new DenseMatrix64F(neighbors.size(), output_dimension);
     DenseMatrix64F X = new DenseMatrix64F(input_dimension + 1, output_dimension);
     double meanDistance = 0;
-    
+
     int n = 0;
-    for (Integer pos : neighbors) {
+    for (Integer pos : neighbors)
+    {
       for (int i = 0; i < input_dimension; i++)
       {
-    	A.set(n, i, dataInput.get(pos, i));
+        A.set(n, i, dataInput.get(pos, i));
       }
       A.set(n, input_dimension, BIAS);
-    	
+
       for (int i = 0; i < output_dimension; i++)
       {
-    	B.set(n, i, dataOutput.get(pos, i));
+        B.set(n, i, dataOutput.get(pos, i));
       }
       meanDistance = NormOps.normP2(dataInput.extractVector(true, pos).minus(query).getMatrix());
       n++;
-	}
+    }
     meanDistance /= neighbors.size();
-    
+
     SimpleMatrix queryBias = getQueryBias(query);
 
     double[] weights = weightFunction.calculateWeight(A, queryBias);
@@ -387,7 +398,7 @@ public class LWR implements Serializable
     DenseMatrix64F ATAinv = new DenseMatrix64F(input_dimension + 1, input_dimension + 1);
     solver.setA(ATA);
     solver.invert(ATAinv);
-    
+
     DenseMatrix64F ATB = new DenseMatrix64F(input_dimension + 1, output_dimension);
     CommonOps.multTransA(A, B, ATB);
 
@@ -460,7 +471,7 @@ public class LWR implements Serializable
     Set<Integer> neighbors = getNeighbors(input);
 
     updateOutputToModelOutput(neighbors);
-    
+
     switch (memoryManagement)
     {
       case LLR_MEMORY_EVENLY:
@@ -480,7 +491,8 @@ public class LWR implements Serializable
 
   private void updateOutputToModelOutput(Set<Integer> neighbors)
   {
-    for (Integer pos : neighbors) {
+    for (Integer pos : neighbors)
+    {
       SimpleMatrix query = dataInput.extractVector(true, pos);
 
       SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
@@ -490,7 +502,8 @@ public class LWR implements Serializable
 
   private void updateRelevancePrediction(Set<Integer> neighbors)
   {
-    for (Integer pos : neighbors) {
+    for (Integer pos : neighbors)
+    {
       SimpleMatrix query = dataInput.extractVector(true, pos);
 
       SimpleMatrix predict_value = queryForNeighbors(query, neighbors).getResult();
@@ -511,7 +524,8 @@ public class LWR implements Serializable
 
   private void updateRelevanceEvenly(Set<Integer> neighbors)
   {
-    for (Integer pos : neighbors) {
+    for (Integer pos : neighbors)
+    {
       SimpleMatrix query = dataInput.extractVector(true, pos);
 
       double averageDistance = calculateRelevanceEvenly(neighbors, query);
