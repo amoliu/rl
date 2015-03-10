@@ -43,6 +43,7 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
     end
     
     if args.figure
+        close all;
         figure(1);
         figure(2);
         %first_obs = env('start');
