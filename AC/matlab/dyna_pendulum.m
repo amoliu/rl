@@ -30,6 +30,8 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     p.addOptional('alpha', 2, @isnumeric);
     p.addOptional('explorationRate', 1, @isnumeric);
     
+    p.addOptional('actorAlpha', 0.01, @isnumeric);
+    
     p.addOptional('performance', -900, @isnumeric);
     p.addOptional('trialsInARow', 3, @isnumeric);
     
@@ -46,7 +48,7 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.02);
+    javaSpec.setActorAlpha(args.actorAlpha);
     javaSpec.setActorMemory(2000);
     javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
