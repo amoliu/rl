@@ -20,7 +20,7 @@ function plot_many(varargin)
     for i=1:data_size
         d = args.data{i};
         c = cmap(i, :);
-        handles = [handles errorbaralpha(mean(d), 1.96.*std(d)./sqrt(size(d, 1)), 'Color', c)];
+        handles = [handles errorbaralpha(mean(d), 'e', 1.96.*std(d)./sqrt(size(d, 1)), 'Color', c, 'axis', [1, 15, -4000 ,0])];
     end
     
     legend(handles, args.legend);
