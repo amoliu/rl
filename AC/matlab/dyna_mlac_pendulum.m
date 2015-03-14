@@ -33,8 +33,6 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     p.addOptional('performance', -900, @isnumeric);
     p.addOptional('trialsInARow', 3, @isnumeric);
     
-    p.addOptional('actorAlpha', 0.01, @isnumeric);
-    
     p.addOptional('verbose', false, @islogical);
     p.addOptional('figure', false, @islogical);
     p.parse(varargin{:});
@@ -48,7 +46,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(args.actorAlpha);
+    javaSpec.setActorAlpha(0.03);
     javaSpec.setActorMemory(2000);
     javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
