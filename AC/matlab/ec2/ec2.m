@@ -45,7 +45,7 @@ save mlac.mat cr;
 for step=0:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna;
-       joblist(k).arguments = {episodes, 2^step, 100, 1};
+       joblist(k).arguments = {episodes, 2^step, 2};
     end
 
     [results,finishtimes]  = runjobs(s,joblist,1);
@@ -63,7 +63,7 @@ end
 for step=0:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna_mlac;
-       joblist(k).arguments = {episodes, 2^step, 100, 1};
+       joblist(k).arguments = {episodes, 2^step, 2};
     end
 
     [results,finishtimes]  = runjobs(s,joblist,1);
