@@ -2,8 +2,8 @@ close all;
 clear all;
 clc;
 
-desired_performance = -1000;
-times_in_row = 3;
+desired_performance = -800;
+times_in_row = 1;
 power_of_two=11;
 
 x = linspace(0, power_of_two, power_of_two+1);
@@ -49,7 +49,7 @@ end
 %path = make_save_folder('curve');
 h = figure;
 hold on;
-axis_limits = [0,power_of_two,0,350];
+axis_limits = [0,power_of_two,0,450];
 h_sac = errorbaralpha(repmat(m_sac, 1, power_of_two+1), repmat(c_sac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'r');
 h_mlac = errorbaralpha(repmat(m_mlac, 1, power_of_two+1), repmat(c_mlac, 1, power_of_two+1), 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'b');
 h_dyna = errorbaralpha(m_dyna, c_dyna, 'Rendering', 'alpha', 'Axis', axis_limits, 'Color', 'g');
@@ -57,7 +57,7 @@ h_dyna_mlac = errorbaralpha(m_dyna_mlac, c_dyna_mlac, 'Rendering', 'alpha', 'Axi
 legend([h_sac, h_mlac, h_dyna, h_dyna_mlac], {'SAC', 'MLAC', 'DYNA', 'DYNA-MLAC' });
 xlabel('Computation time');
 ylabel('Rise Time');
-title('Performance of Dyna against SAC and MLAC');
+title(strcat('Performance of Dyna against SAC and MLAC considering performance of ', num2str(desired_performance)));
 %filename = strcat('trials-', num2str(trials), '-performance-', num2str(performance), '-times_in_row-', num2str(times_in_row), '-power_of_two-', num2str(power_of_two));
 %saveas(h, strcat(path, filename), 'png');
 hold off;
@@ -70,3 +70,4 @@ legend('DYNA', 'DYNA-MLAC','Location','west');
 xlabel('Computation time');
 ylabel('Convergence rate %');
 title('Convergence rate of Dyna and Dyna-MLAC');
+axis([0, power_of_two, 0, 100]);
