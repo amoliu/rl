@@ -1,4 +1,4 @@
-function plot_many(varargin)
+function h = plot_many(varargin)
     
     p = inputParser;
     p.addParameter('title','', @isstr);
@@ -20,7 +20,7 @@ function plot_many(varargin)
     for i=1:data_size
         d = args.data{i};
         c = cmap(i, :);
-        handles = [handles errorbaralpha(mean(d), 'e', 1.96.*std(d)./sqrt(size(d, 1)), 'Color', c, 'axis', [1, 15, -4000 ,0])];
+        handles = [handles errorbaralpha(mean(d), 'e', 1.96.*std(d)./sqrt(size(d, 1)), 'Color', c, 'axis', [1, size(d, 2), -4000 ,0])];
     end
     
     legend(handles, args.legend);
@@ -29,5 +29,4 @@ function plot_many(varargin)
     title(args.title);
 
     hold off;
-    
 end

@@ -2,7 +2,7 @@ close all;
 clear all;
 clc;
 
-desired_performance = -800;
+desired_performance = -1000;
 times_in_row = 1;
 power_of_two=11;
 
@@ -71,3 +71,17 @@ xlabel('Computation time');
 ylabel('Convergence rate %');
 title('Convergence rate of Dyna and Dyna-MLAC');
 axis([0, power_of_two, 0, 100]);
+hold off;
+
+for i=0:power_of_two
+    load(strcat(folder, 'dyna', num2str(i), '.mat'));
+    dyna = cr;
+    
+    load(strcat(folder, 'dyna-mlac', num2str(i), '.mat'));
+    dyna_mlac = cr;
+    
+    h = plot_many('title', strcat('Dyna against Dyna-Mlac in 2^{', num2str(i), '} updates/controls step'), 'data', {dyna, dyna_mlac}, 'legend', {'Dyna', 'Dyna-Mlac'});
+    %saveas(h, strcat('dynas_', num2str(i)), 'png');
+end
+
+
