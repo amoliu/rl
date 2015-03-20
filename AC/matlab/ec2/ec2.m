@@ -8,14 +8,14 @@ codes = messagecodes;
 s = socket_client('/home/bruno/Documentos/aws/home.pem');
 [s,servers] = updateserverlist(s);
 
-trials = 40;
-episodes = 600;
+trials = 16;
+episodes = 200;
 power_of_two = 10;
 
 % Sac
 for k=1:trials
    joblist(k).command = codes.sac;
-   joblist(k).arguments = {episodes};
+   joblist(k).arguments = {episodes, 0.03, 0.2};
 end
 
 [results,finishtimes]  = runjobs(s,joblist,1);
@@ -45,7 +45,7 @@ save mlac.mat cr;
 for step=0:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna;
-       joblist(k).arguments = {episodes, 2^step, 2};
+       joblist(k).arguments = {episodes, 2^step, 0.03, 0.2};
     end
 
     [results,finishtimes]  = runjobs(s,joblist,1);

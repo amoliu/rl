@@ -27,6 +27,9 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     p.addParameter('steps', 2, @isnumeric);
     p.addOptional('episodes', 100, @isnumeric);
     
+    p.addOptional('actorAlpha', 0.03, @isnumeric);
+    p.addOptional('criticAlpha', 0.2, @isnumeric);
+    
     p.addOptional('alpha', 2, @isnumeric);
     p.addOptional('explorationRate', 1, @isnumeric);
         
@@ -46,14 +49,14 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.03);
+    javaSpec.setActorAlpha(args.actorAlpha);
     javaSpec.setActorMemory(2000);
     javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(5);
     
-    javaSpec.setCriticAlpha(0.1);
+    javaSpec.setCriticAlpha(args.criticAlpha);
     javaSpec.setCriticMemory(2000);
     javaSpec.setCriticNeighbors(20);
     javaSpec.setCriticMin(-3000);

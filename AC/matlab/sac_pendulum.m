@@ -23,6 +23,9 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
     
     p.addOptional('episodes', 100, @isnumeric);
     
+    p.addOptional('actorAlpha', 0.03, @isnumeric);
+    p.addOptional('criticAlpha', 0.2, @isnumeric);
+    
     p.addOptional('performance', -900, @isnumeric);
     p.addOptional('trialsInARow', 3, @isnumeric);
     
@@ -39,19 +42,19 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.005);
+    javaSpec.setActorAlpha(args.actorAlpha);
     javaSpec.setActorMemory(2000);
     javaSpec.setActorNeighbors(10);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
-    javaSpec.setActorValuesToRebuildTree(1);
+    javaSpec.setActorValuesToRebuildTree(5);
     
-    javaSpec.setCriticAlpha(0.1);
+    javaSpec.setCriticAlpha(args.criticAlpha);
     javaSpec.setCriticMemory(2000);
     javaSpec.setCriticNeighbors(20);
     javaSpec.setCriticMin(-3000);
     javaSpec.setCriticMax(0);
-    javaSpec.setCriticValuesToRebuildTree(1);
+    javaSpec.setCriticValuesToRebuildTree(5);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
