@@ -50,22 +50,22 @@ function server(port,debug)
                 if debug
                     fprintf('Received sac command\n');
                 end
-                [episodes, actorAlpha, criticAlpha] = deal(received.arguments{:});
-                [~, ~, cr] = sac_pendulum('episodes', episodes, 'actorAlpha', actorAlpha, 'criticAlpha', criticAlpha, 'verbose', true);
+                [episodes] = deal(received.arguments{:});
+                [~, ~, cr] = sac_pendulum('episodes', episodes, 'verbose', true);
                 mssend(sock,cr);
               case {codes.mlac}
                 if debug
                     fprintf('Received mlac command\n');
                 end
                 [episodes] = deal(received.arguments{:});
-                [~, ~, cr] = mlac_pendulum('mode', 'episode', 'episodes', episodes, 'verbose', true);
+                [~, ~, cr] = mlac_pendulum('episodes', episodes, 'verbose', true);
                 mssend(sock,cr);
               case {codes.dyna}
                 if debug
                     fprintf('Received dyna command\n');
                 end
-                [episodes, steps, actorAlpha, criticAlpha] = deal(received.arguments{:});
-                [~, ~, cr] = dyna_pendulum('episodes', episodes, 'steps', steps, 'actorAlpha', actorAlpha, 'criticAlpha', criticAlpha, 'verbose', true);
+                [episodes, steps, alpha] = deal(received.arguments{:});
+                [~, ~, cr] = dyna_pendulum('episodes', episodes, 'steps', steps, 'alpha', alpha, 'verbose', true);
                 mssend(sock,cr);
               case {codes.dyna_mlac}
                 if debug
