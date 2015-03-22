@@ -53,7 +53,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(5);
     
-    javaSpec.setCriticAlpha(0.1);
+    javaSpec.setCriticAlpha(0.3);
     javaSpec.setCriticMemory(2000);
     javaSpec.setCriticNeighbors(20);
     javaSpec.setCriticMin(-3000);
