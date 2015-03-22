@@ -10,12 +10,12 @@ s = socket_client('/home/bruno/Documentos/aws/home.pem');
 
 trials = 16;
 episodes = 200;
-power_of_two = 10;
+power_of_two = 11;
 
 % Sac
 for k=1:trials
    joblist(k).command = codes.sac;
-   joblist(k).arguments = {episodes, 0.03, 0.2};
+   joblist(k).arguments = {episodes};
 end
 
 [results,finishtimes]  = runjobs(s,joblist,1);
@@ -34,42 +34,43 @@ end
 
 [results,finishtimes]  = runjobs(s,joblist,1);
 
-% Make sac.mat file
 cr = zeros(trials,episodes);
 for k=1:trials
    cr(k,:) = results{k};
 end
 save mlac.mat cr;
 
+dyna_episodes = [200, 200, 100, 100, 50, 30, 30, 30, 15, 15, 15];
+
 %Dyna
-for step=0:power_of_two
+for step=1:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna;
-       joblist(k).arguments = {episodes, 2^step, 0.03, 0.2};
+       joblist(k).arguments = {dyna_episodes(step), 2^step, 1};
     end
 
     [results,finishtimes]  = runjobs(s,joblist,1);
 
     % Make dyna.mat file
-    cr = zeros(trials,episodes);
+    cr = zeros(trials,dyna_episodes(step));
     for k=1:trials
        cr(k,:) = results{k};
     end
-    filename = strcat('dyna', num2str(step), '.mat');
+    filename = strcat('dyna-alpha1', num2str(step), '.mat');
     save(filename, 'cr');
 end
 
 %Dyna-mlac
-for step=0:power_of_two
+for step=1:power_of_two
     for k=1:trials
        joblist(k).command = codes.dyna_mlac;
-       joblist(k).arguments = {episodes, 2^step, 2};
+       joblist(k).arguments = {dyna_episodes(step), 2^step};
     end
 
     [results,finishtimes]  = runjobs(s,joblist,1);
 
     % Make dyna.mat file
-    cr = zeros(trials,episodes);
+    cr = zeros(trials,dyna_episodes(step));
     for k=1:trials
        cr(k,:) = results{k};
     end
