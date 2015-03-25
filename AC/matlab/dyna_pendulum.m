@@ -27,7 +27,7 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     p.addParameter('steps', 2, @isnumeric);
     p.addOptional('episodes', 100, @isnumeric);
         
-    p.addOptional('alpha', 2, @isnumeric);
+    p.addOptional('alpha', 1, @isnumeric);
     p.addOptional('explorationRate', 1, @isnumeric);
         
     p.addOptional('performance', -900, @isnumeric);
