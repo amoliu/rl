@@ -71,8 +71,8 @@ function server(port,debug)
                 if debug
                     fprintf('Received dyna-mlac command\n');
                 end
-                [episodes, steps, alpha] = deal(received.arguments{:});
-                [~, ~, cr] = dyna_mlac_pendulum('episodes', episodes, 'steps', steps, 'alpha', alpha, 'verbose', true);
+                [episodes, steps, actorScale, criticScale, processScale] = deal(received.arguments{:});
+                [~, ~, cr] = dyna_mlac_pendulum('episodes', episodes, 'steps', steps, 'actorScale', actorScale, 'criticScale', criticScale, 'processScale', processScale, 'verbose', true);
                 mssend(sock,cr);
               case {codes.all}
                 if debug
