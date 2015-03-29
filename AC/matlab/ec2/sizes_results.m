@@ -48,8 +48,9 @@ end
 hold on;
 ha = plot(actor, 'Color', [1 0 0]);
 hc = plot(critic, 'Color', [0 1 0]);
+hp = plot(processModel, 'Color', [0 0 1]);
 
-legend([ha, hc], {'Actor', 'Critic'}, 'Location','east');
+legend([ha, hc, hp], {'Actor', 'Critic', 'Process Model'}, 'Location','east');
 %xlabel(args.xlabel);
 ylabel('Performance');
 title('Log-scale memory sizes in Dyna-mlac using 2^6 updates/control step');
