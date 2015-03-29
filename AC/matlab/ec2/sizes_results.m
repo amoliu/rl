@@ -52,5 +52,5 @@ hc = plot(critic, 'Color', [0 1 0]);
 legend([ha, hc], {'Actor', 'Critic'}, 'Location','east');
 %xlabel(args.xlabel);
 ylabel('Performance');
-title('Log-scale memory sizes');
+title('Log-scale memory sizes in Dyna-mlac using 2^6 updates/control step');
 hold off;
