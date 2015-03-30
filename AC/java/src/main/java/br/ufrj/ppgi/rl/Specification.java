@@ -78,8 +78,10 @@ public class Specification implements Serializable
   private float               processModelSd;
 
   private LLRMemoryManagement processModelMemoryManagement;
-  
+
   private double              processModelMeanDistanceLimit;
+
+  private int                 processModelAnglePosition;
 
   private SimpleMatrix        observationMinValue;
 
@@ -424,7 +426,7 @@ public class Specification implements Serializable
   {
     if (observationRange == null)
     {
-      observationRange = observationMaxValue.minus(observationMinValue).divide(100);
+      observationRange = observationMaxValue.minus(observationMinValue).divide(10);
     }
 
     return observationRange;
@@ -548,5 +550,15 @@ public class Specification implements Serializable
   public void setProcessModelMeanDistanceLimit(double processModelMeanDistanceLimit)
   {
     this.processModelMeanDistanceLimit = processModelMeanDistanceLimit;
+  }
+
+  public int getProcessModelAnglePosition()
+  {
+    return processModelAnglePosition;
+  }
+
+  public void setProcessModelAnglePosition(int processModelAnglePosition)
+  {
+    this.processModelAnglePosition = processModelAnglePosition;
   }
 }

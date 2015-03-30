@@ -67,6 +67,7 @@ function [critic, actor, cr, rmse, model, episodes] = mlac_pendulum(varargin)
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
+    javaSpec.setProcessModelAnglePosition(0);
     
     javaSpec.setProcessModelCrossLimit(10);
     javaSpec.setProcessModelUpperBound([20 0]);

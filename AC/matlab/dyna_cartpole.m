@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pendulum(varargin)
+function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_cartpole(varargin)
 %DYNA_PENDULUM Runs the dyna algorithim on the pendulum swing-up.
 %   DYNA_PENDULUM(E, S) learns during E episodes,
 %   doing S model steps per real step.
@@ -39,26 +39,28 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     args = p.Results;
     
     % Initialize environment
-    spec = env_mops_sim('init');
+    opts.swingup = 1;
+    spec = env_cartpole('init', opts);
     
     % Normalization factor used in observations
-    norm_factor   = [ pi/10, pi ];
+    norm_factor = [1/10, 1, pi/5, pi];
+    % norm_factor = [1, 1, 1, 1];
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
     javaSpec.setActorAlpha(0.03);
-    javaSpec.setActorMemory(2000);
-    javaSpec.setActorNeighbors(10);
+    javaSpec.setActorMemory(8000);
+    javaSpec.setActorNeighbors(15);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
-    javaSpec.setActorValuesToRebuildTree(5);
+    javaSpec.setActorValuesToRebuildTree(1);
     
-    javaSpec.setCriticAlpha(0.2);
-    javaSpec.setCriticMemory(2000);
+    javaSpec.setCriticAlpha(0.3);
+    javaSpec.setCriticMemory(8500);
     javaSpec.setCriticNeighbors(20);
-    javaSpec.setCriticMin(-3000);
+    javaSpec.setCriticMin(-12000);
     javaSpec.setCriticMax(0);
-    javaSpec.setCriticValuesToRebuildTree(5);
+    javaSpec.setCriticValuesToRebuildTree(1);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
     javaSpec.setActionDimensions(spec.action_dims);
@@ -66,33 +68,33 @@ function [critic, actor, cr, rmse, model, skiped, distance, episodes] = dyna_pen
     javaSpec.setExplorationRate(1);
     javaSpec.setProcessModelExplorationRate(args.explorationRate);
     javaSpec.setLamda(0.65);
-    javaSpec.setGamma(0.97);
+    javaSpec.setGamma(0.99);
     javaSpec.setSd(1.0);
     javaSpec.setProcessModelSd(1.0);
     
-    javaSpec.setProcessModelMemory(100);
-    javaSpec.setProcessModelNeighbors(9);
+    javaSpec.setProcessModelMemory(8000);
+    javaSpec.setProcessModelNeighbors(20);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
     
     javaSpec.setProcessModelCrossLimit(10);
-    javaSpec.setProcessModelUpperBound([20 0]);
+    javaSpec.setProcessModelUpperBound([0 0 10 0]);
     javaSpec.setProcessModelThreshold(0.5);
-    javaSpec.setProcessModelAnglePosition(0);
+    javaSpec.setProcessModelAnglePosition(2);
     
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
     javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/args.alpha);
     javaSpec.setProcessModelActorAplha(javaSpec.getActorAlpha()/args.alpha);
     javaSpec.setProcessModelGamma(0.97);
     javaSpec.setProcessModelIterationsWithoutLearning(0);
-    javaSpec.setRewardCalculator(br.ufrj.ppgi.rl.reward.RewardCalculator.Pendulum);
+    javaSpec.setRewardCalculator(br.ufrj.ppgi.rl.reward.RewardCalculator.Cartpole);
     javaSpec.setNormalization(norm_factor);
     javaSpec.setProcessModelMeanDistanceLimit(0.65);
        
     agent = br.ufrj.ppgi.rl.ac.DynaActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, rmse, episodes, skiped, distance] = learn('mops_sim', norm_factor, agent, args);
+    [critic, actor, cr, rmse, episodes, skiped, distance] = learn('cartpole', norm_factor, agent, args);
     model = agent.getProcessModel();
 end

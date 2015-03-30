@@ -4,7 +4,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public enum RewardCalculator
 {
-  Pendulum(new PendulumReward());
+  Pendulum(new PendulumReward()), Cartpole(new CartpoleReward());
 
   private final Reward reward;
 
@@ -17,7 +17,7 @@ public enum RewardCalculator
   {
     return reward.calculate(new SimpleMatrix(state), new SimpleMatrix(action));
   }
-  
+
   public double calculate(SimpleMatrix state, SimpleMatrix action)
   {
     return reward.calculate(state, action);

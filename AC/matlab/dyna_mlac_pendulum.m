@@ -83,6 +83,7 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setProcessModelCrossLimit(10);
     javaSpec.setProcessModelUpperBound([20 0]);
     javaSpec.setProcessModelThreshold(0.5);
+    javaSpec.setProcessModelAnglePosition(0);
         
     javaSpec.setProcessModelStepsPerEpisode(args.steps);
     javaSpec.setProcessModelCriticAlpha(javaSpec.getCriticAlpha()/args.alpha);

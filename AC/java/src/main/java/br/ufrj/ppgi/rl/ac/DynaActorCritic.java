@@ -110,13 +110,13 @@ public class DynaActorCritic extends StandardActorCritic
 
       // Restart model transition if hit a terminal state or
       // if we had model.steps iterations
-      if (modelStep >= 100)
+      if (modelStep >= 100 || reward <= -10000)
       {
         restartModel();
       }
     }
 
-    return meanDistance;
+    return skiped;
   }
 
   private SimpleMatrix chooseAction(SimpleMatrix observation, int i)

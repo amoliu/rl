@@ -579,11 +579,21 @@ public class LWR implements Serializable
 
   private void buildKDTree()
   {
-    tree = new KdTree<Integer>(input_dimension);
+    KdTree<Integer> newTree = new KdTree<Integer>(input_dimension);
     for (int i = 0; i < last_llr; i++)
     {
-      tree.addPoint(dataInput.extractVector(true, i).getMatrix().data, i);
+      try {
+        newTree.addPoint(dataInput.extractVector(true, i).getMatrix().data, i);
+      }
+      catch (NullPointerException npe)
+      {
+        // The lib used for KNN has a random bug that gives a NPE while adding.
+        // This will try to fix it!
+        return;
+      }
     }
+    
+    tree = newTree;
   }
 
   public void setRandom(Random random)

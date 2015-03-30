@@ -20,22 +20,23 @@ function [critic, actor, cr, rmse, model, episodes] = mlac_cartpole(varargin)
     spec = env_cartpole('init', opts);
     
     % Normalization factor used in observations
-    norm_factor = [1/8, 1/2, pi/10, pi];
+    norm_factor = [1/12, 1/4, pi/10, pi];
     % norm_factor = [1, 1, 1, 1];
     
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
-    javaSpec.setActorAlpha(0.10);
-    javaSpec.setActorMemory(4000);
+    javaSpec.setActorAlpha(0.002);
+    javaSpec.setActorMemory(8000);
     javaSpec.setActorNeighbors(15);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(1);
     
-    javaSpec.setCriticInitialValue(0);
-    javaSpec.setCriticAlpha(0.25);
-    javaSpec.setCriticMemory(5000);
+    javaSpec.setCriticAlpha(0.025);
+    javaSpec.setCriticMemory(8000);
     javaSpec.setCriticNeighbors(20);
+    javaSpec.setCriticMin(-12000);
+    javaSpec.setCriticMax(0);
     javaSpec.setCriticValuesToRebuildTree(1);
 
     javaSpec.setObservationDimensions(spec.observation_dims);
@@ -43,18 +44,19 @@ function [critic, actor, cr, rmse, model, episodes] = mlac_cartpole(varargin)
 
     javaSpec.setExplorationRate(1);
     javaSpec.setLamda(0.67);
-    javaSpec.setGamma(0.97);
-    javaSpec.setSd(5.0);
+    javaSpec.setGamma(0.99);
+    javaSpec.setSd(1.0);
     
-    javaSpec.setProcessModelMemory(100);
-    javaSpec.setProcessModelNeighbors(10);
+    javaSpec.setProcessModelMemory(2000);
+    javaSpec.setProcessModelNeighbors(15);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
+    javaSpec.setProcessModelAnglePosition(3);
     
-    javaSpec.setProcessModelCrossLimit(1000);
-    javaSpec.setProcessModelUpperBound([0 0 0 0]);
-    javaSpec.setProcessModelThreshold(-2.0);
+    javaSpec.setProcessModelCrossLimit(10);
+    javaSpec.setProcessModelUpperBound([0 0 20 0]);
+    javaSpec.setProcessModelThreshold(0.5);
     
     agent = br.ufrj.ppgi.rl.ac.MLAC;
     agent.init(javaSpec);

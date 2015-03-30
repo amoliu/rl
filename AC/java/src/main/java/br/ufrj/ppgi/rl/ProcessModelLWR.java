@@ -38,11 +38,12 @@ public class ProcessModelLWR implements Serializable
   {
     LWRQueryVO query = lwr.query(createProcessoModelInput(observation, action));
 
-    if (query.getResult().get(0) < 0)
+    if (query.getResult().get(specification.getProcessModelAnglePosition()) < 0)
     {
       query.setResult(query.getResult().plus(specification.getProcessModelUpperBound()));
     }
-    if (query.getResult().get(0) > specification.getProcessModelUpperBound().get(0))
+    if (query.getResult().get(specification.getProcessModelAnglePosition()) > specification.getProcessModelUpperBound()
+                                                                                           .get(specification.getProcessModelAnglePosition()))
     {
       query.setResult(query.getResult().minus(specification.getProcessModelUpperBound()));
     }
@@ -52,13 +53,15 @@ public class ProcessModelLWR implements Serializable
 
   public void add(SimpleMatrix observation, SimpleMatrix action, SimpleMatrix nextObservation)
   {
-    if (nextObservation.get(0) - observation.get(0) < -specification.getProcessModelCrossLimit())
+    if (nextObservation.get(specification.getProcessModelAnglePosition())
+        - observation.get(specification.getProcessModelAnglePosition()) < -specification.getProcessModelCrossLimit())
     {
       addToLLR(observation, action, nextObservation.plus(specification.getProcessModelUpperBound()));
       addToLLR(observation.minus(specification.getProcessModelUpperBound()), action, nextObservation);
     }
     else
-      if (nextObservation.get(0) - observation.get(0) > specification.getProcessModelCrossLimit())
+      if (nextObservation.get(specification.getProcessModelAnglePosition())
+          - observation.get(specification.getProcessModelAnglePosition()) > specification.getProcessModelCrossLimit())
       {
         addToLLR(observation.plus(specification.getProcessModelUpperBound()), action, nextObservation);
         addToLLR(observation, action, nextObservation.minus(specification.getProcessModelUpperBound()));
@@ -73,7 +76,7 @@ public class ProcessModelLWR implements Serializable
   {
     lwr.add(createProcessoModelInput(observation, action), nextObservation);
 
-    if (observation.get(0) - specification.getProcessModelThreshold() < 0)
+    if (observation.get(specification.getProcessModelAnglePosition()) - specification.getProcessModelThreshold() < 0)
     {
       SimpleMatrix newObservation = observation.plus(specification.getProcessModelUpperBound());
       SimpleMatrix newNextObservation = nextObservation.plus(specification.getProcessModelUpperBound());
@@ -81,8 +84,8 @@ public class ProcessModelLWR implements Serializable
       lwr.add(createProcessoModelInput(newObservation, action), newNextObservation);
     }
 
-    if (observation.get(0) + specification.getProcessModelThreshold() > specification.getProcessModelUpperBound()
-                                                                                     .get(0))
+    if (observation.get(specification.getProcessModelAnglePosition()) + specification.getProcessModelThreshold() > specification.getProcessModelUpperBound()
+                                                                                                                                .get(0))
     {
       SimpleMatrix newObservation = observation.minus(specification.getProcessModelUpperBound());
       SimpleMatrix newNextObservation = nextObservation.minus(specification.getProcessModelUpperBound());
