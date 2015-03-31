@@ -43,12 +43,13 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
     end
     
     if args.figure
-        close all;
-        figure(1);
-        figure(2);
-        %first_obs = env('start');
-        %h = viz(first_obs);
-        %title('Training');
+        %close all;
+        %figure(1);
+        %figure(2);
+         figure;
+         first_obs = env('start');
+         h = viz(first_obs);
+         title('Training');
     end
     
     while while_cond()
@@ -67,28 +68,30 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
             norm_obs = obs ./ norm_factor;
 
             if args.figure
-                figure(1);
-                criticInput = agent.getCritic.getLLR.getMatlabDataInput;
-                criticOutput = agent.getCritic.getLLR.getMatlabDataOutput;
-                scatter(criticInput(:,1), criticInput(:,2), 25, criticOutput, 'filled')
-                title('Critic');
-                xlabel('angle[rad]');
-                ylabel('angular velocity[rad/s]');
-                axis([0, 20, -15, 15]);
-                colorbar;
-                
-                figure(2);
-                actorInput = agent.getActor.getLLR.getMatlabDataInput;
-                actorOutput = agent.getActor.getLLR.getMatlabDataOutput;
-                scatter(actorInput(:,1), actorInput(:,2), 25, actorOutput, 'filled')
-                title('Actor');
-                xlabel('angle[rad]');
-                ylabel('angular velocity[rad/s]');
-                axis([0, 20, -15, 15]);
-                colorbar;
-                
-                drawnow;
-                pause(0.001);
+%                 figure(1);
+%                 criticInput = agent.getCritic.getLLR.getMatlabDataInput;
+%                 criticOutput = agent.getCritic.getLLR.getMatlabDataOutput;
+%                 scatter(criticInput(:,1), criticInput(:,2), 25, criticOutput, 'filled')
+%                 title('Critic');
+%                 xlabel('angle[rad]');
+%                 ylabel('angular velocity[rad/s]');
+%                 axis([0, 20, -15, 15]);
+%                 colorbar;
+%                 
+%                 figure(2);
+%                 actorInput = agent.getActor.getLLR.getMatlabDataInput;
+%                 actorOutput = agent.getActor.getLLR.getMatlabDataOutput;
+%                 scatter(actorInput(:,1), actorInput(:,2), 25, actorOutput, 'filled')
+%                 title('Actor');
+%                 xlabel('angle[rad]');
+%                 ylabel('angular velocity[rad/s]');
+%                 axis([0, 20, -15, 15]);
+%                 colorbar;
+%                 
+%                 drawnow;
+%                 pause(0.001);
+                viz(obs, h);
+                pause(0.002);
             end
             
             if terminal

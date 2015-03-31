@@ -43,7 +43,7 @@ function ac_cartpole_viz(actor, critic, cr)
     opts.swingup = 1;
     env_cartpole('init', opts);
     
-    norm_factor = [1/12, 1, pi/10, pi];
+    norm_factor = [1/10, 1/4, pi/10, pi/2];
     
     % Reset simulation to initial condition
     obs = env_mops_sim('start');
