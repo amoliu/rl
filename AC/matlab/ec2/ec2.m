@@ -89,3 +89,19 @@ for k=1:size(servers, 2)
    joblist(k).arguments = {episodes, dyna_episodes, start_power, end_power, whoami};
 end
 runjobs(s,joblist,1);
+
+% Alpha experiment
+for k=1:size(servers, 2)
+   whoami = k;
+   joblist(k).command = codes.alpha_dyna;
+   joblist(k).arguments = {whoami};
+end
+runjobs(s,joblist,1);
+
+% Alpha ac experiment
+for k=1:size(servers, 2)
+   whoami = k;
+   joblist(k).command = codes.alpha_ac;
+   joblist(k).arguments = {whoami};
+end
+runjobs(s,joblist,1);

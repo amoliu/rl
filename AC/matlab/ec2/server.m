@@ -120,6 +120,54 @@ function server(port,debug)
                     fprintf('Closed socket\n');
                 end
                 break;
+              case {codes.alpha_dyna}
+                if debug
+                    fprintf('Received alpha dyna command\n');
+                end
+                [whoami] = deal(received.arguments{:});
+                mssend(sock,'1');
+                msclose(sock);
+                
+                path = '/mnt/s3/alpha/';
+                alpha = 1;
+                for i=1:4
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'alpha', alpha, 'verbose', true);
+                    t = strcat('dyna-mlac-', num2str(alpha), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'alpha', alpha, 'verbose', true);
+                    t = strcat('dyna-', num2str(alpha), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    alpha = alpha * 2;
+                end
+              case {codes.alpha_ac}
+                if debug
+                    fprintf('Received alpha ac command\n');
+                end
+                [whoami] = deal(received.arguments{:});
+                mssend(sock,'1');
+                msclose(sock);
+                
+                path = '/mnt/s3/alpha-ac/';
+                scale = 0.25;
+                for i=1:5
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'actorAlpha', scale, 'verbose', true);
+                    t = strcat('dyna-mlac-actor-', num2str(scale), '-', num2str(whoami), '.mat');
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'criticAlpha', scale, 'verbose', true);
+                    t = strcat('dyna-mlac-critic-', num2str(scale), '-', num2str(whoami), '.mat');
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'actorAlpha', scale, 'verbose', true);
+                    t = strcat('dyna-actor', num2str(scale), '-', num2str(whoami), '.mat');
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'criticAlpha', scale, 'verbose', true);
+                    t = strcat('dyna-critic', num2str(scale), '-', num2str(whoami), '.mat');
+                    save(strcat(path,t), 'cr');
+                    scale = scale * 2;
+                end
             end
         end
     end

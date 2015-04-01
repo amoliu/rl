@@ -11,3 +11,7 @@ function codes = messagecodes
     codes.dyna_mlac = 13;
     
     codes.all = 14;
+    
+    codes.alpha_dyna = 15;
+    codes.alpha_ac = 16;
+    
