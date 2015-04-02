@@ -105,3 +105,11 @@ for k=1:size(servers, 2)
    joblist(k).arguments = {whoami};
 end
 runjobs(s,joblist,1);
+
+% ER experiment
+for k=1:size(servers, 2)
+   whoami = k;
+   joblist(k).command = codes.er;
+   joblist(k).arguments = {whoami};
+end
+runjobs(s,joblist,1);

@@ -168,6 +168,34 @@ function server(port,debug)
                     save(strcat(path,t), 'cr');
                     scale = scale * 2;
                 end
+            case {codes.er}
+                if debug
+                    fprintf('Received er command\n');
+                end
+                [whoami] = deal(received.arguments{:});
+                mssend(sock,'1');
+                msclose(sock);
+                
+                path = '/mnt/s3/er/';
+                er = 1;
+                for i=1:4
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'explorationRate', er, 'verbose', true);
+                    t = strcat('dyna-mlac-er', num2str(er), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'modelExplorationRate', er, 'verbose', true);
+                    t = strcat('dyna-mlac-mer', num2str(er), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'explorationRate', er, 'verbose', true);
+                    t = strcat('dyna-er', num2str(er), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'modelExplorationRate', er, 'verbose', true);
+                    t = strcat('dyna-mer', num2str(er), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    er = er * 2;
+                end
             end
         end
     end
