@@ -70,4 +70,5 @@ legend([ha, hc, hp], {'Actor', 'Critic', 'Process Model'}, 'Location','east');
 %xlabel(args.xlabel);
 ylabel('Performance');
 title('Log-scale memory sizes in Dyna-mlac using 2^6 updates/control step');
+grid on;
 hold off;
