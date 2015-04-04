@@ -2,6 +2,7 @@ clear all;
 close all;
 clc;
 
+x = logspace(-1,2,4);
 path = '../results/mat/alpha/';
 
 %Dyna plot
@@ -22,11 +23,12 @@ end
 
 figure;
 hold on;
-plot(dyna,'--bo','LineWidth',2,'MarkerSize',10);
-plot(dyna_mlac,'--ro','LineWidth',2,'MarkerSize',10);
+semilogx(x, dyna,'--bo','LineWidth',2,'MarkerSize',10);
+semilogx(x, dyna_mlac,'--ro','LineWidth',2,'MarkerSize',10);
 xlabel('Alpha fraction');
 ylabel('End performance');
 legend('Dyna', 'Dyna-Mlac');
 title('Different alpha values in Dynas using 2^6 updates/control step');
 grid on;
+set(gca,'xscale','log');
 hold off;
