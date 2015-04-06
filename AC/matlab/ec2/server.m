@@ -94,13 +94,13 @@ function server(port,debug)
                     save(strcat(path,t), 'cr');
                 end
                 
-                if dyna_episodes > 0
+                if numel(dyna_episodes) > 0
                     path = '/mnt/s3/dyna/';
                     for power=start_power:end_power
                         steps = 2^power;
                         fprintf(strcat('Dyna ', num2str(steps), ' \n'));
-                        [~, ~, cr] = dyna_pendulum('mode', 'episode', 'episodes', dyna_episodes, 'steps', steps, 'verbose', true);
-                        t = strcat('dyna', num2str(steps), '-', num2str(dyna_episodes), '-episodes-', num2str(whoami));
+                        [~, ~, cr] = dyna_pendulum('mode', 'episode', 'episodes', dyna_episodes(power), 'steps', steps, 'verbose', true);
+                        t = strcat('dyna', num2str(steps), '-', num2str(whoami));
                         save(strcat(path,t), 'cr');
                     end
 
@@ -108,8 +108,8 @@ function server(port,debug)
                     for power=start_power:end_power
                         steps = 2^power;
                         fprintf(strcat('Dyna-mlac ', num2str(steps), ' \n'));
-                        [~, ~, cr] = dyna_mlac_pendulum('mode', 'episode', 'episodes', dyna_episodes, 'steps', steps, 'verbose', true);
-                        t = strcat('dyna-mlac', num2str(steps), '-', num2str(dyna_episodes), '-episodes-', num2str(whoami));
+                        [~, ~, cr] = dyna_mlac_pendulum('mode', 'episode', 'episodes', dyna_episodes(power), 'steps', steps, 'verbose', true);
+                        t = strcat('dyna-mlac', num2str(steps), '-', num2str(whoami));
                         save(strcat(path,t), 'cr');
                     end
                 end

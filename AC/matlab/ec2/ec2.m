@@ -80,9 +80,9 @@ end
 
 % All standalone
 episodes = 600;
-dyna_episodes = 200;
-start_power = 0;
-end_power = 14;
+start_power = 1;
+end_power = 11;
+dyna_episodes = [200, 200, 100, 100, 50, 30, 30, 30, 15, 15, 15];
 for k=1:size(servers, 2)
    whoami = k;
    joblist(k).command = codes.all;
