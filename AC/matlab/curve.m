@@ -73,7 +73,14 @@ title('Convergence rate of Dyna and Dyna-MLAC');
 axis([0, power_of_two, 0, 100]);
 hold off;
 
-for i=0:power_of_two
+load(strcat(folder, 'sac.mat'));
+sac = cr;
+load(strcat(folder, 'mlac.mat'));
+mlac = cr;
+h = plot_many('title', strcat('SAC against Mlac'), 'data', {sac, mlac}, 'legend', {'SAC', 'MLAC'});
+%saveas(h, strcat('dynas_', num2str(i)), 'png');
+
+for i=1:power_of_two
     load(strcat(folder, 'dyna', num2str(i), '.mat'));
     dyna = cr;
     
