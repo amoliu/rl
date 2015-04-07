@@ -11,8 +11,12 @@ public class StepVO implements Serializable
   private double[][]        action;
 
   private int               modelSkiped;
-  
+
   private double            meanDistance;
+
+  private double            actorUpdate;
+
+  private double            criticUpdate;
 
   public StepVO(double[][] action)
   {
@@ -76,5 +80,25 @@ public class StepVO implements Serializable
   public void setMeanDistance(double meanDistance)
   {
     this.meanDistance = meanDistance;
+  }
+
+  public double getActorUpdate()
+  {
+    return actorUpdate;
+  }
+
+  public void setActorUpdate(double actorUpdate)
+  {
+    this.actorUpdate = actorUpdate;
+  }
+
+  public double getCriticUpdate()
+  {
+    return criticUpdate;
+  }
+
+  public void setCriticUpdate(double criticUpdate)
+  {
+    this.criticUpdate = criticUpdate;
   }
 }

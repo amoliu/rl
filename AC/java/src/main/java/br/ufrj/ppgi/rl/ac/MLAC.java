@@ -78,11 +78,15 @@ public class MLAC implements Agent
   @Override
   public StepVO step(double reward, double[][] observation)
   {
-    double error = update(reward, new SimpleMatrix(observation));
+    MLACStepVO mlacVO = update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
     step++;
 
-    return new StepVO(error, chooseAction(lastObservation));
+    StepVO stepVO = new StepVO(mlacVO.getError(), chooseAction(lastObservation));
+    stepVO.setActorUpdate(mlacVO.getActorUpdate());
+    stepVO.setCriticUpdate(mlacVO.getCriticUpdate());
+
+    return stepVO;
   }
 
   @Override
@@ -99,7 +103,7 @@ public class MLAC implements Agent
     this.specification = null;
   }
 
-  protected double update(double reward, SimpleMatrix observation)
+  protected MLACStepVO update(double reward, SimpleMatrix observation)
   {
     LWRQueryVO modelQuery = processModel.query(lastObservation, lastAction);
     processModel.add(lastObservation, lastAction, observation);
@@ -110,11 +114,13 @@ public class MLAC implements Agent
     SimpleMatrix modelXa = getXa(modelQuery.getX());
 
     double actorUpdate = criticXs.mult(modelXa).get(0);
-    actor.update(actorUpdate, lastObservation, lastAction, false);
+    actorUpdate = actor.update(actorUpdate, lastObservation, lastAction, false);
 
-    critic.update(lastObservation, lastAction, reward, observation);
+    double criticUpdate = critic.update(lastObservation, lastAction, reward, observation);
 
-    return Math.pow(NormOps.normP2(observation.minus(modelQuery.getResult()).getMatrix()), 2);
+    double error = Math.pow(NormOps.normP2(observation.minus(modelQuery.getResult()).getMatrix()), 2);
+
+    return new MLACStepVO(error, actorUpdate, criticUpdate);
   }
 
   protected double[][] chooseAction(SimpleMatrix observation)

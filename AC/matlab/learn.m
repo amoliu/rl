@@ -1,4 +1,4 @@
-function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name, norm_factor, agent, args)
+function [critic, actor, cr, rmse, episodes, skiped, distance, actorUpdates, criticUpdates] = learn(env_name, norm_factor, agent, args)
 %LEARN Make the agent learn about the environment.
 %   LEARN(ENV, N, A) learns using N as norm factor to the observations,
 %   given the agent A in the ENV environment.
@@ -35,6 +35,8 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
     episodes = 1;
     
     skiped = [];
+    actorUpdates = [];
+    criticUpdates = [];
     
     if strcmp(args.mode, 'episode')
         while_cond = @condition_mode_episodes;
@@ -60,6 +62,8 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
         rmse(episodes) = 0;
         skiped(episodes) = 0;
         distance(episodes) = 0;
+        actorUpdates(episodes) = 0;
+        criticUpdates(episodes) = 0;
         
         while 1
              % Actuate
@@ -99,6 +103,8 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
             rmse(episodes) = rmse(episodes) + stepVO.getError;
             skiped(episodes) = skiped(episodes) + stepVO.getModelSkiped;
             distance(episodes) = distance(episodes) + stepVO.getMeanDistance;
+            actorUpdates(episodes) = actorUpdates(episodes) + stepVO.getActorUpdate;
+            criticUpdates(episodes) = criticUpdates(episodes) + stepVO.getCriticUpdate;
             
             % Learn and choose next action
             stepVO = agent.step(reward, norm_obs);

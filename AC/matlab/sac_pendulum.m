@@ -1,4 +1,4 @@
-function [critic, actor, cr, episodes] = sac_pendulum(varargin)
+function [critic, actor, cr, actorUpdates, criticUpdates, episodes] = sac_pendulum(varargin)
 %SAC_PENDULUM Runs the standard ac algorithim on the pendulum swing-up.
 %   SAC_PENDULUM(E) learns during E episodes
 %
@@ -42,8 +42,8 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
     javaSpec.setActorAlpha(0.03);
     javaSpec.setActorMemory(2000);
     javaSpec.setActorNeighbors(10);
-    javaSpec.setActorMin(spec.action_min);
-    javaSpec.setActorMax(spec.action_max);
+    javaSpec.setActorMin(-1.5);
+    javaSpec.setActorMax(1.5);
     javaSpec.setActorValuesToRebuildTree(5);
     
     javaSpec.setCriticAlpha(0.2);
@@ -64,5 +64,5 @@ function [critic, actor, cr, episodes] = sac_pendulum(varargin)
     agent = br.ufrj.ppgi.rl.ac.StandardActorCritic;
     agent.init(javaSpec);
     
-    [critic, actor, cr, ~, episodes] = learn('mops_sim', norm_factor, agent, args);
+    [critic, actor, cr, ~, episodes, ~, ~, actorUpdates, criticUpdates] = learn('mops_sim', norm_factor, agent, args);
 end
