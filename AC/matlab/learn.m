@@ -96,9 +96,9 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
                 break;
             end
 
-            rmse(episodes) = rmse(episodes) + stepVO.getError;
+            rmse(episodes) = rmse(episodes) + abs(stepVO.getError);
             skiped(episodes) = skiped(episodes) + stepVO.getModelSkiped;
-            distance(episodes) = distance(episodes) + stepVO.getMeanDistance;
+            distance(episodes) = distance(episodes) + abs(stepVO.getMeanDistance);
             
             % Learn and choose next action
             stepVO = agent.step(reward, norm_obs);
@@ -114,7 +114,7 @@ function [critic, actor, cr, rmse, episodes, skiped, distance] = learn(env_name,
         episodes = episodes + 1;
     end
 
-    rmse = sqrt(rmse ./ 100);
+    %rmse = sqrt(rmse ./ 100);
     
     % Destroy simulation
     env('fini');

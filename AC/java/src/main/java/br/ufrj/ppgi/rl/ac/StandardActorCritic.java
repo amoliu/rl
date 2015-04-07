@@ -65,11 +65,11 @@ public class StandardActorCritic implements Agent
   @Override
   public StepVO step(double reward, double[][] observation)
   {
-    update(reward, new SimpleMatrix(observation));
+    double actorUpdate = update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
     step++;
 
-    return new StepVO(chooseAction(lastObservation));
+    return new StepVO(actorUpdate, chooseAction(lastObservation));
   }
 
   @Override
@@ -86,10 +86,12 @@ public class StandardActorCritic implements Agent
     this.specification = null;
   }
 
-  protected void update(double reward, SimpleMatrix observation)
+  protected double update(double reward, SimpleMatrix observation)
   {
     double delta = critic.update(lastObservation, lastAction, reward, observation);
     actor.update(delta, lastObservation, lastAction, randomness);
+    
+    return delta;
   }
 
   protected double[][] chooseAction(SimpleMatrix observation)

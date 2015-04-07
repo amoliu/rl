@@ -2,7 +2,6 @@ package br.ufrj.ppgi.rl.ac;
 
 import static org.ejml.simple.SimpleMatrix.END;
 
-import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 
 import br.ufrj.ppgi.matlab.EJMLMatlabUtils;
@@ -78,11 +77,11 @@ public class MLAC implements Agent
   @Override
   public StepVO step(double reward, double[][] observation)
   {
-    double error = update(reward, new SimpleMatrix(observation));
+    double actorUpdate = update(reward, new SimpleMatrix(observation));
     lastObservation = new SimpleMatrix(observation);
     step++;
 
-    return new StepVO(error, chooseAction(lastObservation));
+    return new StepVO(actorUpdate, chooseAction(lastObservation));
   }
 
   @Override
@@ -114,7 +113,8 @@ public class MLAC implements Agent
 
     critic.update(lastObservation, lastAction, reward, observation);
 
-    return Math.pow(NormOps.normP2(observation.minus(modelQuery.getResult()).getMatrix()), 2);
+    //return Math.pow(NormOps.normP2(observation.minus(modelQuery.getResult()).getMatrix()), 2);
+    return actorUpdate;
   }
 
   protected double[][] chooseAction(SimpleMatrix observation)
