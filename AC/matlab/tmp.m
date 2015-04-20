@@ -1,69 +1,72 @@
-episodes = 15;
-trials = 24;
-step = 2^10;
-    
-cr_005 = zeros(trials,episodes);
-for k=1:trials
-   joblist(k).command = codes.dyna;
-   joblist(k).arguments = {episodes, step, 0.005};
-end
-[results,finishtimes]  = runjobs(s,joblist,1);
-for k=1:trials
-   cr_005(k,:) = results{k};
-end
-save(strcat('cr_005', num2str(step)), 'cr_005');
+path = '/home/bruno/Documentos/mestrado/rl/AC/results/mat/memory/';
 
-cr_01 = zeros(trials,episodes);
-for k=1:trials
-   joblist(k).command = codes.dyna;
-   joblist(k).arguments = {episodes, step, 0.01};
-end
-[results,finishtimes]  = runjobs(s,joblist,1);
-for k=1:trials
-   cr_01(k,:) = results{k};
-end
-save(strcat('cr_01', num2str(step)), 'cr_01');
+episodes = 16;
+trials = 20;
 
-cr_02 = zeros(trials,episodes);
-for k=1:trials
-   joblist(k).command = codes.dyna;
-   joblist(k).arguments = {episodes, step, 0.02};
-end
-[results,finishtimes]  = runjobs(s,joblist,1);
-for k=1:trials
-   cr_02(k,:) = results{k};
-end
-save(strcat('cr_02', num2str(step)), 'cr_02');
+memory = [2000 1000 500 250 125 60 30 15];
+actorNeighbors = [20 10 5 3 2 2 2 2];
+criticNeighbors = [40 20 10 5 3 2 2 2];
+processNeighbors = [20 10 5 3 2 2 2 2];
 
-crmlac_005 = zeros(trials,episodes);
-for k=1:trials
-   joblist(k).command = codes.dyna_mlac;
-   joblist(k).arguments = {episodes, step, 0.005};
+t_cr = zeros(episodes, trials);
+for i=1:size(memory,2)    
+    for j=1:episodes
+        t = strcat('dyna-mlac-actor', num2str(memory(i)), '-', num2str(j));
+        load(strcat(path,t), 'cr');
+        
+        t_cr(j,:) = cr;
+    end
+    cr = t_cr;
+    t = strcat('dyna-mlac-actor', num2str(memory(i)));
+    save(strcat(path, t), 'cr');
 end
-[results,finishtimes]  = runjobs(s,joblist,1);
-for k=1:trials
-   crmlac_005(k,:) = results{k};
-end
-save(strcat('crmlac_005', num2str(step)), 'crmlac_005');
 
-crmlac_01 = zeros(trials,episodes);
-for k=1:trials
-   joblist(k).command = codes.dyna_mlac;
-   joblist(k).arguments = {episodes, step, 0.01};
+for i=1:size(memory,2)    
+    for j=1:episodes
+        t = strcat('dyna-mlac-critic', num2str(memory(i)), '-', num2str(j));
+        load(strcat(path,t), 'cr');
+    end
+    cr = t_cr;
+    t = strcat('dyna-mlac-critic', num2str(memory(i)));
+    save(strcat(path, t), 'cr');
 end
-[results,finishtimes]  = runjobs(s,joblist,1);
-for k=1:trials
-   crmlac_01(k,:) = results{k};
-end
-save(strcat('crmlac_01', num2str(step)), 'crmlac_01');
 
-crmlac_02 = zeros(trials,episodes);
-for k=1:trials
-   joblist(k).command = codes.dyna_mlac;
-   joblist(k).arguments = {episodes, step, 0.02};
+for i=1:size(memory,2)    
+    for j=1:episodes
+        t = strcat('dyna-mlac-process', num2str(memory(i)), '-', num2str(j));
+        load(strcat(path,t), 'cr');
+    end
+    cr = t_cr;
+    t = strcat('dyna-mlac-process', num2str(memory(i)));
+    save(strcat(path, t), 'cr');
 end
-[results,finishtimes]  = runjobs(s,joblist,1);
-for k=1:trials
-   crmlac_02(k,:) = results{k};
+
+for i=1:size(memory,2)    
+    for j=1:episodes
+        t = strcat('dyna-actor', num2str(memory(i)), '-', num2str(j));
+        load(strcat(path,t), 'cr');
+    end
+    cr = t_cr;
+    t = strcat('dyna-actor', num2str(memory(i)));
+    save(strcat(path, t), 'cr');
 end
-save(strcat('crmlac_02', num2str(step)), 'crmlac_02');
+
+for i=1:size(memory,2)    
+    for j=1:episodes
+        t = strcat('dyna-critic', num2str(memory(i)), '-', num2str(j));
+        load(strcat(path,t), 'cr');
+    end
+    cr = t_cr;
+    t = strcat('dyna-critic', num2str(memory(i)));
+    save(strcat(path, t), 'cr');
+end
+
+for i=1:size(memory,2)    
+    for j=1:episodes
+        t = strcat('dyna-process', num2str(memory(i)), '-', num2str(j));
+        load(strcat(path,t), 'cr');
+    end
+    cr = t_cr;
+    t = strcat('dyna-process', num2str(memory(i)));
+    save(strcat(path, t), 'cr');
+end

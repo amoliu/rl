@@ -1,23 +1,23 @@
-folder = '../../results/mat/logplot/';
+folder = '../../results/mat/memory/';
 
 episodes = 20;
 step = 2^6;
 trials = 15;
 
-actor = zeros(1, 5);
-actorError = zeros(1, 5);
+memory = [2000 1000 500 250 125 60 30 15];
+memory_size = size(memory,2);
 
-critic = zeros(1, 5);
-criticError = zeros(1, 5);
+actor = zeros(1, memory_size);
+actorError = zeros(1, memory_size);
 
-processModel = zeros(1, 5);
-processModelError = zeros(1, 5);
+critic = zeros(1, memory_size);
+criticError = zeros(1, memory_size);
 
-actorScale = 0.25;
-criticScale = 1;
-processScale = 1;
-for a=1:5
-    filename = strcat(folder, 'dyna-mlac-', num2str(actorScale), '-', num2str(criticScale), '-', num2str(processScale), '.mat');
+processModel = zeros(1, memory_size);
+processModelError = zeros(1, memory_size);
+
+for a=1:memory_size
+    filename = strcat(folder, 'dyna-mlac-actor', num2str(memory(a)), '.mat');
     load(filename);
     
     m = mean(cr);
@@ -25,15 +25,10 @@ for a=1:5
     
     actor(a) = m(1,end);
     actorError(a) = er(1, end);
-    
-    actorScale = actorScale * 2;
 end
 
-actorScale = 1;
-criticScale = 0.25;
-processScale = 1;
-for c=1:5
-    filename = strcat(folder, 'dyna-mlac-', num2str(actorScale), '-', num2str(criticScale), '-', num2str(processScale), '.mat');
+for c=1:memory_size
+    filename = strcat(folder, 'dyna-mlac-critic', num2str(memory(c)), '.mat');
     load(filename);
     
     m = mean(cr);
@@ -41,15 +36,10 @@ for c=1:5
     
     critic(c) = m(1,end);
     criticError(c) = er(1,end);
-    
-    criticScale = criticScale * 2;
 end
 
-actorScale = 1;
-criticScale = 1;
-processScale = 0.25;
-for p=1:5
-    filename = strcat(folder, 'dyna-mlac-', num2str(actorScale), '-', num2str(criticScale), '-', num2str(processScale), '.mat');
+for p=1:memory_size
+    filename = strcat(folder, 'dyna-mlac-process', num2str(memory(p)), '.mat');
     load(filename);
     
     m = mean(cr);
@@ -57,8 +47,6 @@ for p=1:5
     
     processModel(p) = m(1,end);
     processModelError(p) = er(1,end);
-    
-    processScale = processScale * 2;
 end
 
 hold on;
