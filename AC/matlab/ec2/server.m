@@ -196,6 +196,44 @@ function server(port,debug)
                     save(strcat(path,t), 'cr');
                     er = er * 2;
                 end
+            case {codes.memory}
+               if debug
+                    fprintf('Received memory command\n');
+                end
+                [whoami] = deal(received.arguments{:});
+                mssend(sock,'1');
+                msclose(sock);
+                
+                path = '/mnt/s3/memory/';
+                memory = [2000 1000 500 250 125 60 30 15];
+                actorNeighbors = [20 10 5 3 2 2 2 2];
+                criticNeighbors = [40 20 10 5 3 2 2 2];
+                processNeighbors = [20 10 5 3 2 2 2 2];
+                for i=1:size(memory,2)
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'actorMemory', memory(i), 'actorNeighbors', actorNeighbors(i), 'verbose', true);
+                    t = strcat('dyna-mlac-actor', num2str(memory(i)), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                                      
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'criticMemory', memory(i), 'criticNeighbors', criticNeighbors(i), 'verbose', true);
+                    t = strcat('dyna-mlac-critic', num2str(memory(i)), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_mlac_pendulum('episodes', 20, 'steps', 64, 'processMemory', memory(i), 'processNeighbors', processNeighbors(i), 'verbose', true);
+                    t = strcat('dyna-mlac-process', num2str(memory(i)), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'actorMemory', memory(i), 'actorNeighbors', actorNeighbors(i), 'verbose', true);
+                    t = strcat('dyna-actor', num2str(memory(i)), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                                      
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'criticMemory', memory(i), 'criticNeighbors', criticNeighbors(i), 'verbose', true);
+                    t = strcat('dyna-critic', num2str(memory(i)), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                    
+                    [~, ~, cr] = dyna_pendulum('episodes', 20, 'steps', 64, 'processMemory', memory(i), 'processNeighbors', processNeighbors(i), 'verbose', true);
+                    t = strcat('dyna-process', num2str(memory(i)), '-', num2str(whoami));
+                    save(strcat(path,t), 'cr');
+                end      
             end
         end
     end

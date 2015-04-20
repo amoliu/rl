@@ -113,3 +113,11 @@ for k=1:size(servers, 2)
    joblist(k).arguments = {whoami};
 end
 runjobs(s,joblist,1);
+
+% Memory experiment
+for k=1:size(servers, 2)
+   whoami = k;
+   joblist(k).command = codes.memory;
+   joblist(k).arguments = {whoami};
+end
+runjobs(s,joblist,1);

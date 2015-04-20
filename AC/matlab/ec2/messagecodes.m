@@ -15,4 +15,5 @@ function codes = messagecodes
     codes.alpha_dyna = 15;
     codes.alpha_ac = 16;
     codes.er = 17;
+    codes.memory = 18;
     
