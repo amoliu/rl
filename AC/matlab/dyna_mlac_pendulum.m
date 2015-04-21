@@ -30,6 +30,15 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     p.addOptional('alpha', 1, @isnumeric);
     p.addOptional('explorationRate', 1, @isnumeric);
         
+    p.addOptional('actorMemory', 2000, @isnumeric);
+    p.addOptional('actorNeighbors', 10, @isnumeric);
+    
+    p.addOptional('criticMemory', 2000, @isnumeric);
+    p.addOptional('criticNeighbors', 20, @isnumeric);
+    
+    p.addOptional('processMemory', 100, @isnumeric);
+    p.addOptional('processNeighbors', 10, @isnumeric);
+    
     p.addOptional('performance', -900, @isnumeric);
     p.addOptional('trialsInARow', 3, @isnumeric);
     
