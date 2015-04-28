@@ -56,15 +56,15 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec = br.ufrj.ppgi.rl.Specification;
 
     javaSpec.setActorAlpha(0.03);
-    javaSpec.setActorMemory(2000);
-    javaSpec.setActorNeighbors(10);
+    javaSpec.setActorMemory(args.actorMemory);
+    javaSpec.setActorNeighbors(args.actorNeighbors);
     javaSpec.setActorMin(spec.action_min);
     javaSpec.setActorMax(spec.action_max);
     javaSpec.setActorValuesToRebuildTree(1);
     
     javaSpec.setCriticAlpha(0.3);
-    javaSpec.setCriticMemory(2000);
-    javaSpec.setCriticNeighbors(20);
+    javaSpec.setCriticMemory(args.criticMemory);
+    javaSpec.setCriticNeighbors(args.criticNeighbors);
     javaSpec.setCriticMin(-3000);
     javaSpec.setCriticMax(0);
     javaSpec.setCriticValuesToRebuildTree(1);
@@ -79,8 +79,8 @@ function [critic, actor, cr, rmse, model, episodes] = dyna_mlac_pendulum(varargi
     javaSpec.setSd(1.0);
     javaSpec.setProcessModelSd(1.0);
     
-    javaSpec.setProcessModelMemory(100);
-    javaSpec.setProcessModelNeighbors(9);
+    javaSpec.setProcessModelMemory(args.processMemory);
+    javaSpec.setProcessModelNeighbors(args.processNeighbors);
     javaSpec.setProcessModelValuesToRebuildTree(1);
     javaSpec.setObservationMinValue(spec.observation_min ./ norm_factor);
     javaSpec.setObservationMaxValue(spec.observation_max ./ norm_factor);
