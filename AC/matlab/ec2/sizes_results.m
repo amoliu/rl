@@ -26,6 +26,8 @@ for a=1:memory_size
     actor(a) = m(1,end);
     actorError(a) = er(1, end);
 end
+actor = fliplr(actor);
+actorError = fliplr(actorError);
 
 for c=1:memory_size
     filename = strcat(folder, 'dyna-mlac-critic', num2str(memory(c)), '.mat');
@@ -37,6 +39,8 @@ for c=1:memory_size
     critic(c) = m(1,end);
     criticError(c) = er(1,end);
 end
+critic = fliplr(critic);
+criticError = fliplr(criticError);
 
 for p=1:memory_size
     filename = strcat(folder, 'dyna-mlac-process', num2str(memory(p)), '.mat');
@@ -48,6 +52,8 @@ for p=1:memory_size
     processModel(p) = m(1,end);
     processModelError(p) = er(1,end);
 end
+processModel = fliplr(processModel);
+processModelError = fliplr(processModelError);
 
 hold on;
 ha = errorbaralpha(actor, actorError, 'Color', [1 0 0]);
@@ -56,7 +62,9 @@ hp = errorbaralpha(processModel, processModelError, 'Color', [0 0 1]);
 
 legend([ha, hc, hp], {'Actor', 'Critic', 'Process Model'}, 'Location','east');
 %xlabel(args.xlabel);
-ylabel('Performance');
-title('Log-scale memory sizes in Dyna-mlac using 2^6 updates/control step');
+ylabel('End performance');
+xlabel('Memory size');
+title('Memory sizes in Dyna-mlac using 2^6 updates/control step');
 grid on;
+set(gca, 'XTickLabel', sprintf('%3.0f|', fliplr(memory)));
 hold off;
