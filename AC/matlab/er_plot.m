@@ -36,9 +36,11 @@ plot(dyna,'--bo','LineWidth',2,'MarkerSize',10);
 plot(dynam,'--co','LineWidth',2,'MarkerSize',10);
 plot(dyna_mlac,'--ro','LineWidth',2,'MarkerSize',10);
 plot(dyna_mlacm,'--go','LineWidth',2,'MarkerSize',10);
-xlabel('Alpha fraction');
+xlabel('Exploration rate');
 ylabel('End performance');
-legend('Dyna', 'Dyna Model', 'Dyna-Mlac', 'Dyna-Mlac Model');
+legend('Dyna', 'Dyna Model', 'Dyna-Mlac', 'Dyna-Mlac Model', 'Location','east')
 title('Different exploration rates in Dynas using 2^6 updates/control step');
+set(gca,'XTick',[1 2 3 4])
+set(gca, 'XTickLabel', {'1', '2', '4', '8'});
 grid on;
 hold off;
