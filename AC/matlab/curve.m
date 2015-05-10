@@ -48,6 +48,7 @@ end
 
 %path = make_save_folder('curve');
 h = figure;
+set(h,'units','normalized','outerposition',[0 0 1 1]);
 hAxes = axes('Parent',h,'Layer','top','FontSize',24);
 hold on;
 axis_limits = [0,power_of_two,0,250];
@@ -59,7 +60,7 @@ legend([h_sac, h_mlac, h_dyna, h_dyna_mlac], {'SAC', 'MLAC', 'DYNA', 'DYNA-MLAC'
 xlabel('Updates per control step','FontSize',24);
 ylabel('Rise Time','FontSize',24);
 title(strcat('Performance of Dyna against SAC and MLAC considering performance of ', num2str(desired_performance)));
-set(gca,'XTickLabel',{'2^0', '2^1', '2^2', '2^3', '2^4', '2^5', '2^6', '2^7', '2^8', '2^9', '2^{10}', '2^{11}'});
+set(gca,'XTickLabel',{'', '2^1', '2^2', '2^3', '2^4', '2^5', '2^6', '2^7', '2^8', '2^9', '2^{10}', '2^{11}'});
 
 xlabh = get(gca,'XLabel');
 set(xlabh,'Position',get(xlabh,'Position') - [0 .6 0]);
@@ -67,7 +68,7 @@ set(xlabh,'Position',get(xlabh,'Position') - [0 .6 0]);
 rotateticklabel(gca);
 %filename = strcat('trials-', num2str(trials), '-performance-', num2str(performance), '-times_in_row-', num2str(times_in_row), '-power_of_two-', num2str(power_of_two));
 %saveas(h, strcat(path, filename), 'png');
-saveas( gcf, 'curve_1000', 'epsc' );
+saveas( gcf, 'curve_1000', 'png' );
 hold off;
 
 % h = figure;
