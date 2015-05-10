@@ -51,8 +51,8 @@ b=get(h,'XTick');
 c=get(h,'YTick');
 %make new tick labels
 if rot<180
-    th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','right');
+    th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','right','FontSize',24);
 else
-    th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','left');
+    th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','left','FontSize',24);
 end
 
