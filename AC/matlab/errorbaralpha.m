@@ -111,9 +111,6 @@ else
 end    
 
 % Setup plot
-newplot
-hold on
-
 
 % Deal with logplots
 x = r.x;
