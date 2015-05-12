@@ -87,7 +87,7 @@ public class DynaMLAC extends MLAC
                                                                          specification.getNormalization());
       double reward = specification.getRewardCalculator().calculate(denormalizedObservation, action);
 
-      critic.update(lastModelObservation, action, reward, modelQuery.getResult(),
+      critic.update(lastModelObservation, action, reward, criticResult,
                     specification.getProcessModelCriticAlpha(), specification.getProcessModelGamma());
 
       lastModelObservation = modelQuery.getResult();
