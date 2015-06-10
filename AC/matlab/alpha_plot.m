@@ -21,14 +21,16 @@ for i=1:4
     trial = trial * 2;
 end
 
-figure;
+h = figure;
+axes('Parent',h,'Layer','top','FontSize',24);
 hold on;
 semilogx(x, dyna,'--bo','LineWidth',2,'MarkerSize',10);
 semilogx(x, dyna_mlac,'--ro','LineWidth',2,'MarkerSize',10);
-xlabel('Alpha fraction');
-ylabel('End performance');
-legend('Dyna', 'Dyna-Mlac');
-title('Different alpha values in Dynas using 2^6 updates/control step');
+xlabel('Alpha fraction','FontSize',24);
+ylabel('End performance','FontSize',24);
+legend('Dyna-SAC', 'Dyna-MLAC');
+%title('Different alpha values in Dynas using 2^6 updates/control step');
 grid on;
 set(gca,'xscale','log');
+saveas( gcf, 'dyna_alpha', 'png' ) 
 hold off;

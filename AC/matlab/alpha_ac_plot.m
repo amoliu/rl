@@ -2,7 +2,7 @@ clear all;
 close all;
 clc;
 
-x = logspace(-1,2,5);
+x = logspace(-2,2,5);
 path = '../results/mat/alpha-ac/';
 
 %Dyna plot
@@ -21,16 +21,18 @@ for i=1:5
     alpha = alpha * 2;
 end
 
-figure;
+h = figure;
+axes('Parent',h,'Layer','top','FontSize',24);
 hold on;
 semilogx(x, actor,'--bo','LineWidth',2,'MarkerSize',10);
 semilogx(x, critic,'--ro','LineWidth',2,'MarkerSize',10);
-xlabel('Alpha fraction');
-ylabel('End performance');
+xlabel('Alpha fraction','FontSize',24);
+ylabel('End performance','FontSize',24);
 legend('Actor', 'Critic');
-title('Different alpha values in Dyna using 2^6 updates/control step');
+%title('Different alpha values in Dyna using 2^6 updates/control step');
 set(gca,'xscale','log');
 grid on;
+saveas( gcf, 'dyna_ac', 'png' ) 
 hold off;
 
 %Dyna mlac plot
@@ -49,14 +51,16 @@ for i=1:5
     alpha = alpha * 2;
 end
 
-figure;
+h = figure;
+axes('Parent',h,'Layer','top','FontSize',24);
 hold on;
 semilogx(x, actor,'--bo','LineWidth',2,'MarkerSize',10);
 semilogx(x, critic,'--ro','LineWidth',2,'MarkerSize',10);
-xlabel('Alpha fraction');
-ylabel('End performance');
+xlabel('Alpha fraction','FontSize',24);
+ylabel('End performance','FontSize',24);
 legend('Actor', 'Critic');
-title('Different alpha values in Dyna-Mlac using 2^6 updates/control step');
+%title('Different alpha values in Dyna-Mlac using 2^6 updates/control step');
 set(gca,'xscale','log');
 grid on;
+%saveas( gcf, 'dyna_mlac_ac', 'png' ) 
 hold off;

@@ -65,8 +65,9 @@ hp = errorbaralpha(processModel, processModelError, 'Color', [0 0 1]);
 legend([ha, hc, hp], {'Actor', 'Critic', 'Process Model'}, 'Location','east');
 ylabel('End performance','FontSize',24);
 xlabel('Memory size','FontSize',24);
-title('Memory sizes in Dyna-mlac using 2^6 updates/control step');
+%title('Memory sizes in Dyna-mlac using 2^6 updates/control step');
+title('')
 grid on;
 set(gca, 'XTickLabel', sprintf('%3.0f|', fliplr(memory)));
-saveas( gcf, 'outputfilename', 'png' )  
+saveas( gcf, 'logplot_memory_size', 'png' )  
 hold off;

@@ -30,17 +30,19 @@ for i=1:4
     trial = trial * 2;
 end
 
-figure;
+h = figure;
+axes('Parent',h,'Layer','top','FontSize',24);
 hold on;
 plot(dyna,'--bo','LineWidth',2,'MarkerSize',10);
 plot(dynam,'--co','LineWidth',2,'MarkerSize',10);
 plot(dyna_mlac,'--ro','LineWidth',2,'MarkerSize',10);
 plot(dyna_mlacm,'--go','LineWidth',2,'MarkerSize',10);
-xlabel('Exploration rate');
-ylabel('End performance');
-legend('Dyna', 'Dyna Model', 'Dyna-Mlac', 'Dyna-Mlac Model', 'Location','east')
-title('Different exploration rates in Dynas using 2^6 updates/control step');
+xlabel('Exploration rate','FontSize',24);
+ylabel('End performance','FontSize',24);
+legend('Dyna-SAC', 'Dyna-SAC Model', 'Dyna-MLAC', 'Dyna-MLAC Model', 'Location','east')
+%title('Different exploration rates in Dynas using 2^6 updates/control step');
 set(gca,'XTick',[1 2 3 4])
 set(gca, 'XTickLabel', {'1', '2', '4', '8'});
 grid on;
+saveas( gcf, 'exploration_rate_dynas', 'png' ) 
 hold off;
