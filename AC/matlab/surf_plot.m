@@ -13,7 +13,8 @@ Z=NaN(max_episodes, power_of_two);
 
 for i=1:power_of_two
     load(strcat(folder, 'dyna-mlac', num2str(i), '.mat'));
-    Z(1:size(cr,2),i) = mean(cr);
+    cr = cr;
+    Z(1:size(cr,2),i) = mean(cr( (cr(:,end) > desired_performance), :));
 end
 
 % Prepare axes
