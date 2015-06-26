@@ -7,7 +7,7 @@ folder = '../results/mat/';
 desired_performance = -1000;
 times_in_row = 1;
 max_episodes=300;
-power_of_two=9;
+power_of_two=11;
 
 Z=NaN(max_episodes, power_of_two);
 
