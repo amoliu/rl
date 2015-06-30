@@ -40,3 +40,21 @@ view(-25,30);
 
 saveas( gcf, '3dsurf', 'png' );
 hold off;
+
+h2=figure;
+
+hAxes = axes('Parent',h2,'Layer','top','FontSize',24);
+contour3(X,Y,Z,20);
+view(-90,90);
+
+xlabel('Updates per control step','FontSize',24);
+ylabel('Episodes','FontSize',24);
+zlabel('Rise Time','FontSize',24);
+
+colorbar;
+
+saveas( gcf, 'contour1', 'png' );
+
+view(-25,30);
+saveas( gcf, 'contour2', 'png' );
+hold off;
